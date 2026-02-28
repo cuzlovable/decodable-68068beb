@@ -10,6 +10,9 @@ import Profile from "./pages/Profile";
 import BodygraphPage from "./pages/BodygraphPage";
 import EnvironmentPage from "./pages/EnvironmentPage";
 import CompatibilityPage from "./pages/CompatibilityPage";
+import MatchesPage from "./pages/MatchesPage";
+import ChatPage from "./pages/ChatPage";
+import UnleashCheckPage from "./pages/UnleashCheckPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/bodygraph" element={<BodygraphPage />} />
           <Route path="/environment" element={<EnvironmentPage />} />
           <Route path="/compatibility" element={<CompatibilityPage />} />
+          <Route path="/matches" element={<MatchesPage />} />
+          <Route path="/chat/:matchId" element={<ChatPage />} />
+          <Route path="/unleash/:matchId" element={<UnleashCheckPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
