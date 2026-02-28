@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import BodygraphPage from "./pages/BodygraphPage";
+import EnvironmentPage from "./pages/EnvironmentPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/bodygraph" element={<BodygraphPage />} />
+          <Route path="/environment" element={<EnvironmentPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,1 +1,4 @@
 project_id = "eigfbhrbrcytaalswrhq"
+
+[functions.environment-suggestions]
+verify_jwt = false
