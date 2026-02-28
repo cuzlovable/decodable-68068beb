@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, LogOut } from "lucide-react";
+import { Sparkles, LogOut, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -100,6 +100,28 @@ const Profile = () => {
                 : "Your Human Design chart is being processed. Check back soon for your full energetic profile and compatibility insights."}
             </p>
           </div>
+        </motion.div>
+
+        {/* Bodygraph Link */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mt-6"
+        >
+          <Link to="/bodygraph">
+            <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 hover:shadow-aura transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-aura flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground">My Bodygraph</h3>
+                  <p className="text-xs text-muted-foreground">View chart, open centers & daily deconditioning</p>
+                </div>
+              </div>
+            </div>
+          </Link>
         </motion.div>
 
         {/* Placeholder sections */}
