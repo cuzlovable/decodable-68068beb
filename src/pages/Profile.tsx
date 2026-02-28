@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, LogOut, Activity } from "lucide-react";
+import { Sparkles, LogOut, Activity, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -124,19 +124,30 @@ const Profile = () => {
           </Link>
         </motion.div>
 
-        {/* Placeholder sections */}
+        {/* Environment Link */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-6 p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50"
+          className="mt-6"
         >
-          <h3 className="font-display text-lg font-semibold text-foreground mb-2">Nodal Environments</h3>
-          <p className="text-sm text-muted-foreground">
-            {profile?.south_node_environment
-              ? `South Node: ${profile.south_node_environment} · North Node: ${profile.north_node_environment}`
-              : "Your nodal environments will appear here once your chart is calculated. These reveal the places where your energy thrives."}
-          </p>
+          <Link to="/environment">
+            <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 hover:shadow-aura transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-aura flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-display text-lg font-semibold text-foreground">My Environments</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {profile?.south_node_environment
+                      ? `${profile.south_node_environment} → ${profile.north_node_environment}`
+                      : "Discover where your aura thrives"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Link>
         </motion.div>
 
         <motion.div
