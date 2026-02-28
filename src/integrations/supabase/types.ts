@@ -14,6 +14,71 @@ export type Database = {
   }
   public: {
     Tables: {
+      matches: {
+        Row: {
+          chemistry_score: number | null
+          created_at: string
+          dominant_theme: string | null
+          id: string
+          status: string
+          updated_at: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          chemistry_score?: number | null
+          created_at?: string
+          dominant_theme?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          chemistry_score?: number | null
+          created_at?: string
+          dominant_theme?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           authority: string | null
@@ -82,6 +147,53 @@ export type Database = {
           variables?: Json | null
         }
         Relationships: []
+      }
+      unleash_checks: {
+        Row: {
+          answered_at: string | null
+          authority: string
+          available_at: string
+          created_at: string
+          id: string
+          match_id: string
+          reflection: string | null
+          response: string | null
+          unleashed: boolean | null
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string | null
+          authority: string
+          available_at?: string
+          created_at?: string
+          id?: string
+          match_id: string
+          reflection?: string | null
+          response?: string | null
+          unleashed?: boolean | null
+          user_id: string
+        }
+        Update: {
+          answered_at?: string | null
+          authority?: string
+          available_at?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          reflection?: string | null
+          response?: string | null
+          unleashed?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unleash_checks_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -193,11 +193,11 @@ const CompatibilityPage = () => {
         </div>
 
         {/* Connections List */}
-        <AnimatePresence mode="popLayout">
+        <div>
           {filteredConnections.map((conn, i) => (
             <ConnectionCard key={`${conn.type}-${conn.gate1}-${conn.gate2}`} conn={conn} index={i} />
           ))}
-        </AnimatePresence>
+        </div>
 
         {filteredConnections.length === 0 && (
           <div className="text-center py-12 text-muted-foreground text-sm">
