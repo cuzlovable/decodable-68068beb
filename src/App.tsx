@@ -9,6 +9,7 @@ import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import BodygraphPage from "./pages/BodygraphPage";
 import EnvironmentPage from "./pages/EnvironmentPage";
+import CompatibilityPage from "./pages/CompatibilityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/bodygraph" element={<BodygraphPage />} />
           <Route path="/environment" element={<EnvironmentPage />} />
+          <Route path="/compatibility" element={<CompatibilityPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
