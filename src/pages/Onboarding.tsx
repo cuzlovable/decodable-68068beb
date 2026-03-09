@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ArrowRight, ArrowLeft, MapPin, Clock, CalendarDays } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, MapPin, Clock, CalendarDays, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -18,6 +18,8 @@ const Onboarding = () => {
     birth_date: "",
     birth_time: "",
     birth_location: "",
+    birth_latitude: 0,
+    birth_longitude: 0,
   });
 
   useEffect(() => {
@@ -36,7 +38,7 @@ const Onboarding = () => {
       return;
     }
     if (step === 2 && !form.birth_location) {
-      toast.error("Please enter your birth location");
+      toast.error("Please select your birth location from the dropdown");
       return;
     }
     if (step < STEPS.length - 1) {
@@ -55,19 +57,52 @@ const Onboarding = () => {
         return;
       }
 
+      toast.info("Calculating your Human Design chart...");
+
+      // Call the chart calculation edge function
+      const { data: chart, error: chartError } = await supabase.functions.invoke("calculate-chart", {
+        body: {
+          birth_date: form.birth_date,
+          birth_time: form.birth_time,
+          birth_location: form.birth_location,
+          latitude: form.birth_latitude,
+          longitude: form.birth_longitude,
+        },
+      });
+
+      if (chartError) {
+        console.error("Chart calculation error:", chartError);
+        throw new Error("Failed to calculate your chart. Please try again.");
+      }
+
+      if (chart?.error) {
+        throw new Error(chart.error);
+      }
+
+      // Save birth data + calculated chart to profile
       const { error } = await supabase
         .from("profiles")
         .update({
           birth_date: form.birth_date,
           birth_time: form.birth_time,
           birth_location: form.birth_location,
+          birth_latitude: form.birth_latitude,
+          birth_longitude: form.birth_longitude,
+          energy_type: chart.energy_type,
+          authority: chart.authority,
+          profile: chart.profile,
+          north_node_gate: chart.north_node_gate,
+          south_node_gate: chart.south_node_gate,
+          north_node_environment: chart.north_node_environment,
+          south_node_environment: chart.south_node_environment,
+          variables: chart.variables,
           onboarding_completed: true,
         })
         .eq("user_id", session.user.id);
 
       if (error) throw error;
 
-      toast.success("Your cosmic blueprint is being calculated ✨");
+      toast.success(`Welcome, ${chart.profile} ${chart.authority} ${chart.energy_type}! ✨`);
       navigate("/profile");
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
@@ -108,11 +143,11 @@ const Onboarding = () => {
       title: "Where were you born?",
       subtitle: "Your birth location determines your Nodal Environments.",
       field: (
-        <Input
-          type="text"
-          placeholder="e.g. Los Angeles, CA"
+        <LocationAutocomplete
           value={form.birth_location}
-          onChange={(e) => setForm({ ...form, birth_location: e.target.value })}
+          onChange={(location, lat, lon) =>
+            setForm({ ...form, birth_location: location, birth_latitude: lat, birth_longitude: lon })
+          }
           className="rounded-xl py-6 text-center text-lg bg-background/50"
         />
       ),
@@ -167,6 +202,7 @@ const Onboarding = () => {
                 <Button
                   variant="outline"
                   onClick={() => setStep(step - 1)}
+                  disabled={loading}
                   className="rounded-full px-6 py-5 border-border"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -179,7 +215,14 @@ const Onboarding = () => {
                 className="rounded-full gradient-aura text-primary-foreground px-8 py-5 shadow-aura hover:opacity-90 transition-opacity"
               >
                 {step === STEPS.length - 1 ? (
-                  loading ? "Calculating..." : "Reveal My Design"
+                  loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Calculating Chart...
+                    </>
+                  ) : (
+                    "Reveal My Design"
+                  )
                 ) : (
                   <>
                     Next
