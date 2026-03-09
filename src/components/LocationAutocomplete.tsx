@@ -56,7 +56,7 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
         // Filter out amenities/shops/restaurants - only keep places
         data = data.filter(r => ["city", "town", "village", "state", "country", "county", "municipality"].includes(r.addresstype || ""));
       }
-      const data: LocationResult[] = await res.json();
+      
       setResults(data);
       setIsOpen(data.length > 0);
     } catch {
