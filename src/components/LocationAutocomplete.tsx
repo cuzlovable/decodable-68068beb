@@ -41,9 +41,20 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
     setLoading(true);
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=8&addressdetails=1&featuretype=city`,
         { headers: { "Accept-Language": "en" } }
       );
+      // If city-only search returns nothing, fall back to broader search
+      let data: LocationResult[] = await res.json();
+      if (data.length === 0) {
+        const fallback = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1`,
+          { headers: { "Accept-Language": "en" } }
+        );
+        data = await fallback.json();
+        // Filter out amenities/shops/restaurants - only keep places
+        data = data.filter(r => ["city", "town", "village", "state", "country", "county", "municipality"].includes(r.addresstype || ""));
+      }
       const data: LocationResult[] = await res.json();
       setResults(data);
       setIsOpen(data.length > 0);
