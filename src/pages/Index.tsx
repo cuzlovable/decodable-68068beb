@@ -52,8 +52,7 @@ const Index = () => {
               </div>
 
               <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3 text-foreground">
-                Find love written{" "}
-                <span className="text-gradient-aura">in the stars</span>
+                Synchronicity, decoded.
               </h1>
 
               <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-xs mx-auto">
