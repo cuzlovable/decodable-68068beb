@@ -134,4 +134,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .text-pop {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45), 0 0 30px rgba(0, 0, 0, 0.25);
+  }
 }
