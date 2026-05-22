@@ -85,7 +85,7 @@ const BodygraphPage = () => {
           <Bodygraph definedGates={definedGates} />
 
           {/* Legend */}
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-5 text-[10px] text-muted-foreground">
+          <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm gradient-aura" />
               Defined
@@ -95,16 +95,8 @@ const BodygraphPage = () => {
               Open
             </div>
             <div className="flex items-center gap-1.5">
-              <svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="hsl(260,50%,68%)" strokeWidth="3" strokeDasharray="6 4" strokeLinecap="round" /></svg>
-              Mind line
-            </div>
-            <div className="flex items-center gap-1.5">
-              <svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="hsl(24,90%,62%)" strokeWidth="3" strokeLinecap="round" /></svg>
-              Body line
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[hsl(24,90%,62%)] border border-[hsl(24,90%,50%)]" />
-              Gate
+              <div className="w-3 h-3 rounded-sm bg-aura-lavender/50" />
+              Mind
             </div>
           </div>
         </motion.div>
