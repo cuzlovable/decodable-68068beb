@@ -51,7 +51,7 @@ const Index = () => {
                 Powered by Human Design
               </div>
 
-              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3 text-white text-pop">
+              <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3 text-[hsl(215,18%,38%)] text-pop">
                 Synchronicity, decoded.
               </h1>
 
