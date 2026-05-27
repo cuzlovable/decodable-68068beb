@@ -45,11 +45,6 @@ const Index = () => {
             className="w-full max-w-md"
           >
             <div className="p-8 md:p-10 rounded-3xl bg-card/70 backdrop-blur-xl border border-border/40 shadow-aura text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6 tracking-wide uppercase">
-                <Sparkles className="w-3 h-3" />
-                Powered by Human Design
-              </div>
 
               <h1 className="font-display text-3xl md:text-4xl font-bold leading-tight mb-3 text-gradient-aura">
                 Synchronicity, decoded.
