@@ -9,7 +9,7 @@ import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import BodygraphPage from "./pages/BodygraphPage";
 import EnvironmentPage from "./pages/EnvironmentPage";
-import CompatibilityPage from "./pages/CompatibilityPage";
+import GroupDynamicsPage from "./pages/GroupDynamicsPage";
 import MatchesPage from "./pages/MatchesPage";
 import ChatPage from "./pages/ChatPage";
 import UnleashCheckPage from "./pages/UnleashCheckPage";
@@ -30,7 +30,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/bodygraph" element={<BodygraphPage />} />
           <Route path="/environment" element={<EnvironmentPage />} />
-          <Route path="/compatibility" element={<CompatibilityPage />} />
+          <Route path="/group-dynamics" element={<GroupDynamicsPage />} />
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/chat/:matchId" element={<ChatPage />} />
           <Route path="/unleash/:matchId" element={<UnleashCheckPage />} />
