@@ -1,9 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, UsersRound, Sparkles } from "lucide-react";
+import { ArrowLeft, Users, UsersRound, Sparkles, Plus, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  CENTERS,
+  UNIQUE_CHANNELS,
+  getDefinedCenters,
+  type CenterId,
+} from "@/lib/humandesign";
 
 type GroupGuidance = {
   pentaRole: string;
@@ -23,7 +31,7 @@ const GUIDANCE_BY_TYPE: Record<string, GroupGuidance> = {
     waPresence: "Large groups feel your impact even when you say little. You're not here to manage the Wa — you're here to ignite it and exit.",
     waTip: "Drop the vision, let Generators and Projectors carry it. Lingering in the Wa drains you.",
   },
-  "Generator": {
+  Generator: {
     pentaRole: "Sacral engine of the Penta",
     pentaSkills: "Your sustainable life-force is the Penta's actual fuel. Small groups feel productive because of you.",
     pentaTip: "Only respond to what genuinely lights you up — the Penta will absorb whatever you sacrally commit to.",
@@ -65,6 +73,219 @@ const DEFAULT_GUIDANCE: GroupGuidance = {
   waPresence: "Larger groups will use only the parts of your design that fit the collective field.",
   waTip: "Your Wa role will appear once your chart finishes processing.",
 };
+
+// Demo "your" gates — would come from your calculated chart in production
+const YOUR_DEMO_GATES = [64, 47, 17, 62, 31, 7, 1, 8, 15, 5, 14, 2, 34, 57, 20];
+
+type Member = { id: string; name: string; gates: number[] };
+
+function parseGates(input: string): number[] {
+  return Array.from(
+    new Set(
+      input
+        .split(/[,\s]+/)
+        .map((s) => parseInt(s.trim(), 10))
+        .filter((n) => Number.isFinite(n) && n >= 1 && n <= 64)
+    )
+  );
+}
+
+function GroupSimulator({ kind, accent }: { kind: "penta" | "wa"; accent: "primary" | "sky" }) {
+  const maxMembers = kind === "penta" ? 4 : 30; // Penta = self + 4 others, Wa = larger
+  const minTotal = kind === "penta" ? 3 : 6;
+  const [members, setMembers] = useState<Member[]>([]);
+  const [name, setName] = useState("");
+  const [gateInput, setGateInput] = useState("");
+
+  const addMember = () => {
+    const gates = parseGates(gateInput);
+    if (!name.trim() || gates.length === 0) return;
+    if (members.length >= maxMembers) return;
+    setMembers((m) => [...m, { id: crypto.randomUUID(), name: name.trim(), gates }]);
+    setName("");
+    setGateInput("");
+  };
+
+  const removeMember = (id: string) => setMembers((m) => m.filter((x) => x.id !== id));
+
+  // Composite calculation: you + all members
+  const composite = useMemo(() => {
+    const all = new Set<number>(YOUR_DEMO_GATES);
+    members.forEach((m) => m.gates.forEach((g) => all.add(g)));
+    const allGates = Array.from(all);
+
+    // New channels = active in group but not in your solo chart
+    const yourSet = new Set(YOUR_DEMO_GATES);
+    const allSet = all;
+    const groupChannels = UNIQUE_CHANNELS.filter(
+      (ch) => allSet.has(ch.gates[0]) && allSet.has(ch.gates[1])
+    );
+    const newChannels = groupChannels.filter(
+      (ch) => !(yourSet.has(ch.gates[0]) && yourSet.has(ch.gates[1]))
+    );
+
+    const definedCenters = getDefinedCenters(allGates);
+    const yourDefined = getDefinedCenters(YOUR_DEMO_GATES);
+    const newDefined: CenterId[] = (Object.keys(CENTERS) as CenterId[]).filter(
+      (c) => definedCenters.has(c) && !yourDefined.has(c)
+    );
+
+    return {
+      totalPeople: members.length + 1,
+      totalGates: allGates.length,
+      groupChannels,
+      newChannels,
+      definedCenters: Array.from(definedCenters),
+      newDefined,
+    };
+  }, [members]);
+
+  const valid = composite.totalPeople >= minTotal;
+  const tooSmall = kind === "penta" && composite.totalPeople < 3;
+  const tooLarge = kind === "penta" && composite.totalPeople > 5;
+  const accentClasses =
+    accent === "primary"
+      ? { ring: "border-primary/30", chip: "bg-primary/10 text-primary", btn: "gradient-aura text-primary-foreground" }
+      : { ring: "border-sky-400/30", chip: "bg-sky-500/10 text-sky-500", btn: "bg-gradient-to-br from-sky-400 to-indigo-500 text-primary-foreground" };
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Zap className="w-4 h-4 text-foreground/70" />
+        <h3 className="font-display text-sm font-semibold text-foreground">
+          {kind === "penta" ? "Build your Penta" : "Build your Wa"}
+        </h3>
+      </div>
+      <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+        Add the other members' defined gates to see which new channels form between you and which
+        centers the group lights up together.
+        {kind === "penta" ? " (Penta = 3–5 people total)" : " (Wa = 6+ people)"}
+      </p>
+
+      {/* Add member form */}
+      <div className="space-y-2 mb-4">
+        <Input
+          placeholder="Member name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="rounded-xl"
+        />
+        <Input
+          placeholder="Their defined gates (e.g. 34, 57, 10, 20)"
+          value={gateInput}
+          onChange={(e) => setGateInput(e.target.value)}
+          className="rounded-xl font-mono text-xs"
+        />
+        <Button
+          onClick={addMember}
+          disabled={!name.trim() || parseGates(gateInput).length === 0 || members.length >= maxMembers}
+          className={`w-full rounded-xl ${accentClasses.btn}`}
+          size="sm"
+        >
+          <Plus className="w-4 h-4 mr-1" /> Add to {kind === "penta" ? "Penta" : "Wa"}
+        </Button>
+      </div>
+
+      {/* Members list */}
+      {members.length > 0 && (
+        <div className="space-y-2 mb-4">
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+            Group ({composite.totalPeople} including you)
+          </p>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
+            <span className="text-xs font-semibold text-foreground flex-1">You</span>
+            <span className="text-[10px] text-muted-foreground font-mono">
+              {YOUR_DEMO_GATES.length} gates
+            </span>
+          </div>
+          {members.map((m) => (
+            <div key={m.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
+              <span className="text-xs font-semibold text-foreground flex-1 truncate">{m.name}</span>
+              <span className="text-[10px] text-muted-foreground font-mono">{m.gates.length} gates</span>
+              <button
+                onClick={() => removeMember(m.id)}
+                className="text-muted-foreground hover:text-destructive"
+                aria-label={`Remove ${m.name}`}
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Composite results */}
+      {members.length > 0 && (
+        <div className={`p-4 rounded-2xl border ${accentClasses.ring} bg-background/40 space-y-4`}>
+          {tooSmall && (
+            <p className="text-xs text-amber-600">
+              A Penta needs at least 3 people. Add {3 - composite.totalPeople} more.
+            </p>
+          )}
+          {tooLarge && (
+            <p className="text-xs text-amber-600">
+              That's larger than a Penta (max 5). Consider switching to the Wa tab.
+            </p>
+          )}
+
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+              Channels formed in the group
+            </p>
+            {composite.groupChannels.length === 0 ? (
+              <p className="text-xs text-foreground/60">No channels form yet.</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {composite.groupChannels.map((ch) => {
+                  const isNew = composite.newChannels.some((n) => n.id === ch.id);
+                  return (
+                    <span
+                      key={ch.id}
+                      className={`px-2 py-1 rounded-full text-[10px] font-medium ${
+                        isNew ? accentClasses.chip : "bg-muted/40 text-foreground/70"
+                      }`}
+                      title={ch.theme}
+                    >
+                      {ch.gates[0]}–{ch.gates[1]} {ch.name}
+                      {isNew && " ✦"}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+              Centers defined together ({composite.definedCenters.length}/9)
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {composite.definedCenters.map((c) => {
+                const isNew = composite.newDefined.includes(c);
+                return (
+                  <span
+                    key={c}
+                    className={`px-2 py-1 rounded-full text-[10px] font-medium ${
+                      isNew ? accentClasses.chip : "bg-muted/40 text-foreground/70"
+                    }`}
+                  >
+                    {CENTERS[c].label}
+                    {isNew && " ✦"}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+
+          <p className="text-[10px] text-muted-foreground leading-relaxed">
+            ✦ = newly formed by the group. The {kind === "penta" ? "Penta" : "Wa"} uses these to
+            shape its collective skill set — even gates you don't carry can light up through others.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const GroupDynamicsPage = () => {
   const navigate = useNavigate();
@@ -129,8 +350,7 @@ const GroupDynamicsPage = () => {
           <p className="text-sm text-foreground/80 leading-relaxed">
             In your own chart you have <span className="font-semibold">traits</span>. In a Penta (3–5 people)
             those become <span className="font-semibold">skills</span>. In a Wa (a larger group) they
-            become <span className="font-semibold">roles</span>. Your energy is leveraged differently at
-            each scale — and the group only uses what it needs.
+            become <span className="font-semibold">roles</span>.
           </p>
           {type && (
             <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
@@ -139,71 +359,80 @@ const GroupDynamicsPage = () => {
           )}
         </motion.div>
 
-        {/* Penta Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-4"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-2xl gradient-aura flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="font-display text-lg font-semibold text-foreground">Penta</h2>
-              <p className="text-xs text-muted-foreground">Small group · 3–5 people</p>
-            </div>
-          </div>
+        <Tabs defaultValue="penta" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4 rounded-2xl">
+            <TabsTrigger value="penta" className="rounded-xl">
+              <Users className="w-4 h-4 mr-1.5" /> Penta
+            </TabsTrigger>
+            <TabsTrigger value="wa" className="rounded-xl">
+              <UsersRound className="w-4 h-4 mr-1.5" /> Wa
+            </TabsTrigger>
+          </TabsList>
 
-          <Field label="Your skill in a Penta" value={guidance.pentaRole} />
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {guidance.pentaSkills}
-          </p>
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
-            <p className="text-[11px] uppercase tracking-wider text-primary font-medium mb-1">Tip</p>
-            <p className="text-xs text-foreground/80 leading-relaxed">{guidance.pentaTip}</p>
-          </div>
-        </motion.div>
+          <TabsContent value="penta">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-2xl gradient-aura flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-foreground">Penta</h2>
+                  <p className="text-xs text-muted-foreground">Small group · 3–5 people</p>
+                </div>
+              </div>
 
-        {/* Wa Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center">
-              <UsersRound className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h2 className="font-display text-lg font-semibold text-foreground">Wa</h2>
-              <p className="text-xs text-muted-foreground">Large group · teams, rooms, communities</p>
-            </div>
-          </div>
+              <Field label="Your skill in a Penta" value={guidance.pentaRole} />
+              <p className="text-sm text-foreground/80 leading-relaxed mb-4">{guidance.pentaSkills}</p>
+              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+                <p className="text-[11px] uppercase tracking-wider text-primary font-medium mb-1">Tip</p>
+                <p className="text-xs text-foreground/80 leading-relaxed">{guidance.pentaTip}</p>
+              </div>
 
-          <Field label="Your role in a Wa" value={guidance.waRole} />
-          <p className="text-sm text-foreground/80 leading-relaxed mb-4">
-            {guidance.waPresence}
-          </p>
-          <div className="p-3 rounded-xl bg-sky-500/5 border border-sky-400/20">
-            <p className="text-[11px] uppercase tracking-wider text-sky-500 font-medium mb-1">Tip</p>
-            <p className="text-xs text-foreground/80 leading-relaxed">{guidance.waTip}</p>
-          </div>
-        </motion.div>
+              <GroupSimulator kind="penta" accent="primary" />
+            </motion.div>
+          </TabsContent>
 
-        {/* Footer note */}
+          <TabsContent value="wa">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center">
+                  <UsersRound className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-semibold text-foreground">Wa</h2>
+                  <p className="text-xs text-muted-foreground">Large group · teams, rooms, communities</p>
+                </div>
+              </div>
+
+              <Field label="Your role in a Wa" value={guidance.waRole} />
+              <p className="text-sm text-foreground/80 leading-relaxed mb-4">{guidance.waPresence}</p>
+              <div className="p-3 rounded-xl bg-sky-500/5 border border-sky-400/20">
+                <p className="text-[11px] uppercase tracking-wider text-sky-500 font-medium mb-1">Tip</p>
+                <p className="text-xs text-foreground/80 leading-relaxed">{guidance.waTip}</p>
+              </div>
+
+              <GroupSimulator kind="wa" accent="sky" />
+            </motion.div>
+          </TabsContent>
+        </Tabs>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
+          className="mt-6 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">Penta & Wa</span> come from the BG5 / business
-            application of Human Design. The Penta takes only what it needs — channels outside your
-            assigned skill set aren't used while you're in the group.
+            The group takes only what it needs — channels outside your assigned skill set aren't
+            used while you're inside the {`Penta or Wa`}.
           </p>
         </motion.div>
       </div>
