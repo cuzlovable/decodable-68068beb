@@ -172,22 +172,22 @@ const Profile = () => {
           </Link>
         </motion.div>
 
-        {/* Compatibility Link */}
+        {/* Group Dynamics Link */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="mt-6"
         >
-          <Link to="/compatibility">
+          <Link to="/group-dynamics">
             <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 hover:shadow-aura transition-shadow cursor-pointer">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl gradient-aura flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-primary-foreground" />
+                  <Users className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-semibold text-foreground">Compatibility</h3>
-                  <p className="text-xs text-muted-foreground">Gate-to-gate synastry & chemistry analysis</p>
+                  <h3 className="font-display text-lg font-semibold text-foreground">Penta & Wa Dynamics</h3>
+                  <p className="text-xs text-muted-foreground">How your energy lands in small & large groups</p>
                 </div>
               </div>
             </div>
