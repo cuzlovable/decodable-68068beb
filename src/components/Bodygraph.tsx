@@ -422,7 +422,6 @@ const Bodygraph = ({
             key={centerId}
             center={centerId}
             isDefined={definedCenters.has(centerId)}
-            isMind={centerId === "head" || centerId === "ajna"}
           />
         ))}
 
