@@ -287,3 +287,18 @@ export function getDeconditioningItems(openCenters: CenterId[]): DeconditioningI
 
   return items;
 }
+
+// ─── Mind Gate Rinse Tips (Head + Ajna gates) ──────────────
+export const MIND_GATE_TIPS: Record<number, { name: string; tip: string }> = {
+  64: { name: "Confusion", tip: "Let mental images swirl without forcing clarity — answers arrive when the noise settles." },
+  61: { name: "Mystery", tip: "Sit with the unknown. Not every 'why' is yours to solve today." },
+  63: { name: "Doubt", tip: "Question the doubt before acting on it — most of it isn't real." },
+  47: { name: "Realization", tip: "Insights surface on their own schedule. Stop chasing the aha." },
+  24: { name: "Rationalization", tip: "Stop replaying the loop. Insight returns when you stop gripping it." },
+  4:  { name: "Formulization", tip: "'I don't know yet' is a complete answer. Don't fabricate certainty." },
+  17: { name: "Opinion", tip: "Don't share opinions that weren't invited — they bounce back as pressure." },
+  43: { name: "Insight", tip: "Wait for the correct audience. The right ear unlocks the right words." },
+  11: { name: "Ideas", tip: "Ideas are entertainment, not instructions. Enjoy them, don't act on them." },
+};
+
+export const MIND_GATES = [64, 61, 63, 47, 24, 4, 17, 43, 11];

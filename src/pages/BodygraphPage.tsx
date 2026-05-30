@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
 import OpenCenterAlerts from "@/components/OpenCenterAlerts";
 import DeconditioningChecklist from "@/components/DeconditioningChecklist";
+import MindGateRinse from "@/components/MindGateRinse";
 import { getOpenCenters } from "@/lib/humandesign";
 
 // Demo defined gates (would come from chart calculation in production)
@@ -52,7 +53,7 @@ const BodygraphPage = () => {
 
   return (
     <div className="min-h-screen gradient-celestial px-4 py-6 pb-20">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="text-muted-foreground">
@@ -85,20 +86,30 @@ const BodygraphPage = () => {
           <Bodygraph definedGates={definedGates} />
 
           {/* Legend */}
-          <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-muted-foreground">
+          <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm gradient-aura" />
-              Defined
+              <div className="w-3 h-3 rounded-sm bg-[hsl(0,0%,15%)]" />
+              Design · Body
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm border border-aura-sky border-dashed" />
+              <div className="w-3 h-3 rounded-sm bg-[hsl(0,70%,50%)]" />
+              Personality · Mind
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-sm border border-muted-foreground border-dashed" />
               Open
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-aura-lavender/50" />
-              Mind
-            </div>
           </div>
+        </motion.div>
+
+        {/* Mind Gate Rinse */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6"
+        >
+          <MindGateRinse definedGates={definedGates} />
         </motion.div>
 
         {/* Open Center Alerts */}
