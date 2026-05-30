@@ -59,42 +59,69 @@ const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] 
   },
 };
 
-// All positions stored using s() so they sit inside the shifted shapes.
+// Canonical Jovian gate positions. Ordering chosen so Head↔Ajna and
+// Ajna↔Throat channels run parallel (no crossings) and Throat↔G channels
+// align vertically. All positions sit comfortably inside their center shapes.
 const GATE_POS: Record<number, [number, number]> = {
-  64: [s(235), 75], 61: [s(300), 65], 63: [s(365), 75],
+  // HEAD — gates along the top edge of the down-triangle
+  64: [s(245), 85], 61: [s(300), 75], 63: [s(355), 85],
 
-  4:  [s(260), 250], 24: [s(240), 285], 47: [s(220), 315],
-  11: [s(340), 250], 43: [s(360), 285], 17: [s(380), 315],
+  // AJNA — top row (near Head) connects 64-47, 61-24, 63-4
+  //         bottom row (near Throat) connects 17-62, 43-23, 11-56
+  47: [s(245), 225], 24: [s(300), 225], 4:  [s(355), 225],
+  17: [s(245), 305], 43: [s(300), 305], 11: [s(355), 305],
 
-  62: [s(240), 380], 23: [s(300), 380], 56: [s(360), 380],
-  35: [s(225), 410], 12: [s(225), 445],
-  45: [s(300), 415],
-  16: [s(375), 410], 20: [s(375), 445],
-  33: [s(245), 460], 8:  [s(300), 460], 31: [s(355), 460],
+  // THROAT — top row aligns with Ajna bottom (62/23/56)
+  62: [s(245), 380], 23: [s(300), 380], 56: [s(355), 380],
+  35: [s(225), 415], 12: [s(225), 445],
+  45: [s(335), 415],
+  16: [s(375), 415], 20: [s(375), 445],
+  // Bottom row aligns with G top (33-13, 8-1, 31-7)
+  33: [s(255), 455], 8:  [s(300), 455], 31: [s(345), 455],
 
-  13: [s(285), 480], 25: [s(315), 480],
-  2:  [s(250), 515], 46: [s(350), 515],
-  15: [s(250), 575], 10: [s(350), 575],
-  7:  [s(285), 610], 1:  [s(315), 610],
+  // G / SELF — diamond. Top three align with Throat bottom; 25 at apex.
+  13: [s(255), 495], 1:  [s(300), 480], 7:  [s(345), 495],
+  2:  [s(245), 530], 46: [s(355), 530],
+  15: [s(245), 565], 10: [s(355), 565],
+  25: [s(300), 605],
 
-  40: [s(395), 538], 21: [s(425), 515], 26: [s(425), 560], 51: [s(445), 538],
+  // HEART — tiny right-triangle on the right of G
+  40: [s(400), 525], 26: [s(425), 545], 21: [s(425), 510], 51: [s(445), 530],
 
-  48: [s(65), 655], 44: [s(65), 700], 32: [s(65), 745],
-  28: [s(105), 675], 50: [s(105), 725],
-  18: [s(140), 700], 57: [s(180), 700],
+  // SPLEEN — left triangle (base at left, apex pointing right toward Sacral)
+  48: [s(70), 660], 44: [s(70), 700], 32: [s(70), 740],
+  28: [s(110), 680], 50: [s(110), 720],
+  18: [s(150), 700], 57: [s(190), 700],
 
+  // SACRAL — 3×3 grid inside rectangle (220..380 × 655..780)
   5:  [s(255), 680], 14: [s(300), 680], 29: [s(345), 680],
   59: [s(255), 720], 9:  [s(300), 720], 3:  [s(345), 720],
   42: [s(255), 760], 27: [s(300), 760], 34: [s(345), 760],
 
-  36: [s(535), 655], 22: [s(535), 700], 49: [s(535), 745],
-  6:  [s(495), 675], 30: [s(495), 725],
-  37: [s(460), 700], 55: [s(420), 700],
+  // SOLAR PLEXUS — right triangle (mirror of Spleen)
+  36: [s(530), 660], 22: [s(530), 700], 49: [s(530), 740],
+  6:  [s(490), 680], 30: [s(490), 720],
+  37: [s(450), 700], 55: [s(410), 700],
 
+  // ROOT — 3×3 grid inside rectangle (220..380 × 810..920)
   53: [s(255), 835], 60: [s(300), 835], 52: [s(345), 835],
   19: [s(255), 870], 39: [s(300), 870], 41: [s(345), 870],
   58: [s(255), 905], 38: [s(300), 905], 54: [s(345), 905],
 };
+
+// Canonical HD center colors when defined (matches printed Jovian charts)
+const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string; text: string }> = {
+  head:    { fill: "#FFEC85", stroke: "#C9B340", text: "#5A4A00" },  // yellow
+  ajna:    { fill: "#3AA848", stroke: "#1F6E2A", text: "#FFFFFF" },  // green
+  throat:  { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
+  g:       { fill: "#FFEC85", stroke: "#C9B340", text: "#5A4A00" },  // yellow
+  heart:   { fill: "#EC1E31", stroke: "#A0101F", text: "#FFFFFF" },  // red
+  splenic: { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
+  sacral:  { fill: "#EC1E31", stroke: "#A0101F", text: "#FFFFFF" },  // red
+  solar:   { fill: "#D68900", stroke: "#8F5C00", text: "#FFFFFF" },  // mustard
+  root:    { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
+};
+
 
 const GATE_R = 10;
 
