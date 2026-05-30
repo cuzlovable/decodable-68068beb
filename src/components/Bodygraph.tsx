@@ -145,21 +145,16 @@ const PLANETS = [
 function CenterEl({
   center,
   isDefined,
-  isMind,
 }: {
   center: CenterId;
   isDefined: boolean;
-  isMind: boolean;
 }) {
   const { shape, labelAt } = CENTER_SHAPES[center];
   const label = CENTERS[center].label;
+  const palette = CENTER_COLORS[center];
 
-  const fillColor = isDefined
-    ? isMind ? "url(#mindGradient)" : "url(#bodyGradient)"
-    : "transparent";
-  const strokeColor = isDefined
-    ? isMind ? "hsl(0, 70%, 50%)" : "hsl(0, 0%, 18%)"
-    : "hsl(215, 25%, 70%)";
+  const fillColor = isDefined ? palette.fill : "transparent";
+  const strokeColor = isDefined ? palette.stroke : "hsl(215, 25%, 70%)";
   const strokeWidth = isDefined ? 2.5 : 1.4;
   const strokeDash = isDefined ? undefined : "4 3";
 
@@ -216,7 +211,7 @@ function CenterEl({
         x={labelAt[0]}
         y={labelAt[1]}
         textAnchor="middle"
-        fill={isDefined ? (isMind ? "hsl(0, 70%, 45%)" : "hsl(0, 0%, 20%)") : "hsl(215, 20%, 55%)"}
+        fill={isDefined ? "hsl(0, 0%, 25%)" : "hsl(215, 20%, 55%)"}
         fontSize="11"
         fontFamily="DM Sans, sans-serif"
         fontWeight={isDefined ? 700 : 400}
