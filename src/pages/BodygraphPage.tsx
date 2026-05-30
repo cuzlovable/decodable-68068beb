@@ -53,7 +53,7 @@ const BodygraphPage = () => {
 
   return (
     <div className="min-h-screen gradient-celestial px-4 py-6 pb-20">
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="sm" onClick={() => navigate("/profile")} className="text-muted-foreground">
