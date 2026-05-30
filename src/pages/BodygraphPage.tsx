@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
 import OpenCenterAlerts from "@/components/OpenCenterAlerts";
 import DeconditioningChecklist from "@/components/DeconditioningChecklist";
+import MindGateRinse from "@/components/MindGateRinse";
 import { getOpenCenters } from "@/lib/humandesign";
 
 // Demo defined gates (would come from chart calculation in production)
