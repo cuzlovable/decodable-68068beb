@@ -45,20 +45,30 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 async function hdhub<T>(path: string, init: RequestInit, apiKey: string): Promise<T> {
-  const res = await fetch(`${HDHUB_BASE}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-KEY": apiKey,
-      ...(init.headers ?? {}),
-    },
-  });
-  if (!res.ok) {
+  // HDHub free tier limits to 5 req/min. Retry on 429 with backoff.
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await fetch(`${HDHUB_BASE}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+        ...(init.headers ?? {}),
+      },
+    });
+    if (res.ok) return res.json() as Promise<T>;
     const body = await res.text();
+    const isRateLimit = res.status === 429 || /rate limit/i.test(body);
+    if (isRateLimit && attempt < 3) {
+      const waitMs = 13000 * (attempt + 1); // 13s, 26s, 39s
+      console.log(`[hdhub] 429 on ${path}, waiting ${waitMs}ms (attempt ${attempt + 1})`);
+      await new Promise((r) => setTimeout(r, waitMs));
+      continue;
+    }
     throw new Error(`HDHub ${path} ${res.status}: ${body}`);
   }
-  return res.json() as Promise<T>;
+  throw new Error(`HDHub ${path}: exhausted retries`);
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
