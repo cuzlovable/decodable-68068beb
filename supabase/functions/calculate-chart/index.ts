@@ -71,18 +71,29 @@ serve(async (req) => {
       throw new Error("birth_date, birth_time, and birth_location are required");
     }
 
-    // 1) Resolve IANA timezone for the birth city. Pick the result closest to
-    //    the lat/lon the user already chose, falling back to the top hit.
-    const search = await hdhub<{ results: Array<{ latitude: number; longitude: number; timezone: string; label: string }> }>(
-      `/locations/search?query=${encodeURIComponent(birth_location)}`,
-      { method: "GET" },
-      apiKey,
-    );
-    if (!search.results?.length) throw new Error(`Location not found: ${birth_location}`);
+    // 1) Resolve IANA timezone. Try the full location, then progressively
+    //    simpler queries (drop trailing comma segments, then just the city).
+    const queryVariants = Array.from(new Set([
+      birth_location,
+      birth_location.split(",").slice(0, 2).join(",").trim(),
+      birth_location.split(",")[0].trim(),
+    ].filter(Boolean)));
 
-    let best = search.results[0];
+    type LocResult = { latitude: number; longitude: number; timezone: string; label: string };
+    let results: LocResult[] = [];
+    for (const q of queryVariants) {
+      const search = await hdhub<{ results: LocResult[] }>(
+        `/locations/search?query=${encodeURIComponent(q)}`,
+        { method: "GET" },
+        apiKey,
+      );
+      if (search.results?.length) { results = search.results; break; }
+    }
+    if (!results.length) throw new Error(`Location not found: ${birth_location}`);
+
+    let best = results[0];
     if (typeof latitude === "number" && typeof longitude === "number" && latitude !== 0) {
-      best = search.results.reduce((acc, r) =>
+      best = results.reduce((acc, r) =>
         haversine(latitude, longitude, r.latitude, r.longitude) <
         haversine(latitude, longitude, acc.latitude, acc.longitude)
           ? r
