@@ -10,7 +10,7 @@ import DeconditioningChecklist from "@/components/DeconditioningChecklist";
 import MindGateRinse from "@/components/MindGateRinse";
 import { getOpenCenters } from "@/lib/humandesign";
 
-// Demo defined gates (would come from chart calculation in production)
+// Fallback used only if the profile somehow has no calculated chart yet.
 const DEMO_DEFINED_GATES = [64, 47, 17, 62, 31, 7, 1, 8, 15, 5, 14, 2, 34, 57, 20];
 
 const BodygraphPage = () => {
@@ -39,8 +39,25 @@ const BodygraphPage = () => {
     load();
   }, [navigate]);
 
-  // In production, defined gates would be calculated from birth data
-  const definedGates = DEMO_DEFINED_GATES;
+  // Use the real chart from the profile; only fall back to demo if missing.
+  const definedGates: number[] =
+    (profile?.defined_gates && profile.defined_gates.length > 0)
+      ? profile.defined_gates
+      : DEMO_DEFINED_GATES;
+  const raw = profile?.chart_raw as any | undefined;
+  const personalityGates: number[] | undefined = raw?.gate_and_line?.personality
+    ? Object.values(raw.gate_and_line.personality).map((v: any) => v?.[0]).filter((g: any) => typeof g === "number")
+    : undefined;
+  const designGates: number[] | undefined = raw?.gate_and_line?.design
+    ? Object.values(raw.gate_and_line.design).map((v: any) => v?.[0]).filter((g: any) => typeof g === "number")
+    : undefined;
+  const designPlanets = raw?.gate_and_line?.design
+    ? Object.entries(raw.gate_and_line.design).map(([planet, gl]: [string, any]) => ({ planet, gate: gl[0], line: gl[1] }))
+    : undefined;
+  const personalityPlanets = raw?.gate_and_line?.personality
+    ? Object.entries(raw.gate_and_line.personality).map(([planet, gl]: [string, any]) => ({ planet, gate: gl[0], line: gl[1] }))
+    : undefined;
+  const variables = (profile?.variables as any) || undefined;
   const openCenters = getOpenCenters(definedGates);
 
   if (loading) {
