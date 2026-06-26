@@ -100,7 +100,14 @@ const BodygraphPage = () => {
             </p>
           </div>
 
-          <Bodygraph definedGates={definedGates} />
+          <Bodygraph
+            definedGates={definedGates}
+            designGates={designGates}
+            personalityGates={personalityGates}
+            designPlanets={designPlanets as any}
+            personalityPlanets={personalityPlanets as any}
+            variables={variables}
+          />
 
           {/* Legend */}
           <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-muted-foreground flex-wrap">
