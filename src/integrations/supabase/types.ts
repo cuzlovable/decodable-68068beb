@@ -88,16 +88,24 @@ export type Database = {
           birth_location: string | null
           birth_longitude: number | null
           birth_time: string | null
+          chart_raw: Json | null
           created_at: string
+          defined_centers: string[] | null
+          defined_gates: number[] | null
+          definition: string | null
           display_name: string | null
           energy_type: string | null
           id: string
+          incarnation_cross: string | null
           north_node_environment: string | null
           north_node_gate: number | null
+          not_self_theme: string | null
           onboarding_completed: boolean
           profile: string | null
+          signature: string | null
           south_node_environment: string | null
           south_node_gate: number | null
+          strategy: string | null
           updated_at: string
           user_id: string
           variables: Json | null
@@ -110,16 +118,24 @@ export type Database = {
           birth_location?: string | null
           birth_longitude?: number | null
           birth_time?: string | null
+          chart_raw?: Json | null
           created_at?: string
+          defined_centers?: string[] | null
+          defined_gates?: number[] | null
+          definition?: string | null
           display_name?: string | null
           energy_type?: string | null
           id?: string
+          incarnation_cross?: string | null
           north_node_environment?: string | null
           north_node_gate?: number | null
+          not_self_theme?: string | null
           onboarding_completed?: boolean
           profile?: string | null
+          signature?: string | null
           south_node_environment?: string | null
           south_node_gate?: number | null
+          strategy?: string | null
           updated_at?: string
           user_id: string
           variables?: Json | null
@@ -132,16 +148,24 @@ export type Database = {
           birth_location?: string | null
           birth_longitude?: number | null
           birth_time?: string | null
+          chart_raw?: Json | null
           created_at?: string
+          defined_centers?: string[] | null
+          defined_gates?: number[] | null
+          definition?: string | null
           display_name?: string | null
           energy_type?: string | null
           id?: string
+          incarnation_cross?: string | null
           north_node_environment?: string | null
           north_node_gate?: number | null
+          not_self_theme?: string | null
           onboarding_completed?: boolean
           profile?: string | null
+          signature?: string | null
           south_node_environment?: string | null
           south_node_gate?: number | null
+          strategy?: string | null
           updated_at?: string
           user_id?: string
           variables?: Json | null
