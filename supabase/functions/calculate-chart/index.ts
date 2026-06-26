@@ -81,12 +81,14 @@ serve(async (req) => {
 
     type LocResult = { latitude: number; longitude: number; timezone: string; label: string };
     let results: LocResult[] = [];
+    console.log("[calculate-chart v2] variants:", queryVariants);
     for (const q of queryVariants) {
       const search = await hdhub<{ results: LocResult[] }>(
         `/locations/search?query=${encodeURIComponent(q)}`,
         { method: "GET" },
         apiKey,
       );
+      console.log("[calculate-chart v2]", q, "->", search.results?.length ?? 0);
       if (search.results?.length) { results = search.results; break; }
     }
     if (!results.length) throw new Error(`Location not found: ${birth_location}`);
