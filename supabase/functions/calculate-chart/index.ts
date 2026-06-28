@@ -145,28 +145,39 @@ serve(async (req) => {
     }
 
     // 4) Normalize for our UI.
+    // IMPORTANT: defined_gates must come ONLY from gate_and_line. HDHub's
+    // `raw.gates` can include "gate.line" strings (e.g. "13.4"), which when
+    // coerced via Number() produce floats like 13.4 — never matching any real
+    // gate number and inflating the set with garbage. Trust the planet activations.
     const personality = raw.gate_and_line?.personality ?? {};
     const design = raw.gate_and_line?.design ?? {};
-    const personalityGates = Object.values(personality)
-      .map((v: any) => (Array.isArray(v) ? v[0] : null))
-      .filter((g: any): g is number => typeof g === "number");
-    const designGates = Object.values(design)
-      .map((v: any) => (Array.isArray(v) ? v[0] : null))
-      .filter((g: any): g is number => typeof g === "number");
-    const definedGates = Array.from(new Set([...(raw.gates?.map((g: string) => Number(g)) ?? []), ...personalityGates, ...designGates]))
-      .filter((g) => Number.isFinite(g));
+    const toGate = (v: any) => {
+      const raw0 = Array.isArray(v) ? v[0] : v;
+      const n = typeof raw0 === "string" ? parseInt(raw0, 10) : Number(raw0);
+      return Number.isInteger(n) && n >= 1 && n <= 64 ? n : null;
+    };
+    const personalityGates = Object.values(personality).map(toGate).filter((g): g is number => g !== null);
+    const designGates = Object.values(design).map(toGate).filter((g): g is number => g !== null);
+    const definedGates = Array.from(new Set<number>([...personalityGates, ...designGates]));
 
     const definedCenters = normalizeCenters(raw.centers ?? []);
 
     // Variables → flatten into the simple gate.line numbers our Bodygraph component expects.
+    // PHS arrow mapping (Design = top, Personality = bottom):
+    //   digestion   = Design Sun/Earth color   (top-left  arrow)
+    //   environment = Design Node color        (top-right arrow)
+    //   motivation  = Personality Sun/Earth    (bottom-left arrow)
+    //   perspective = Personality Node color   (bottom-right arrow)
     const v = raw.variables ?? {};
     const flat = (entry: any) =>
       entry && typeof entry.color === "number" ? entry.color + (entry.tone ?? 0) / 10 : undefined;
     const variables = {
       digestion: flat(v?.design?.["sun/earth"]),
       environment: flat(v?.design?.node),
-      awareness: flat(v?.personal?.["sun/earth"]),
+      motivation: flat(v?.personal?.["sun/earth"]),
       perspective: flat(v?.personal?.node),
+      // Back-compat alias for older UI fields.
+      awareness: flat(v?.personal?.["sun/earth"]),
     };
 
     const chart = {
