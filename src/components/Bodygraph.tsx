@@ -2,136 +2,128 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/lib/humandesign";
 
-// ─── Canonical Jovian-style Bodygraph ──────────────────────────────
-// Layout: 920w x 980h
-//   - Centered chart: 220..700 (480 wide)
-//   - Left column (Design / Body): ~10..210   (BLACK)
-//   - Right column (Personality / Mind): 710..910  (RED)
-//   - Variable arrows in four corners
-//   - Mind centers (Head + Ajna) tinted differently to call out mental vs body
+// ─── Premium Bodygraph ────────────────────────────────────────────
+// Brand-aligned, professional Human Design chart.
+// Canvas 900 x 1080. Centered chart, planet columns flanking it,
+// 4 Variable arrows hugging the Head/Ajna corners.
+//
+// Color tokens (all from index.css HSL vars):
+//   Design / Body         → hsl(var(--foreground))      dark neutral
+//   Personality / Mind    → hsl(14 75% 58%)             muted coral (brand-aligned)
+//   Undefined center      → transparent w/ soft border
+//   Defined centers       → soft, brand-tinted fills
+
+const DESIGN_C = "hsl(230 25% 18%)";       // body / unconscious
+const PERSON_C = "hsl(14 78% 56%)";        // mind / conscious — muted coral
+const NEUTRAL  = "hsl(30 20% 88%)";        // border / inactive
+const SOFT_BG  = "hsl(30 40% 97%)";        // card-like surface
 
 type Shape =
   | { kind: "triangle"; points: [number, number][] }
   | { kind: "rect"; x: number; y: number; w: number; h: number }
   | { kind: "diamond"; cx: number; cy: number; r: number };
 
-// Shift the chart right by +160 from a 0-based layout so we have room for the
-// Design (left) planet column. Original chart canvas was 600 wide.
 const SHIFT_X = 160;
 const s = (x: number) => x + SHIFT_X;
 
 const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
   head: {
-    shape: { kind: "triangle", points: [[s(200), 50], [s(400), 50], [s(300), 175]] },
-    labelAt: [s(300), 35],
+    shape: { kind: "triangle", points: [[s(200), 60], [s(400), 60], [s(300), 195]] },
+    labelAt: [s(300), 46],
   },
   ajna: {
-    shape: { kind: "triangle", points: [[s(300), 195], [s(200), 320], [s(400), 320]] },
-    labelAt: [s(300), 345],
+    shape: { kind: "triangle", points: [[s(200), 215], [s(400), 215], [s(300), 350]] },
+    labelAt: [s(300), 370],
   },
   throat: {
-    shape: { kind: "rect", x: s(210), y: 360, w: 180, h: 110 },
-    labelAt: [s(300), 485],
+    shape: { kind: "rect", x: s(210), y: 375, w: 180, h: 110 },
+    labelAt: [s(300), 503],
   },
   g: {
-    shape: { kind: "diamond", cx: s(300), cy: 545, r: 75 },
-    labelAt: [s(300), 635],
+    shape: { kind: "diamond", cx: s(300), cy: 560, r: 78 },
+    labelAt: [s(300), 657],
   },
   heart: {
-    shape: { kind: "triangle", points: [[s(445), 500], [s(445), 575], [s(385), 538]] },
-    labelAt: [s(470), 590],
+    shape: { kind: "triangle", points: [[s(445), 510], [s(445), 590], [s(380), 550]] },
+    labelAt: [s(478), 605],
   },
   splenic: {
-    shape: { kind: "triangle", points: [[s(50), 635], [s(50), 765], [s(215), 700]] },
-    labelAt: [s(50), 790],
+    shape: { kind: "triangle", points: [[s(45), 645], [s(45), 775], [s(218), 710]] },
+    labelAt: [s(45), 800],
   },
   sacral: {
-    shape: { kind: "rect", x: s(220), y: 655, w: 160, h: 125 },
-    labelAt: [s(300), 800],
+    shape: { kind: "rect", x: s(220), y: 665, w: 160, h: 125 },
+    labelAt: [s(300), 808],
   },
   solar: {
-    shape: { kind: "triangle", points: [[s(550), 635], [s(550), 765], [s(385), 700]] },
-    labelAt: [s(550), 790],
+    shape: { kind: "triangle", points: [[s(555), 645], [s(555), 775], [s(382), 710]] },
+    labelAt: [s(555), 800],
   },
   root: {
-    shape: { kind: "rect", x: s(220), y: 810, w: 160, h: 110 },
-    labelAt: [s(300), 935],
+    shape: { kind: "rect", x: s(220), y: 820, w: 160, h: 110 },
+    labelAt: [s(300), 950],
   },
 };
 
-// Canonical Jovian gate positions. Ordering chosen so Head↔Ajna and
-// Ajna↔Throat channels run parallel (no crossings) and Throat↔G channels
-// align vertically. All positions sit comfortably inside their center shapes.
+// Soft, brand-tuned defined center palette (light, harmonious)
+const CENTER_PALETTE: Record<CenterId, { fill: string; stroke: string }> = {
+  head:    { fill: "hsl(45 75% 88%)",  stroke: "hsl(40 50% 60%)"  },
+  ajna:    { fill: "hsl(140 35% 78%)", stroke: "hsl(140 30% 45%)" },
+  throat:  { fill: "hsl(25 30% 70%)",  stroke: "hsl(25 30% 38%)"  },
+  g:       { fill: "hsl(45 80% 82%)",  stroke: "hsl(40 55% 55%)"  },
+  heart:   { fill: "hsl(14 72% 72%)",  stroke: "hsl(14 65% 45%)"  },
+  sacral:  { fill: "hsl(14 75% 75%)",  stroke: "hsl(14 65% 48%)"  },
+  splenic: { fill: "hsl(25 30% 68%)",  stroke: "hsl(25 30% 38%)"  },
+  solar:   { fill: "hsl(35 75% 78%)",  stroke: "hsl(30 55% 48%)"  },
+  root:    { fill: "hsl(25 30% 68%)",  stroke: "hsl(25 30% 38%)"  },
+};
+
+// Gate positions — kept aligned so channels are parallel & uncrossed
 const GATE_POS: Record<number, [number, number]> = {
-  // HEAD — gates along the top edge of the down-triangle
-  64: [s(245), 85], 61: [s(300), 75], 63: [s(355), 85],
-
-  // AJNA — top row (near Head) connects 64-47, 61-24, 63-4
-  //         bottom row (near Throat) connects 17-62, 43-23, 11-56
-  47: [s(245), 225], 24: [s(300), 225], 4:  [s(355), 225],
-  17: [s(245), 305], 43: [s(300), 305], 11: [s(355), 305],
-
-  // THROAT — top row aligns with Ajna bottom (62/23/56)
-  62: [s(245), 380], 23: [s(300), 380], 56: [s(355), 380],
-  35: [s(225), 415], 12: [s(225), 445],
-  45: [s(335), 415],
-  16: [s(375), 415], 20: [s(375), 445],
-  // Bottom row aligns with G top (33-13, 8-1, 31-7)
-  33: [s(255), 455], 8:  [s(300), 455], 31: [s(345), 455],
-
-  // G / SELF — diamond. Top three align with Throat bottom; 25 at apex.
-  13: [s(255), 495], 1:  [s(300), 480], 7:  [s(345), 495],
-  2:  [s(245), 530], 46: [s(355), 530],
-  15: [s(245), 565], 10: [s(355), 565],
-  25: [s(300), 605],
-
-  // HEART — tiny right-triangle on the right of G
-  40: [s(400), 525], 26: [s(425), 545], 21: [s(425), 510], 51: [s(445), 530],
-
-  // SPLEEN — left triangle (base at left, apex pointing right toward Sacral)
-  48: [s(70), 660], 44: [s(70), 700], 32: [s(70), 740],
-  28: [s(110), 680], 50: [s(110), 720],
-  18: [s(150), 700], 57: [s(190), 700],
-
-  // SACRAL — 3×3 grid inside rectangle (220..380 × 655..780)
-  5:  [s(255), 680], 14: [s(300), 680], 29: [s(345), 680],
-  59: [s(255), 720], 9:  [s(300), 720], 3:  [s(345), 720],
-  42: [s(255), 760], 27: [s(300), 760], 34: [s(345), 760],
-
-  // SOLAR PLEXUS — right triangle (mirror of Spleen)
-  36: [s(530), 660], 22: [s(530), 700], 49: [s(530), 740],
-  6:  [s(490), 680], 30: [s(490), 720],
-  37: [s(450), 700], 55: [s(410), 700],
-
-  // ROOT — 3×3 grid inside rectangle (220..380 × 810..920)
-  53: [s(255), 835], 60: [s(300), 835], 52: [s(345), 835],
-  19: [s(255), 870], 39: [s(300), 870], 41: [s(345), 870],
-  58: [s(255), 905], 38: [s(300), 905], 54: [s(345), 905],
+  // HEAD (downward triangle, apex at bottom)
+  64: [s(250), 95], 61: [s(300), 80], 63: [s(350), 95],
+  // AJNA (downward triangle)
+  47: [s(250), 235], 24: [s(300), 220], 4:  [s(350), 235],
+  17: [s(255), 318], 43: [s(300), 332], 11: [s(345), 318],
+  // THROAT
+  62: [s(250), 395], 23: [s(300), 395], 56: [s(350), 395],
+  35: [s(225), 430], 12: [s(225), 460],
+  45: [s(335), 430],
+  16: [s(375), 430], 20: [s(375), 460],
+  33: [s(255), 472], 8:  [s(300), 472], 31: [s(345), 472],
+  // G / SELF (diamond)
+  13: [s(258), 510], 1:  [s(300), 495], 7:  [s(342), 510],
+  2:  [s(248), 545], 46: [s(352), 545],
+  15: [s(248), 580], 10: [s(352), 580],
+  25: [s(300), 620],
+  // HEART
+  40: [s(403), 538], 26: [s(425), 555], 21: [s(425), 522], 51: [s(442), 545],
+  // SPLEEN (sideways triangle, apex pointing right)
+  48: [s(70), 670], 44: [s(70), 710], 32: [s(70), 750],
+  28: [s(115), 690], 50: [s(115), 730],
+  18: [s(155), 710], 57: [s(195), 710],
+  // SACRAL — 3×3
+  5:  [s(258), 695], 14: [s(300), 695], 29: [s(342), 695],
+  59: [s(258), 728], 9:  [s(300), 728], 3:  [s(342), 728],
+  42: [s(258), 762], 27: [s(300), 762], 34: [s(342), 762],
+  // SOLAR PLEXUS (sideways triangle, apex pointing left)
+  36: [s(530), 670], 22: [s(530), 710], 49: [s(530), 750],
+  6:  [s(485), 690], 30: [s(485), 730],
+  37: [s(445), 710], 55: [s(405), 710],
+  // ROOT — 3×3
+  53: [s(258), 845], 60: [s(300), 845], 52: [s(342), 845],
+  19: [s(258), 875], 39: [s(300), 875], 41: [s(342), 875],
+  58: [s(258), 905], 38: [s(300), 905], 54: [s(342), 905],
 };
 
-// Canonical HD center colors when defined (matches printed Jovian charts)
-const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string; text: string }> = {
-  head:    { fill: "#FFEC85", stroke: "#C9B340", text: "#5A4A00" },  // yellow
-  ajna:    { fill: "#3AA848", stroke: "#1F6E2A", text: "#FFFFFF" },  // green
-  throat:  { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
-  g:       { fill: "#FFEC85", stroke: "#C9B340", text: "#5A4A00" },  // yellow
-  heart:   { fill: "#EC1E31", stroke: "#A0101F", text: "#FFFFFF" },  // red
-  splenic: { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
-  sacral:  { fill: "#EC1E31", stroke: "#A0101F", text: "#FFFFFF" },  // red
-  solar:   { fill: "#D68900", stroke: "#8F5C00", text: "#FFFFFF" },  // mustard
-  root:    { fill: "#8B5E3C", stroke: "#5A3A22", text: "#FFFFFF" },  // brown
-};
+const GATE_R = 11;
 
-
-const GATE_R = 10;
-
-// 13 planet rows (Sun → Chiron)
 const PLANETS = [
   { glyph: "☉", name: "Sun" },
   { glyph: "⊕", name: "Earth" },
-  { glyph: "☽", name: "Moon" },
   { glyph: "☊", name: "N. Node" },
   { glyph: "☋", name: "S. Node" },
+  { glyph: "☽", name: "Moon" },
   { glyph: "☿", name: "Mercury" },
   { glyph: "♀", name: "Venus" },
   { glyph: "♂", name: "Mars" },
@@ -142,21 +134,14 @@ const PLANETS = [
   { glyph: "♇", name: "Pluto" },
 ];
 
-function CenterEl({
-  center,
-  isDefined,
-}: {
-  center: CenterId;
-  isDefined: boolean;
-}) {
+function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean }) {
   const { shape, labelAt } = CENTER_SHAPES[center];
   const label = CENTERS[center].label;
-  const palette = CENTER_COLORS[center];
+  const palette = CENTER_PALETTE[center];
 
-  const fillColor = isDefined ? palette.fill : "transparent";
-  const strokeColor = isDefined ? palette.stroke : "hsl(215, 25%, 70%)";
-  const strokeWidth = isDefined ? 2.5 : 1.4;
-  const strokeDash = isDefined ? undefined : "4 3";
+  const fillColor = isDefined ? palette.fill : SOFT_BG;
+  const strokeColor = isDefined ? palette.stroke : NEUTRAL;
+  const strokeWidth = isDefined ? 2 : 1.2;
 
   let el: JSX.Element;
   switch (shape.kind) {
@@ -167,7 +152,6 @@ function CenterEl({
           fill={fillColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
-          strokeDasharray={strokeDash}
           strokeLinejoin="round"
         />
       );
@@ -175,15 +159,9 @@ function CenterEl({
     case "rect":
       el = (
         <rect
-          x={shape.x}
-          y={shape.y}
-          width={shape.w}
-          height={shape.h}
-          rx={4}
-          fill={fillColor}
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeDasharray={strokeDash}
+          x={shape.x} y={shape.y} width={shape.w} height={shape.h}
+          rx={6}
+          fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth}
         />
       );
       break;
@@ -191,14 +169,7 @@ function CenterEl({
       const { cx, cy, r } = shape;
       const pts = `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
       el = (
-        <polygon
-          points={pts}
-          fill={fillColor}
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          strokeDasharray={strokeDash}
-          strokeLinejoin="round"
-        />
+        <polygon points={pts} fill={fillColor} stroke={strokeColor} strokeWidth={strokeWidth} strokeLinejoin="round" />
       );
       break;
     }
@@ -208,96 +179,72 @@ function CenterEl({
     <g>
       {el}
       <text
-        x={labelAt[0]}
-        y={labelAt[1]}
-        textAnchor="middle"
-        fill={isDefined ? "hsl(0, 0%, 25%)" : "hsl(215, 20%, 55%)"}
-        fontSize="11"
+        x={labelAt[0]} y={labelAt[1]} textAnchor="middle"
+        fill={isDefined ? "hsl(230 25% 20%)" : "hsl(230 10% 55%)"}
+        fontSize="10.5"
         fontFamily="DM Sans, sans-serif"
-        fontWeight={isDefined ? 700 : 400}
+        fontWeight={isDefined ? 700 : 500}
+        letterSpacing="0.5"
       >
-        {label}
+        {label.toUpperCase()}
       </text>
     </g>
   );
 }
 
-// ─── Variable arrows ─────────────────────────────────────────
 function VariableArrow({
-  x,
-  y,
-  dir,
-  label,
-  number,
-  side,
+  x, y, dir, label, number, side,
 }: {
-  x: number;
-  y: number;
-  dir: "left" | "right";
-  label: string;
-  number: number;
-  side: "design" | "personality";
+  x: number; y: number; dir: "left" | "right"; label: string; number: number; side: "design" | "personality";
 }) {
-  const color = side === "personality" ? "hsl(0, 70%, 50%)" : "hsl(0, 0%, 15%)";
+  const color = side === "personality" ? PERSON_C : DESIGN_C;
+  const w = 44, h = 18;
   const arrow = dir === "right"
-    ? `${x},${y - 8} ${x + 26},${y - 8} ${x + 26},${y - 14} ${x + 40},${y} ${x + 26},${y + 14} ${x + 26},${y + 8} ${x},${y + 8}`
-    : `${x + 40},${y - 8} ${x + 14},${y - 8} ${x + 14},${y - 14} ${x},${y} ${x + 14},${y + 14} ${x + 14},${y + 8} ${x + 40},${y + 8}`;
+    ? `${x},${y - h/2} ${x + w - 14},${y - h/2} ${x + w - 14},${y - h/2 - 5} ${x + w},${y} ${x + w - 14},${y + h/2 + 5} ${x + w - 14},${y + h/2} ${x},${y + h/2}`
+    : `${x + w},${y - h/2} ${x + 14},${y - h/2} ${x + 14},${y - h/2 - 5} ${x},${y} ${x + 14},${y + h/2 + 5} ${x + 14},${y + h/2} ${x + w},${y + h/2}`;
   return (
     <g>
-      <polygon points={arrow} fill={color} />
+      <polygon points={arrow} fill={color} opacity={0.92} />
       <text
-        x={x + 20}
-        y={y + 28}
-        textAnchor="middle"
-        fontSize="10"
-        fontFamily="DM Sans, sans-serif"
-        fill={color}
+        x={x + w/2} y={y + 3.5} textAnchor="middle"
+        fontSize="10" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif"
       >
-        {label} · {number}
+        {number}
+      </text>
+      <text
+        x={x + w/2} y={y + h + 12} textAnchor="middle"
+        fontSize="9" fill={color} fontFamily="DM Sans, sans-serif" fontWeight="600" letterSpacing="0.4"
+      >
+        {label.toUpperCase()}
       </text>
     </g>
   );
 }
 
-// ─── Planet column row ───────────────────────────────────────
 function PlanetRow({
-  x,
-  y,
-  planet,
-  gateLine,
-  side,
-  align,
+  x, y, planet, gateLine, side, align,
 }: {
-  x: number;
-  y: number;
-  planet: { glyph: string; name: string };
-  gateLine: string;
-  side: "design" | "personality";
-  align: "left" | "right";
+  x: number; y: number; planet: { glyph: string; name: string }; gateLine: string;
+  side: "design" | "personality"; align: "left" | "right";
 }) {
-  const color = side === "personality" ? "hsl(0, 70%, 50%)" : "hsl(0, 0%, 15%)";
-  const glyphX = align === "right" ? x + 130 : x;
-  const numberX = align === "right" ? x : x + 130;
+  const color = side === "personality" ? PERSON_C : DESIGN_C;
+  const boxW = 130, boxH = 28;
+  const boxX = align === "right" ? x - boxW : x;
   return (
     <g>
+      <rect
+        x={boxX} y={y - boxH/2} width={boxW} height={boxH} rx={6}
+        fill={SOFT_BG} stroke={NEUTRAL} strokeWidth={1}
+      />
       <text
-        x={glyphX}
-        y={y}
-        textAnchor={align === "right" ? "end" : "start"}
-        fontSize="18"
-        fill={color}
-        fontFamily="serif"
+        x={boxX + 14} y={y + 5} textAnchor="start"
+        fontSize="15" fill={color} fontFamily="serif"
       >
         {planet.glyph}
       </text>
       <text
-        x={numberX}
-        y={y}
-        textAnchor={align === "right" ? "end" : "start"}
-        fontSize="13"
-        fontFamily="DM Sans, sans-serif"
-        fontWeight="600"
-        fill={color}
+        x={boxX + boxW - 14} y={y + 5} textAnchor="end"
+        fontSize="13" fontFamily="DM Sans, sans-serif" fontWeight="600" fill={color}
       >
         {gateLine}
       </text>
@@ -307,18 +254,15 @@ function PlanetRow({
 
 interface BodygraphProps {
   definedGates: number[];
-  /** Optional split: which gates came from Design (body) vs Personality (mind). If absent, we infer demo-style. */
   designGates?: number[];
   personalityGates?: number[];
-  /** Optional planet activations — if missing we synthesise from definedGates for demo. */
-  designPlanets?: Array<{ gate: number; line: number }>;
-  personalityPlanets?: Array<{ gate: number; line: number }>;
-  /** Variables: each is gate.line number for color/tone/base */
+  designPlanets?: Array<{ gate: number; line: number; planet?: string }>;
+  personalityPlanets?: Array<{ gate: number; line: number; planet?: string }>;
   variables?: {
-    digestion: number;     // bottom-left, Design, arrow →
-    environment: number;   // top-left, Design, arrow ←
-    awareness: number;     // bottom-right, Personality, arrow ←
-    perspective: number;   // top-right, Personality, arrow →
+    digestion: number;
+    environment: number;
+    awareness: number;
+    perspective: number;
   };
   className?: string;
 }
@@ -335,27 +279,36 @@ const Bodygraph = ({
   const definedCenters = useMemo(() => getDefinedCenters(definedGates), [definedGates]);
   const gateSet = useMemo(() => new Set(definedGates), [definedGates]);
 
-  // Demo fallback: split alternating gates into design/personality
-  const dGates = useMemo(() => new Set(designGates ?? definedGates.filter((_, i) => i % 2 === 0)), [designGates, definedGates]);
-  const pGates = useMemo(() => new Set(personalityGates ?? definedGates.filter((_, i) => i % 2 === 1)), [personalityGates, definedGates]);
+  const dGates = useMemo(
+    () => new Set(designGates ?? definedGates.filter((_, i) => i % 2 === 0)),
+    [designGates, definedGates]
+  );
+  const pGates = useMemo(
+    () => new Set(personalityGates ?? definedGates.filter((_, i) => i % 2 === 1)),
+    [personalityGates, definedGates]
+  );
 
-  // Demo planets — pull from defined gates, give each a line 1..6
   const demoLine = (g: number) => ((g * 7) % 6) + 1;
   const dPlanets = designPlanets ?? Array.from(dGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
   const pPlanets = personalityPlanets ?? Array.from(pGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
 
   const vars = variables ?? { digestion: 3, environment: 5, awareness: 2, perspective: 4 };
 
-  const activeChannels = useMemo(
-    () => UNIQUE_CHANNELS.filter((ch) => gateSet.has(ch.gates[0]) && gateSet.has(ch.gates[1])),
-    [gateSet]
-  );
+  // Source of a gate: "design" | "personality" | "both" | "none"
+  const gateSource = (g: number): "design" | "personality" | "both" | "none" => {
+    const d = dGates.has(g), p = pGates.has(g);
+    if (d && p) return "both";
+    if (d) return "design";
+    if (p) return "personality";
+    return "none";
+  };
+  const colorFor = (src: ReturnType<typeof gateSource>) =>
+    src === "personality" ? PERSON_C : src === "none" ? NEUTRAL : DESIGN_C;
 
-  // Planet column geometry
-  const colStartY = 200;
+  const colStartY = 215;
   const rowGap = 38;
-  const designColX = 30;       // left column origin
-  const persColX = s(620);     // right column origin
+  const designColX = 150;       // right edge of left column
+  const persColX = s(620);      // left edge of right column
 
   const fmt = (g: number, line: number) => `${g}.${line}`;
 
@@ -366,24 +319,14 @@ const Bodygraph = ({
       transition={{ duration: 0.5 }}
       className={className}
     >
-      <svg viewBox="0 0 920 990" className="w-full mx-auto" xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox="0 0 920 1010" className="w-full mx-auto block" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(0, 0%, 25%)" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="hsl(0, 0%, 10%)" stopOpacity="0.92" />
-          </linearGradient>
-          <linearGradient id="mindGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(0, 75%, 60%)" stopOpacity="0.92" />
-            <stop offset="100%" stopColor="hsl(0, 75%, 45%)" stopOpacity="0.92" />
-          </linearGradient>
-          <linearGradient id="splitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(0, 0%, 15%)" />
-            <stop offset="50%" stopColor="hsl(0, 0%, 15%)" />
-            <stop offset="50%" stopColor="hsl(0, 70%, 50%)" />
-            <stop offset="100%" stopColor="hsl(0, 70%, 50%)" />
-          </linearGradient>
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="b" />
+          <pattern id="splitStripe" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <rect width="3" height="6" fill={DESIGN_C} />
+            <rect x="3" width="3" height="6" fill={PERSON_C} />
+          </pattern>
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.8" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -392,12 +335,12 @@ const Bodygraph = ({
         </defs>
 
         {/* Column headers */}
-        <text x={designColX + 65} y={170} textAnchor="middle" fontSize="13" fontWeight="700" fill="hsl(0, 0%, 15%)" fontFamily="DM Sans, sans-serif">DESIGN</text>
-        <text x={designColX + 65} y={186} textAnchor="middle" fontSize="10" fill="hsl(0, 0%, 35%)" fontFamily="DM Sans, sans-serif">Body · Unconscious</text>
-        <text x={persColX + 65} y={170} textAnchor="middle" fontSize="13" fontWeight="700" fill="hsl(0, 70%, 50%)" fontFamily="DM Sans, sans-serif">PERSONALITY</text>
-        <text x={persColX + 65} y={186} textAnchor="middle" fontSize="10" fill="hsl(0, 50%, 45%)" fontFamily="DM Sans, sans-serif">Mind · Conscious</text>
+        <text x={designColX - 65} y={185} textAnchor="middle" fontSize="12" fontWeight="700" fill={DESIGN_C} fontFamily="DM Sans, sans-serif" letterSpacing="1.2">DESIGN</text>
+        <text x={designColX - 65} y={200} textAnchor="middle" fontSize="9" fill="hsl(230 10% 50%)" fontFamily="DM Sans, sans-serif">Body · Unconscious</text>
+        <text x={persColX + 65} y={185} textAnchor="middle" fontSize="12" fontWeight="700" fill={PERSON_C} fontFamily="DM Sans, sans-serif" letterSpacing="1.2">PERSONALITY</text>
+        <text x={persColX + 65} y={200} textAnchor="middle" fontSize="9" fill="hsl(14 50% 50%)" fontFamily="DM Sans, sans-serif">Mind · Conscious</text>
 
-        {/* Planet columns */}
+        {/* Planet rows */}
         {PLANETS.map((p, i) => {
           const y = colStartY + i * rowGap;
           const d = dPlanets[i];
@@ -410,22 +353,13 @@ const Bodygraph = ({
           );
         })}
 
-        {/* Variable arrows — corners */}
-        <VariableArrow x={designColX + 10} y={70} dir="left" label="Env" number={vars.environment} side="design" />
-        <VariableArrow x={designColX + 10} y={935} dir="right" label="Dig" number={vars.digestion} side="design" />
-        <VariableArrow x={persColX + 80} y={70} dir="right" label="View" number={vars.perspective} side="personality" />
-        <VariableArrow x={persColX + 80} y={935} dir="left" label="Awr" number={vars.awareness} side="personality" />
+        {/* Variable arrows — 4 corners */}
+        <VariableArrow x={s(210)} y={30} dir="left"  label="ENV"  number={vars.environment}  side="design" />
+        <VariableArrow x={s(346)} y={30} dir="right" label="VIEW" number={vars.perspective}  side="personality" />
+        <VariableArrow x={s(210)} y={980} dir="right" label="DIG" number={vars.digestion}    side="design" />
+        <VariableArrow x={s(346)} y={980} dir="left"  label="AWR" number={vars.awareness}    side="personality" />
 
-        {/* Centers */}
-        {(Object.keys(CENTERS) as CenterId[]).map((centerId) => (
-          <CenterEl
-            key={centerId}
-            center={centerId}
-            isDefined={definedCenters.has(centerId)}
-          />
-        ))}
-
-        {/* Channels */}
+        {/* Channels (rendered BEFORE centers so they sit underneath) */}
         {UNIQUE_CHANNELS.map((ch) => {
           const from = GATE_POS[ch.gates[0]];
           const to = GATE_POS[ch.gates[1]];
@@ -437,58 +371,57 @@ const Bodygraph = ({
           const pad = GATE_R + 1;
           const x1 = from[0] + ux * pad, y1 = from[1] + uy * pad;
           const x2 = to[0] - ux * pad, y2 = to[1] - uy * pad;
+          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
 
-          const isActive = activeChannels.some((a) => a.id === ch.id);
-          const oneSide = gateSet.has(ch.gates[0]) !== gateSet.has(ch.gates[1]);
+          const s0 = gateSource(ch.gates[0]);
+          const s1 = gateSource(ch.gates[1]);
+          const bothActive = s0 !== "none" && s1 !== "none";
 
-          // Decide color: if active and both sides come from the same source → that color, else split
-          let stroke = "hsl(215, 25%, 80%)";
-          if (isActive) {
-            const aD = dGates.has(ch.gates[0]) && dGates.has(ch.gates[1]);
-            const aP = pGates.has(ch.gates[0]) && pGates.has(ch.gates[1]);
-            stroke = aD ? "hsl(0, 0%, 15%)" : aP ? "hsl(0, 70%, 50%)" : "url(#splitGradient)";
-          } else if (oneSide) {
-            const sideGate = gateSet.has(ch.gates[0]) ? ch.gates[0] : ch.gates[1];
-            stroke = pGates.has(sideGate) ? "hsl(0, 60%, 70%)" : "hsl(0, 0%, 55%)";
-          }
+          // Half-segment colors
+          const half0Color = colorFor(s0);
+          const half1Color = colorFor(s1);
+          const sw0 = s0 === "none" ? 2 : bothActive ? 6 : 5;
+          const sw1 = s1 === "none" ? 2 : bothActive ? 6 : 5;
+          const op0 = s0 === "none" ? 0.35 : 0.95;
+          const op1 = s1 === "none" ? 0.35 : 0.95;
 
           return (
-            <line
-              key={ch.id}
-              x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke={stroke}
-              strokeWidth={isActive ? 3.2 : 1.2}
-              strokeOpacity={isActive ? 0.95 : oneSide ? 0.6 : 0.3}
-              filter={isActive ? "url(#glow)" : undefined}
-              strokeLinecap="round"
-            />
+            <g key={ch.id}>
+              <line x1={x1} y1={y1} x2={mx} y2={my}
+                stroke={half0Color} strokeWidth={sw0} strokeOpacity={op0} strokeLinecap="butt" />
+              <line x1={mx} y1={my} x2={x2} y2={y2}
+                stroke={half1Color} strokeWidth={sw1} strokeOpacity={op1} strokeLinecap="butt" />
+            </g>
           );
         })}
+
+        {/* Centers */}
+        {(Object.keys(CENTERS) as CenterId[]).map((centerId) => (
+          <CenterEl key={centerId} center={centerId} isDefined={definedCenters.has(centerId)} />
+        ))}
 
         {/* Gates */}
         {Object.entries(GATE_POS).map(([gateStr, [cx, cy]]) => {
           const gateNum = Number(gateStr);
-          const active = gateSet.has(gateNum);
-          const fromP = pGates.has(gateNum);
-          const fromD = dGates.has(gateNum);
-          let fill = "hsl(0, 0%, 100%)";
-          let stroke = "hsl(215, 25%, 55%)";
-          let textFill = "hsl(215, 35%, 30%)";
-          if (active) {
-            if (fromP && fromD) { fill = "url(#splitGradient)"; stroke = "hsl(0, 0%, 15%)"; textFill = "hsl(0, 0%, 100%)"; }
-            else if (fromP) { fill = "hsl(0, 70%, 50%)"; stroke = "hsl(0, 70%, 35%)"; textFill = "hsl(0, 0%, 100%)"; }
-            else { fill = "hsl(0, 0%, 15%)"; stroke = "hsl(0, 0%, 0%)"; textFill = "hsl(0, 0%, 100%)"; }
+          const src = gateSource(gateNum);
+          let fill = "white";
+          let stroke = NEUTRAL;
+          let textFill = "hsl(230 25% 35%)";
+          let strokeW = 1.2;
+          if (src === "both") {
+            fill = "url(#splitStripe)"; stroke = DESIGN_C; textFill = "white"; strokeW = 1.6;
+          } else if (src === "personality") {
+            fill = PERSON_C; stroke = "hsl(14 65% 42%)"; textFill = "white"; strokeW = 1.4;
+          } else if (src === "design") {
+            fill = DESIGN_C; stroke = "black"; textFill = "white"; strokeW = 1.4;
           }
           return (
             <g key={gateNum}>
-              <circle cx={cx} cy={cy} r={GATE_R} fill={fill} stroke={stroke} strokeWidth={1.3} />
+              <circle cx={cx} cy={cy} r={GATE_R} fill={fill} stroke={stroke} strokeWidth={strokeW} />
               <text
-                x={cx} y={cy + 3.2}
-                textAnchor="middle"
-                fill={textFill}
-                fontSize="9"
-                fontFamily="DM Sans, sans-serif"
-                fontWeight="600"
+                x={cx} y={cy + 3.3} textAnchor="middle"
+                fill={textFill} fontSize="9.5"
+                fontFamily="DM Sans, sans-serif" fontWeight="700"
                 pointerEvents="none"
               >
                 {gateNum}
