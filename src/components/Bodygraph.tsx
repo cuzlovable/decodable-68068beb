@@ -79,7 +79,7 @@ const CENTER_PALETTE: Record<CenterId, { fill: string; stroke: string }> = {
 };
 
 // Gate positions — kept aligned so channels are parallel & uncrossed
-const GATE_POS: Record<number, [number, number]> = {
+export const GATE_POS: Record<number, [number, number]> = {
   // HEAD (downward triangle, apex at bottom)
   64: [s(250), 95], 61: [s(300), 80], 63: [s(350), 95],
   // AJNA (downward triangle)
