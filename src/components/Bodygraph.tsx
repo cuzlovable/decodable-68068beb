@@ -32,8 +32,8 @@ const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] 
     labelAt: [s(300), 46],
   },
   ajna: {
-    shape: { kind: "triangle", points: [[s(200), 215], [s(400), 215], [s(300), 350]] },
-    labelAt: [s(300), 370],
+    shape: { kind: "triangle", points: [[s(180), 215], [s(420), 215], [s(300), 365]] },
+    labelAt: [s(300), 385],
   },
   throat: {
     shape: { kind: "rect", x: s(210), y: 375, w: 180, h: 110 },
@@ -84,7 +84,7 @@ const GATE_POS: Record<number, [number, number]> = {
   64: [s(250), 95], 61: [s(300), 80], 63: [s(350), 95],
   // AJNA (downward triangle)
   47: [s(250), 235], 24: [s(300), 220], 4:  [s(350), 235],
-  17: [s(255), 318], 43: [s(300), 332], 11: [s(345), 318],
+  17: [s(270), 318], 43: [s(300), 335], 11: [s(330), 318],
   // THROAT
   62: [s(250), 395], 23: [s(300), 395], 56: [s(350), 395],
   35: [s(225), 430], 12: [s(225), 460],
@@ -259,10 +259,11 @@ interface BodygraphProps {
   designPlanets?: Array<{ gate: number; line: number; planet?: string }>;
   personalityPlanets?: Array<{ gate: number; line: number; planet?: string }>;
   variables?: {
-    digestion: number;
-    environment: number;
-    awareness: number;
-    perspective: number;
+    digestion: number;      // Design Sun/Earth color  → top-left  (DIG)
+    environment: number;    // Design Node color       → top-right (ENV)
+    motivation?: number;    // Personality Sun/Earth   → bottom-left  (MOT)
+    perspective: number;    // Personality Node color  → bottom-right (VIEW)
+    awareness?: number;     // legacy alias for motivation
   };
   className?: string;
 }
@@ -292,7 +293,8 @@ const Bodygraph = ({
   const dPlanets = designPlanets ?? Array.from(dGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
   const pPlanets = personalityPlanets ?? Array.from(pGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
 
-  const vars = variables ?? { digestion: 3, environment: 5, awareness: 2, perspective: 4 };
+  const vars = variables ?? { digestion: 3, environment: 5, motivation: 2, perspective: 4 };
+  const motivationVal = vars.motivation ?? vars.awareness ?? 0;
 
   // Source of a gate: "design" | "personality" | "both" | "none"
   const gateSource = (g: number): "design" | "personality" | "both" | "none" => {
@@ -354,10 +356,11 @@ const Bodygraph = ({
         })}
 
         {/* Variable arrows — 4 corners */}
-        <VariableArrow x={s(210)} y={30} dir="left"  label="ENV"  number={vars.environment}  side="design" />
-        <VariableArrow x={s(346)} y={30} dir="right" label="VIEW" number={vars.perspective}  side="personality" />
-        <VariableArrow x={s(210)} y={980} dir="right" label="DIG" number={vars.digestion}    side="design" />
-        <VariableArrow x={s(346)} y={980} dir="left"  label="AWR" number={vars.awareness}    side="personality" />
+        {/* TOP = Design (Body). BOTTOM = Personality (Mind). */}
+        <VariableArrow x={s(210)} y={30}  dir="left"  label="DIG"  number={vars.digestion}   side="design" />
+        <VariableArrow x={s(346)} y={30}  dir="right" label="ENV"  number={vars.environment} side="design" />
+        <VariableArrow x={s(210)} y={980} dir="left"  label="MOT"  number={motivationVal}    side="personality" />
+        <VariableArrow x={s(346)} y={980} dir="right" label="VIEW" number={vars.perspective} side="personality" />
 
         {/* Channels (rendered BEFORE centers so they sit underneath) */}
         {UNIQUE_CHANNELS.map((ch) => {
