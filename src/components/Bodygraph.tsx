@@ -259,10 +259,11 @@ interface BodygraphProps {
   designPlanets?: Array<{ gate: number; line: number; planet?: string }>;
   personalityPlanets?: Array<{ gate: number; line: number; planet?: string }>;
   variables?: {
-    digestion: number;
-    environment: number;
-    awareness: number;
-    perspective: number;
+    digestion: number;      // Design Sun/Earth color  → top-left  (DIG)
+    environment: number;    // Design Node color       → top-right (ENV)
+    motivation?: number;    // Personality Sun/Earth   → bottom-left  (MOT)
+    perspective: number;    // Personality Node color  → bottom-right (VIEW)
+    awareness?: number;     // legacy alias for motivation
   };
   className?: string;
 }
