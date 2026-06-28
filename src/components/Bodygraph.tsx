@@ -293,7 +293,8 @@ const Bodygraph = ({
   const dPlanets = designPlanets ?? Array.from(dGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
   const pPlanets = personalityPlanets ?? Array.from(pGates).slice(0, 13).map((g) => ({ gate: g, line: demoLine(g) }));
 
-  const vars = variables ?? { digestion: 3, environment: 5, awareness: 2, perspective: 4 };
+  const vars = variables ?? { digestion: 3, environment: 5, motivation: 2, perspective: 4 };
+  const motivationVal = vars.motivation ?? vars.awareness ?? 0;
 
   // Source of a gate: "design" | "personality" | "both" | "none"
   const gateSource = (g: number): "design" | "personality" | "both" | "none" => {
