@@ -26,7 +26,7 @@ type Shape =
 const SHIFT_X = 160;
 const s = (x: number) => x + SHIFT_X;
 
-const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
+export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
   head: {
     shape: { kind: "triangle", points: [[s(200), 60], [s(400), 60], [s(300), 195]] },
     labelAt: [s(300), 46],
