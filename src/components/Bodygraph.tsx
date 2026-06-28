@@ -356,10 +356,11 @@ const Bodygraph = ({
         })}
 
         {/* Variable arrows — 4 corners */}
-        <VariableArrow x={s(210)} y={30} dir="left"  label="ENV"  number={vars.environment}  side="design" />
-        <VariableArrow x={s(346)} y={30} dir="right" label="VIEW" number={vars.perspective}  side="personality" />
-        <VariableArrow x={s(210)} y={980} dir="right" label="DIG" number={vars.digestion}    side="design" />
-        <VariableArrow x={s(346)} y={980} dir="left"  label="AWR" number={vars.awareness}    side="personality" />
+        {/* TOP = Design (Body). BOTTOM = Personality (Mind). */}
+        <VariableArrow x={s(210)} y={30}  dir="left"  label="DIG"  number={vars.digestion}   side="design" />
+        <VariableArrow x={s(346)} y={30}  dir="right" label="ENV"  number={vars.environment} side="design" />
+        <VariableArrow x={s(210)} y={980} dir="left"  label="MOT"  number={motivationVal}    side="personality" />
+        <VariableArrow x={s(346)} y={980} dir="right" label="VIEW" number={vars.perspective} side="personality" />
 
         {/* Channels (rendered BEFORE centers so they sit underneath) */}
         {UNIQUE_CHANNELS.map((ch) => {
