@@ -112,15 +112,15 @@ const BodygraphPage = () => {
           {/* Legend */}
           <div className="flex items-center justify-center gap-6 mt-4 text-[10px] text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-[hsl(0,0%,15%)]" />
+              <div className="w-3 h-3 rounded-sm bg-[hsl(230,25%,18%)]" />
               Design · Body
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-[hsl(0,70%,50%)]" />
+              <div className="w-3 h-3 rounded-sm bg-[hsl(14,78%,56%)]" />
               Personality · Mind
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm border border-muted-foreground border-dashed" />
+              <div className="w-3 h-3 rounded-sm border border-border bg-card" />
               Open
             </div>
           </div>
