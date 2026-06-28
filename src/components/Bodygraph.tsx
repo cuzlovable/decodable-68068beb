@@ -32,7 +32,7 @@ const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] 
     labelAt: [s(300), 46],
   },
   ajna: {
-    shape: { kind: "triangle", points: [[s(180), 215], [s(420), 215], [s(300), 365)]] as any },
+    shape: { kind: "triangle", points: [[s(180), 215], [s(420), 215], [s(300), 365]] },
     labelAt: [s(300), 385],
   },
   throat: {
