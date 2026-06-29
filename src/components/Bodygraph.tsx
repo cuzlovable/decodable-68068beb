@@ -461,10 +461,10 @@ const Bodygraph = ({
 
             {/* Decorative gate stubs — always-visible short tube exits matching reference chart */}
             {([
-              // gate 10: short horizontal tube exiting left from G-center left vertex
-              { gate: 10, dx: -42, dy: 0 },
-              // gate 34: short tube exiting up-left to meet the 20-57 channel line
-              { gate: 34, dx: -34, dy: -18 },
+              // gate 10: horizontal tube exiting left until it meets the 20→57 channel line
+              { gate: 10, dx: -94, dy: 0 },
+              // gate 34: diagonal tube up-left until it meets the 20→57 channel line
+              { gate: 34, dx: -190, dy: -80 },
             ] as Array<{ gate: number; dx: number; dy: number }>).map(({ gate, dx, dy }) => {
               const p = GATE_POS_INTERNAL[gate];
               if (!p) return null;
