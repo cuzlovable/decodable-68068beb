@@ -32,60 +32,68 @@ type Shape =
   | { kind: "diamond"; cx: number; cy: number; r: number };
 
 export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
-  // Head: triangle pointing UP (apex at top)
-  head:    { shape: { kind: "triangle", points: [[210, 50], [160, 140], [260, 140]] }, labelAt: [210, 162] },
-  // Ajna: triangle pointing DOWN
-  ajna:    { shape: { kind: "triangle", points: [[160, 170], [260, 170], [210, 260]] }, labelAt: [210, 282] },
-  throat:  { shape: { kind: "rect", x: 170, y: 300, w: 80, h: 80 }, labelAt: [210, 398] },
-  g:       { shape: { kind: "diamond", cx: 210, cy: 450, r: 48 }, labelAt: [210, 520] },
-  // Heart: sideways triangle, shifted right so it clears G while staying in the Solar side field.
-  heart:   { shape: { kind: "triangle", points: [[342, 416], [342, 482], [282, 449]] }, labelAt: [322, 507] },
-  // Spleen pulled further LEFT for a balanced awareness triangle (Ajna / Spleen / Solar)
-  splenic: { shape: { kind: "triangle", points: [[20, 520], [20, 630], [125, 575]] }, labelAt: [52, 650] },
-  sacral:  { shape: { kind: "rect", x: 170, y: 525, w: 80, h: 80 }, labelAt: [210, 622] },
-  // Solar pulled further RIGHT
-  solar:   { shape: { kind: "triangle", points: [[410, 520], [410, 630], [305, 575]] }, labelAt: [378, 650] },
-  root:    { shape: { kind: "rect", x: 170, y: 660, w: 80, h: 70 }, labelAt: [210, 748] },
+  // HEAD — upward triangle (apex top), narrow
+  head:    { shape: { kind: "triangle", points: [[215, 55], [165, 132], [265, 132]] }, labelAt: [215, 150] },
+  // AJNA — downward triangle (apex bottom)
+  ajna:    { shape: { kind: "triangle", points: [[160, 158], [270, 158], [215, 248]] }, labelAt: [215, 268] },
+  // THROAT — large square
+  throat:  { shape: { kind: "rect", x: 160, y: 272, w: 110, h: 95 }, labelAt: [215, 384] },
+  // G — diamond
+  g:       { shape: { kind: "diamond", cx: 215, cy: 440, r: 52 }, labelAt: [215, 510] },
+  // HEART — small triangle, apex LEFT toward G (sits right of G, above Solar)
+  heart:   { shape: { kind: "triangle", points: [[340, 410], [340, 480], [285, 445]] }, labelAt: [355, 500] },
+  // SPLEEN — large triangle, apex RIGHT toward Sacral
+  splenic: { shape: { kind: "triangle", points: [[20, 500], [20, 645], [155, 572]] }, labelAt: [60, 665] },
+  // SACRAL — large square
+  sacral:  { shape: { kind: "rect", x: 160, y: 510, w: 110, h: 95 }, labelAt: [215, 622] },
+  // SOLAR — large triangle, apex LEFT toward Sacral
+  solar:   { shape: { kind: "triangle", points: [[410, 500], [410, 645], [275, 572]] }, labelAt: [370, 665] },
+  // ROOT — square
+  root:    { shape: { kind: "rect", x: 160, y: 670, w: 110, h: 85 }, labelAt: [215, 772] },
 };
 
-// Gates placed on the OUTLINE perimeter of each center shape, positioned
-// on the edge nearest to their channel partner so lines exit cleanly.
+// Gates anchored on the OUTLINE perimeter of each center, positioned on the
+// edge nearest their channel partner so channel lines exit cleanly.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // HEAD — base edge (down to Ajna)
-  64: [175, 140], 61: [210, 140], 63: [245, 140],
-  // AJNA — top edge (up to Head), slanted edges (to Throat sides), apex (to Throat top)
-  47: [175, 170], 24: [210, 170], 4: [245, 170],
-  17: [188, 220], 11: [232, 220],
-  43: [210, 260],
+  64: [183, 130], 61: [215, 130], 63: [247, 130],
+  // AJNA — top edge (up to Head), slanted sides (to Throat), apex (to Throat top)
+  47: [178, 158], 24: [215, 158], 4:  [252, 158],
+  17: [188, 200], 11: [242, 200],
+  43: [215, 245],
   // THROAT — perimeter
-  62: [185, 300], 23: [210, 300], 56: [235, 300],   // top → Ajna
-  16: [170, 336], 20: [170, 365],                    // left → Spleen / body
-  35: [250, 324], 12: [250, 354],                    // right → Solar
-  31: [184, 380], 8: [210, 380], 33: [236, 380], 45: [250, 375], // bottom/right → G/Heart
+  62: [183, 272], 23: [215, 272], 56: [247, 272],   // top edge → Ajna
+  16: [160, 300], 20: [160, 332],                    // left edge → Spleen/G
+  35: [270, 298], 12: [270, 322], 45: [270, 348],   // right edge → Solar/Heart
+  31: [183, 367], 8:  [215, 367], 33: [247, 367],   // bottom edge → G
   // G — diamond perimeter
-  13: [186, 426], 1:  [210, 402], 7:  [234, 426],   // top → Throat
-  25: [258, 450],                                    // right vertex → Heart
-  15: [186, 474], 2:  [210, 498], 46: [234, 474],   // bottom → Sacral
-  10: [162, 450],                                    // left vertex → Spleen
+  1:  [215, 388],                                    // top vertex → Throat
+  13: [188, 415], 7:  [242, 415],                    // upper slants → Throat
+  25: [267, 440],                                    // right vertex → Heart
+  46: [242, 465], 2:  [215, 492], 15: [188, 465],   // lower slants → Sacral
+  10: [163, 440],                                    // left vertex → Spleen
   // HEART — perimeter (apex left toward G)
-  21: [342, 428], 26: [312, 466], 51: [282, 449], 40: [342, 470],
+  21: [335, 416],                                    // top-right → Throat (21-45)
+  26: [313, 460],                                    // mid-right → Solar (26-44)
+  51: [290, 445],                                    // apex left → G (25-51)
+  40: [335, 474],                                    // bottom-right → Solar (40-37)
   // SPLEEN — perimeter (apex right toward G/Sacral)
-  48: [62, 542], 44: [95, 559], 57: [125, 575],     // top/apex → Throat/Heart/G
-  50: [95, 591],                                    // lower slant → Sacral
-  32: [20, 555], 28: [20, 590], 18: [20, 620],      // left edge → Root
+  48: [60, 522], 44: [95, 545], 57: [130, 568],     // top slant → Throat / Heart / G
+  50: [105, 595],                                    // lower slant → Sacral
+  32: [20, 525], 28: [20, 572], 18: [20, 620],      // left edge → Root
   // SACRAL — perimeter
-  5: [185, 525], 14: [210, 525], 29: [235, 525],   // top → G
-  34: [170, 555], 27: [170, 585],                   // left → Spleen
-  59: [250, 570],                                   // right → Solar
-  42: [185, 605], 3:  [210, 605], 9:  [235, 605],  // bottom → Root
-  // SOLAR — perimeter (apex left toward G/Sacral)
-  36: [379, 536], 22: [350, 551], 37: [321, 567],  // top slant → Throat/Heart
-  6:  [305, 575],                                   // apex → Sacral
-  30: [350, 599], 55: [379, 614], 49: [410, 598],  // lower/right perimeter → Root
+  5:  [183, 510], 14: [215, 510], 29: [247, 510],   // top → G
+  34: [160, 540], 27: [160, 575],                    // left → Spleen
+  59: [270, 555],                                    // right → Solar/Heart
+  42: [183, 605], 3:  [215, 605], 9:  [247, 605],   // bottom → Root
+  // SOLAR — perimeter (apex left toward Sacral)
+  36: [370, 522], 22: [335, 545], 37: [300, 568],   // top slant → Throat / Heart
+  6:  [278, 572],                                    // apex → Sacral
+  49: [410, 525], 55: [410, 572], 30: [410, 620],   // right edge → Root
   // ROOT — perimeter
-  53: [185, 660], 60: [210, 660], 52: [235, 660],  // top → Sacral
-  54: [170, 680], 38: [170, 705], 58: [170, 725],  // left → Spleen
-  19: [250, 680], 39: [250, 705], 41: [250, 725],  // right → Solar
+  53: [183, 670], 60: [215, 670], 52: [247, 670],   // top → Sacral
+  54: [160, 695], 38: [160, 720], 58: [160, 745],   // left → Spleen
+  19: [270, 695], 39: [270, 720], 41: [270, 745],   // right → Solar
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
