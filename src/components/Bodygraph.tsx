@@ -206,14 +206,15 @@ function GateEl({
   );
 }
 
-// Tube-style channel: a wide, soft cream band with subtle outline.
-// When active, the band splits at midpoint into the activating side's color.
+type SideMode = "off" | "design" | "personality" | "both";
+
+// Tube-style channel: a cream band that fills with the activating side's color.
+// When a gate is in BOTH Design and Personality, its half splits red/black stacked.
 function TubeChannel({
-  a, b, color1, color2, active, g1Active, g2Active,
+  a, b, g1Mode, g2Mode,
 }: {
   a: [number, number]; b: [number, number];
-  color1: string; color2: string;
-  active: boolean; g1Active: boolean; g2Active: boolean;
+  g1Mode: SideMode; g2Mode: SideMode;
 }) {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
@@ -221,13 +222,31 @@ function TubeChannel({
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
-  const bandW = 9;   // slightly thinner tube
-  const inset = 7;   // shorten so it tucks under the gate circles
+  const bandW = 9;
+  const inset = 7;
+  const halfLen = Math.max(0, len / 2 - inset);
+  const innerH = bandW - 3;
+  const innerY = -bandW / 2 + 1.5;
 
-  // Background band (always rendered as the tube)
+  const renderHalf = (mode: SideMode, x: number) => {
+    if (mode === "off") return null;
+    if (mode === "both") {
+      return (
+        <g>
+          <rect x={x} y={innerY} width={halfLen} height={innerH / 2}
+            fill={DESIGN_C} />
+          <rect x={x} y={innerY + innerH / 2} width={halfLen} height={innerH / 2}
+            fill={PERSON_C} />
+        </g>
+      );
+    }
+    const c = mode === "design" ? DESIGN_C : PERSON_C;
+    return <rect x={x} y={innerY} width={halfLen} height={innerH}
+      rx={innerH / 2} fill={c} />;
+  };
+
   return (
     <g transform={`translate(${mx}, ${my}) rotate(${angle})`}>
-      {/* tube outline + cream fill */}
       <rect
         x={-(len / 2) + inset} y={-bandW / 2}
         width={Math.max(0, len - inset * 2)} height={bandW}
@@ -236,27 +255,8 @@ function TubeChannel({
         stroke={TUBE_EDGE}
         strokeWidth={1}
       />
-      {/* activated half-fills: left half = color1 when g1 active, right half = color2 when g2 active */}
-      {g1Active && (
-        <rect
-          x={-(len / 2) + inset} y={-bandW / 2 + 1.5}
-          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
-          rx={(bandW - 3) / 2}
-          fill={color1}
-        />
-      )}
-      {g2Active && (
-        <rect
-          x={0} y={-bandW / 2 + 1.5}
-          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
-          rx={(bandW - 3) / 2}
-          fill={color2}
-        />
-      )}
-      {active && (
-        <line x1={0} y1={-bandW / 2 + 1} x2={0} y2={bandW / 2 - 1}
-          stroke="hsl(var(--card))" strokeWidth={0.6} opacity={0.5} />
-      )}
+      {renderHalf(g1Mode, -(len / 2) + inset)}
+      {renderHalf(g2Mode, 0)}
     </g>
   );
 }
