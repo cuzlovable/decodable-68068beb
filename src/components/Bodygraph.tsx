@@ -442,8 +442,8 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tube: 40↔6 */}
-            {([[40, 6]] as Array<[number, number]>).map(([g1, g2]) => {
+            {/* Extra decorative tube: 40↔27 (Ego to Sacral) */}
+            {([[40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
               const a = GATE_POS_INTERNAL[g1];
               const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
@@ -452,6 +452,7 @@ const Bodygraph = ({
                   g1Mode={modeForGate(g1)} g2Mode={modeForGate(g2)} />
               );
             })}
+
 
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
