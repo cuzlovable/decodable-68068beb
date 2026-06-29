@@ -30,6 +30,11 @@ serve(async (req) => {
   try {
     const {
       environment,
+      environmentColor,
+      environmentTone,
+      digestion,
+      perspective,
+      motivation,
       latitude,
       longitude,
       birthDate,
@@ -67,22 +72,34 @@ Emphasize North Node Environment locations for this user's life purpose shift.`;
       }
     }
 
-    const envDescription = ENVIRONMENT_CONTEXT[environment] || environment;
+    // The environment is the *precise* PHS sub-tone label, e.g. "Narrow Valley".
+    // Fall back to the broad color label only when no sub-tone was provided.
+    const broad = environmentColor || environment;
+    const envDescription = ENVIRONMENT_CONTEXT[broad] || broad;
 
-    const systemPrompt = `You are an expert Human Design Environment advisor. Your job is to suggest real, specific types of locations near the user's GPS coordinates that align with their Design Variable Environment.
+    const systemPrompt = `You are an expert Human Design Primary Health System (PHS) Environment advisor.
 
-The user's Environment is "${environment}": ${envDescription}
+The user's exact Design Environment is: "${environment}"
+  • Broad color category: ${broad} — ${envDescription}
+  • Sub-tone qualifier: ${environmentTone || "(none)"} — interpret this literally; e.g. "Narrow Valley" means physically narrow valleys / tight passes / canyon-like enclosed lowlands, NOT open shores or open valleys.
+
+Supporting PHS variables (use these to refine, not replace, the environment):
+  • Digestion: ${digestion || "unknown"} (how they take in nourishment & info)
+  • Perspective: ${perspective || "unknown"} (where they should focus their gaze)
+  • Motivation: ${motivation || "unknown"}
 
 ${chironContext}
 
 Rules:
-- Suggest 5-7 specific types of locations that match their environment
-- For each location, provide: name/type, why it aligns with their environment, and a practical tip
-- Consider the user's approximate area (lat: ${latitude}, lng: ${longitude}) for regional relevance
-- Be specific and actionable, not generic
-- If in Chiron Return, weave in North Node transition themes
+- Suggest 5-7 specific, real-world location TYPES that satisfy the exact sub-tone of their environment ("${environment}"). Do NOT default to the broad category if a sub-tone is given.
+- Honor the sub-tone literally. A "Narrow Valley" person needs enclosed, narrow, contained valley-like spaces — not beaches, not open meadows.
+- Mention how the digestion / perspective variables refine the choice when helpful.
+- Consider the user's approximate area (lat: ${latitude}, lng: ${longitude}) for regional relevance.
+- Be specific and actionable, not generic.
+- If in Chiron Return, weave in North Node transition themes.
 
 Respond using the suggest_locations tool.`;
+
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
