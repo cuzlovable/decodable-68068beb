@@ -62,10 +62,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "triangle", points: [[CX + 35, 498], [CX + 150, 508], [CX + 95, 575]] },
     labelAt: [CX + 112, 500],
   },
-  // Sacral — square
+  // Sacral — square (pushed down to clear G and allow 26-44 channel to cross)
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 603],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 580, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 628],
   },
   // Spleen — triangle, apex right
   splenic: {
