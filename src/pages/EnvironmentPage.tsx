@@ -211,19 +211,23 @@ const EnvironmentPage = () => {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {decoded.environment.full}
               </h2>
-              <p className="text-sm text-foreground/80 leading-relaxed mt-2 mb-3">
-                {ENV_DESCRIPTIONS[decoded.environment.colorLabel] ??
-                  `Your environment color is ${decoded.environment.colorLabel}.`}
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Color {decoded.environment.color} · Tone {decoded.environment.tone}
+              </p>
+              <p className="text-sm text-foreground/80 leading-relaxed mt-3 mb-4">
+                {ENVIRONMENT_EXPLAINER}
               </p>
 
               {decoded.digestion && (
                 <div className="mb-4 p-3 rounded-xl bg-muted/30 border border-border/40">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-                    Super-cognition · {decoded.digestion.full}
+                    Determination · {decoded.digestion.full}
+                    <span className="ml-1 opacity-70">
+                      (C{decoded.digestion.color}·T{decoded.digestion.tone})
+                    </span>
                   </p>
                   <p className="text-xs text-foreground/80 leading-relaxed">
-                    {DIG_DESCRIPTIONS[decoded.digestion.colorLabel] ??
-                      `Your cognition is ${decoded.digestion.colorLabel}.`}
+                    {DIGESTION_EXPLAINER}
                   </p>
                 </div>
               )}
