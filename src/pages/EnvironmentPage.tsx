@@ -381,5 +381,3 @@ const EnvironmentPage = () => {
 };
 
 export default EnvironmentPage;
-
-export default EnvironmentPage;
