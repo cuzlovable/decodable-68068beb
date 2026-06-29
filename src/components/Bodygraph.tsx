@@ -103,19 +103,19 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 35, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — all dots safely inside the downward triangle
-  21: [CX + 108, 482],
-  51: [CX + 100, 503],
-  26: [CX + 98, 525],
-  40: [CX + 130, 500],
+  // EGO — each gate sits where its pairing tube meets the triangle
+  21: [CX + 85, 472],   // → throat 45 (up)
+  51: [CX + 88, 495],   // → G 25 (left)
+  26: [CX + 95, 525],   // → spleen 44 (down-left)
+  40: [CX + 125, 515],  // → solar 37 (right)
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 552],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — three columns aligned with G/Root for straight vertical channels
+  // SACRAL — 34 & 27 vertical on left, 59 right-side meeting gate 6 tube
   5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
-  34: [CX - 35, 593],
-  27: [CX - 22, 615], 59: [CX + 22, 615],
+  34: [CX - 40, 590],
+  27: [CX - 40, 615], 59: [CX + 40, 615],
   42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
