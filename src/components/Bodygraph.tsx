@@ -209,8 +209,38 @@ const Bodygraph = ({
   const fmt = (g: number, line: number) => `${g}.${line}`;
 
   // ── Render planet rows as HTML boxes (better mobile responsiveness) ──
+  // Canonical Human Design planet order with name aliases the API may use.
+  const PLANET_ALIASES: Record<string, string[]> = {
+    Sun: ["sun"],
+    Earth: ["earth"],
+    "N. Node": ["north node", "n. node", "north_node", "northnode", "node north", "node_n", "n.node"],
+    "S. Node": ["south node", "s. node", "south_node", "southnode", "node south", "node_s", "s.node"],
+    Moon: ["moon"],
+    Mercury: ["mercury"],
+    Venus: ["venus"],
+    Mars: ["mars"],
+    Jupiter: ["jupiter"],
+    Saturn: ["saturn"],
+    Uranus: ["uranus"],
+    Neptune: ["neptune"],
+    Pluto: ["pluto"],
+  };
+  const normalize = (s?: string) => (s ?? "").toLowerCase().replace(/[._\s-]+/g, " ").trim();
+  const sortByCanonical = (list: Array<{ gate: number; line: number; planet?: string }>) => {
+    const byName: Record<string, { gate: number; line: number; planet?: string }> = {};
+    for (const item of list) {
+      const n = normalize(item.planet);
+      for (const [canon, aliases] of Object.entries(PLANET_ALIASES)) {
+        if (aliases.includes(n) || normalize(canon) === n) { byName[canon] = item; break; }
+      }
+    }
+    return PLANETS.map((p) => byName[p.name]);
+  };
+
   const PlanetCol = ({ side }: { side: "design" | "personality" }) => {
-    const list = side === "design" ? dPlanets : pPlanets;
+    const raw = side === "design" ? dPlanets : pPlanets;
+    // If items carry planet names, sort canonically; else fall back to incoming order.
+    const list = raw.some((it) => it?.planet) ? sortByCanonical(raw) : raw;
     const colorClass = side === "design" ? "text-foreground" : "text-[hsl(14,78%,50%)]";
     return (
       <div className="flex flex-col gap-1 w-[68px] sm:w-[80px] shrink-0">
