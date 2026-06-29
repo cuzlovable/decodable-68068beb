@@ -230,6 +230,7 @@ const MatchesPage = () => {
             with yours, whether that's romance, collaboration, or close friendship. The more
             you tell us what felt right or off, the sharper your matches get.
           </p>
+        </motion.div>
       </div>
     </div>
   );
