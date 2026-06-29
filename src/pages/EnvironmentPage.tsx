@@ -11,25 +11,16 @@ import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 
-// Plain-language descriptions per Environment color (the broad terrain you thrive in).
-const ENV_DESCRIPTIONS: Record<string, string> = {
-  Caves: "You thrive in enclosed, contained spaces with clear edges — rooms, nooks, dens.",
-  Markets: "You thrive amid lively exchange — bustling streets, gathering spots, marketplaces.",
-  Kitchens: "You thrive where things are being made — workshops, studios, kitchens, makerspaces.",
-  Mountains: "You thrive at elevation with sweeping perspective — hills, rooftops, high vistas.",
-  Valleys: "You thrive nestled between natural boundaries — valleys, basins, sheltered terrain.",
-  Shores: "You thrive at the edge of two worlds — coastlines, riverbanks, transition zones.",
-};
+// What "Environment" means in PHS (Primary Health System).
+const ENVIRONMENT_EXPLAINER =
+  "Your Environment is the type of physical space where your body and decision-making work best. " +
+  "It's decoded from your Design Node — a Color (the broad terrain) and a Tone (the sub-quality). " +
+  "Live, work, and rest in this kind of place and your nervous system settles; the right answers come faster.";
 
-// Plain-language descriptions per Digestion / "super-cognition" color (how you best take in life).
-const DIG_DESCRIPTIONS: Record<string, string> = {
-  Consecutive: "You digest best with one food/idea at a time, fully, in sequence.",
-  Alternating: "You digest best with variety — alternating tastes and inputs keeps you sharp.",
-  "Open Taste": "You digest best in a relaxed, social setting where flavors stay light.",
-  "Closed Taste": "You digest best in quiet focus — no distractions while you take it in.",
-  Hot: "You digest best with warm food, warm rooms, warm company.",
-  Cold: "You digest best with cool food, cool rooms, calm surroundings.",
-};
+// What "Determination / Super-cognition" means in PHS.
+const DIGESTION_EXPLAINER =
+  "Your Determination (also called Super-cognition) is how your body best takes in food, information, and stimulus. " +
+  "It's decoded from your Design Sun/Earth — Color sets the mode, Tone refines it.";
 
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -220,19 +211,23 @@ const EnvironmentPage = () => {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {decoded.environment.full}
               </h2>
-              <p className="text-sm text-foreground/80 leading-relaxed mt-2 mb-3">
-                {ENV_DESCRIPTIONS[decoded.environment.colorLabel] ??
-                  `Your environment color is ${decoded.environment.colorLabel}.`}
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Color {decoded.environment.color} · Tone {decoded.environment.tone}
+              </p>
+              <p className="text-sm text-foreground/80 leading-relaxed mt-3 mb-4">
+                {ENVIRONMENT_EXPLAINER}
               </p>
 
               {decoded.digestion && (
                 <div className="mb-4 p-3 rounded-xl bg-muted/30 border border-border/40">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-                    Super-cognition · {decoded.digestion.full}
+                    Determination · {decoded.digestion.full}
+                    <span className="ml-1 opacity-70">
+                      (C{decoded.digestion.color}·T{decoded.digestion.tone})
+                    </span>
                   </p>
                   <p className="text-xs text-foreground/80 leading-relaxed">
-                    {DIG_DESCRIPTIONS[decoded.digestion.colorLabel] ??
-                      `Your cognition is ${decoded.digestion.colorLabel}.`}
+                    {DIGESTION_EXPLAINER}
                   </p>
                 </div>
               )}

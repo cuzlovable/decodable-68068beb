@@ -33,37 +33,37 @@ type GroupGuidance = {
   waTip: string;
 };
 
-// Tight, type-tailored copy. One sentence per slot.
+// One short sentence per slot. Plain, no jargon.
 const GUIDANCE_BY_TYPE: Record<string, GroupGuidance> = {
   Manifestor: {
-    pentaLine: "You're the spark in a Penta — initiate, then inform the others.",
-    pentaTip: "Tell the 2–4 others before you move. Uninformed = resistance.",
-    waLine: "You ignite the Wa, then exit. Lingering drains you.",
-    waTip: "Drop the vision; let Generators and Projectors carry it.",
+    pentaLine: "You spark the small group.",
+    pentaTip: "Inform the 2–4 others before you move.",
+    waLine: "You ignite the crowd, then exit.",
+    waTip: "Drop the vision and let others carry it.",
   },
   Generator: {
-    pentaLine: "You're the engine of the Penta — your sacral yes is the fuel.",
-    pentaTip: "Only respond to what truly lights you up. The Penta runs on that.",
-    waLine: "You're the builder of the Wa — what you commit to gets built.",
-    waTip: "If it's not a gut yes, it's not yours to carry.",
+    pentaLine: "You're the engine of the small group.",
+    pentaTip: "Only commit to what's a gut yes.",
+    waLine: "You build what the crowd commits to.",
+    waTip: "If it's not a yes, it's not yours.",
   },
   "Manifesting Generator": {
-    pentaLine: "You bring speed + multi-skill to the Penta.",
-    pentaTip: "Respond first, then inform — small groups need to know where you jumped.",
-    waLine: "You show the Wa what's possible at speed.",
-    waTip: "Don't slow down to match the group's tempo. Inform, then move.",
+    pentaLine: "You bring speed + range to the small group.",
+    pentaTip: "Respond, then inform — fast.",
+    waLine: "You show the crowd what's possible at speed.",
+    waTip: "Don't slow down — inform and move.",
   },
   Projector: {
-    pentaLine: "You're the guide of the Penta — your perspective is gold when invited.",
-    pentaTip: "Wait for the invitation. Unsolicited guidance creates bitterness.",
-    waLine: "The Wa recognizes you for wisdom about people and systems.",
-    waTip: "Pick your Wa carefully and step out to recharge.",
+    pentaLine: "You guide the small group when invited.",
+    pentaTip: "Wait for the invitation.",
+    waLine: "The crowd recognizes your wisdom.",
+    waTip: "Pick your group and step out to recharge.",
   },
   Reflector: {
-    pentaLine: "You mirror the Penta's health back to it with precision.",
-    pentaTip: "What feels off is data about the group, not about you.",
-    waLine: "You read the Wa's collective field as a single energy.",
-    waTip: "Wait a lunar cycle before committing to any Wa.",
+    pentaLine: "You mirror the small group's health.",
+    pentaTip: "What feels off is data about them, not you.",
+    waLine: "You read the crowd as one field.",
+    waTip: "Wait a lunar cycle before committing.",
   },
 };
 
@@ -159,9 +159,8 @@ function GroupSimulator({
         </h3>
       </div>
       <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-        Add the other members' defined gates to see which of the {canonical.length}{" "}
-        {kind === "penta" ? "Penta skills" : "Wa roles"} the group covers between you.
-        {kind === "penta" ? " (3–5 people total.)" : " (6+ people.)"}
+        Add the others' defined gates to see which {kind === "penta" ? "skills" : "roles"} your
+        group covers together.
       </p>
 
       {/* Add member */}
@@ -343,9 +342,9 @@ const GroupDynamicsPage = () => {
             </span>
           </div>
           <p className="text-sm text-foreground/80 leading-relaxed">
-            Each of your gates is a <span className="font-semibold">trait</span> on its own.
-            In a Penta (3–5 people) certain gates show up as <span className="font-semibold">skills</span>.
-            In a Wa (larger group) certain gates show up as <span className="font-semibold">roles</span>.
+            Each gate is a <span className="font-semibold">trait</span>.
+            In a <span className="font-semibold">Penta</span> (3–5) it shows as a skill.
+            In a <span className="font-semibold">Wa</span> (6+) it shows as a role.
           </p>
           {type && (
             <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
