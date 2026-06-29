@@ -2,11 +2,11 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/lib/humandesign";
 
-// ─── Bodygraph (canonical HD palette + planet columns + PHS arrows) ─────
-const DESIGN_C  = "hsl(0 75% 55%)";     // red (Design / Body)
-const PERSON_C  = "hsl(220 15% 15%)";   // black (Personality / Mind)
+// ─── Bodygraph ──────────────────────────────────────────────────
+const DESIGN_C  = "hsl(0 75% 55%)";     // red (Design)
+const PERSON_C  = "hsl(220 15% 15%)";   // black (Personality)
 const OPEN_GRAY = "hsl(220 15% 75%)";
-const CHANNEL_OFF = "hsl(220 15% 80%)";
+const CHANNEL_OFF = "hsl(220 15% 82%)";
 
 const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string }> = {
   head:    { fill: "hsl(48 95% 60%)",  stroke: "hsl(48 70% 45%)"  },
@@ -25,64 +25,68 @@ type Shape =
   | { kind: "rect"; x: number; y: number; w: number; h: number }
   | { kind: "diamond"; cx: number; cy: number; r: number };
 
-// Canvas: 500 × 820. Roomier spacing per reference image.
+// Canvas 500x780 — uniform center sizing.
 export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
-  head:    { shape: { kind: "triangle", points: [[250, 55], [200, 135], [300, 135]] }, labelAt: [250, 110] },
-  ajna:    { shape: { kind: "triangle", points: [[195, 160], [305, 160], [250, 250]] }, labelAt: [250, 200] },
-  throat:  { shape: { kind: "rect", x: 195, y: 275, w: 110, h: 95 }, labelAt: [250, 328] },
-  g:       { shape: { kind: "diamond", cx: 250, cy: 455, r: 55 }, labelAt: [250, 460] },
-  // Heart sits well right of G with clear gap; apex points right, gates 21/51/26 on left edge, 40 at right apex
-  heart:   { shape: { kind: "triangle", points: [[340, 430], [340, 490], [400, 460] ] }, labelAt: [360, 478] },
-  // Spleen pushed far left, apex right toward Sacral
-  splenic: { shape: { kind: "triangle", points: [[20, 520], [20, 680], [165, 600]] }, labelAt: [65, 605] },
-  sacral:  { shape: { kind: "rect", x: 195, y: 535, w: 110, h: 95 }, labelAt: [250, 588] },
-  // Solar pushed far right, apex left toward Sacral
-  solar:   { shape: { kind: "triangle", points: [[485, 520], [485, 680], [340, 600]] }, labelAt: [435, 605] },
-  root:    { shape: { kind: "rect", x: 195, y: 685, w: 110, h: 90 }, labelAt: [250, 735] },
+  head:    { shape: { kind: "triangle", points: [[250, 40], [210, 110], [290, 110]] }, labelAt: [250, 95] },
+  ajna:    { shape: { kind: "triangle", points: [[210, 130], [290, 130], [250, 200]] }, labelAt: [250, 160] },
+  throat:  { shape: { kind: "rect", x: 200, y: 220, w: 100, h: 85 }, labelAt: [250, 265] },
+  g:       { shape: { kind: "diamond", cx: 250, cy: 410, r: 55 }, labelAt: [250, 415] },
+  // Heart sits clearly right of G — triangle: top apex, left base, right base
+  heart:   { shape: { kind: "triangle", points: [[380, 400], [335, 475], [425, 475]] }, labelAt: [380, 460] },
+  // Spleen — apex points right toward Sacral
+  splenic: { shape: { kind: "triangle", points: [[40, 510], [40, 640], [170, 575]] }, labelAt: [75, 580] },
+  sacral:  { shape: { kind: "rect", x: 200, y: 510, w: 100, h: 85 }, labelAt: [250, 555] },
+  // Solar — apex points left toward Sacral
+  solar:   { shape: { kind: "triangle", points: [[460, 510], [460, 640], [330, 575]] }, labelAt: [425, 580] },
+  root:    { shape: { kind: "rect", x: 200, y: 620, w: 100, h: 80 }, labelAt: [250, 660] },
 };
 
-// Gates placed on perimeter outlines per reference image
+// Gates anchored to center outlines per reference image, with straight vertical
+// alignment for paired channels and 32/28/18 + 49/55/30 along bottom edges.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
-  // HEAD — base edge
-  64: [218, 135], 61: [250, 135], 63: [282, 135],
-  // AJNA
-  47: [213, 160], 24: [250, 160], 4:  [287, 160],
-  17: [220, 200], 11: [280, 200],
-  43: [250, 247],
-  // THROAT
-  62: [213, 275], 23: [250, 275], 56: [287, 275],
-  16: [195, 300], 20: [195, 335],
-  35: [305, 295], 12: [305, 322], 45: [305, 350],
-  31: [213, 370], 8:  [250, 370], 33: [287, 370],
-  // G — diamond
-  1:  [250, 402],
-  7:  [222, 425], 13: [278, 425],
-  10: [197, 455], 25: [303, 455],
-  15: [222, 485], 46: [278, 485],
-  2:  [250, 508],
-  // HEART — left edge top→bottom = 21, 51, 26 ; right apex = 40
-  21: [340, 432], 51: [340, 460], 26: [340, 488],
-  40: [398, 460],
-  // SPLEEN — top slant 48,57,44 (toward sacral apex), left edge 32,28,18, near-apex 50
-  48: [50, 540], 57: [95, 565], 44: [140, 590],
-  50: [150, 610],
-  32: [22, 545], 28: [22, 600], 18: [22, 655],
-  // SACRAL
-  5:  [213, 535], 14: [250, 535], 29: [287, 535],
-  34: [195, 565], 27: [195, 600],
-  59: [305, 580],
-  42: [213, 630], 3:  [250, 630], 9:  [287, 630],
-  // SOLAR — top slant 36,22,37 (toward sacral apex), apex left = 6, right edge 49,55,30
-  36: [455, 540], 22: [410, 565], 37: [365, 590],
-  6:  [350, 610],
-  49: [483, 545], 55: [483, 600], 30: [483, 655],
-  // ROOT
-  53: [213, 685], 60: [250, 685], 52: [287, 685],
-  54: [195, 700], 38: [195, 730], 58: [195, 760],
-  19: [305, 700], 39: [305, 730], 41: [305, 760],
+  // HEAD — base
+  64: [218, 110], 61: [250, 110], 63: [282, 110],
+  // AJNA — top, sides, apex
+  47: [218, 130], 24: [250, 130], 4:  [282, 130],
+  17: [225, 165], 11: [275, 165],
+  43: [250, 197],
+  // THROAT — top row, side cols, bottom row
+  62: [225, 220], 23: [250, 220], 56: [275, 220],
+  16: [200, 245], 20: [200, 285],
+  35: [300, 245], 12: [300, 265], 45: [300, 285],
+  31: [220, 305], 8:  [250, 305], 33: [280, 305],
+  // G — diamond perimeter
+  1:  [250, 360],
+  7:  [220, 375], 13: [280, 375],
+  10: [197, 420], 25: [303, 410],
+  15: [220, 445], 46: [280, 445],
+  2:  [250, 463],
+  // HEART — 21/51/26 left edge (top→bottom), 40 right apex (per reference)
+  21: [378, 418], 51: [358, 448], 26: [346, 472],
+  40: [418, 472],
+  // SPLEEN — top slant 48/57/44, bottom slant 32/28/18, 50 near apex interior
+  48: [50, 522], 57: [95, 548], 44: [140, 572],
+  50: [150, 588],
+  32: [50, 628], 28: [95, 604], 18: [140, 580],
+  // SACRAL — top, side cols, bottom
+  5:  [220, 510], 14: [250, 510], 29: [280, 510],
+  34: [200, 535], 27: [200, 570],
+  59: [300, 545],
+  42: [220, 595], 3:  [250, 595], 9:  [280, 595],
+  // SOLAR — top slant 36/22/37, bottom slant 49/55/30, 6 near apex
+  36: [450, 522], 22: [405, 548], 37: [360, 572],
+  6:  [345, 580],
+  49: [450, 628], 55: [405, 604], 30: [360, 580],
+  // ROOT — top row, left col (root↔spleen), right col (root↔solar)
+  53: [220, 620], 60: [250, 620], 52: [280, 620],
+  54: [200, 645], 38: [200, 670], 58: [200, 695],
+  19: [300, 645], 39: [300, 670], 41: [300, 695],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
+
+// Channels we intentionally don't render as a direct line.
+const HIDDEN_CHANNELS = new Set<string>(["10-57"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
@@ -169,7 +173,7 @@ function GateEl({
   );
 }
 
-// Tube-style channel: two parallel offset lines
+// Tube-style channel: two parallel offset lines, split-colored at midpoint
 function TubeChannel({
   a, b, color1, color2, active,
 }: {
@@ -185,15 +189,13 @@ function TubeChannel({
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
   const sw = active ? 1.6 : 1;
-  const opacity = active ? 1 : 0.55;
+  const opacity = active ? 1 : 0.5;
   return (
     <g opacity={opacity}>
-      {/* Line 1 — colored by first gate side */}
       <line x1={a[0] + ox} y1={a[1] + oy} x2={mx + ox} y2={my + oy}
         stroke={color1} strokeWidth={sw} strokeLinecap="round" />
       <line x1={mx + ox} y1={my + oy} x2={b[0] + ox} y2={b[1] + oy}
         stroke={color2} strokeWidth={sw} strokeLinecap="round" />
-      {/* Line 2 — same split mirrored */}
       <line x1={a[0] - ox} y1={a[1] - oy} x2={mx - ox} y2={my - oy}
         stroke={color1} strokeWidth={sw} strokeLinecap="round" />
       <line x1={mx - ox} y1={my - oy} x2={b[0] - ox} y2={b[1] - oy}
@@ -326,7 +328,7 @@ const Bodygraph = ({
   const colorForGate = (g: number) => {
     const inD = designSet.has(g);
     const inP = personalitySet.has(g);
-    if (inD && inP) return DESIGN_C; // split visual; tube draws both halves anyway
+    if (inD && inP) return DESIGN_C;
     if (inD) return DESIGN_C;
     if (inP) return PERSON_C;
     return CHANNEL_OFF;
@@ -353,7 +355,7 @@ const Bodygraph = ({
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
         <div className="flex-1 max-w-[500px]">
-          <svg viewBox="0 0 500 820" className="w-full block" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 500 780" className="w-full block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={DESIGN_C} />
@@ -365,6 +367,8 @@ const Bodygraph = ({
 
             {/* Tube channels */}
             {UNIQUE_CHANNELS.map((ch) => {
+              const key = [...ch.gates].sort((x, y) => x - y).join("-");
+              if (HIDDEN_CHANNELS.has(key)) return null;
               const a = GATE_POS_INTERNAL[ch.gates[0]];
               const b = GATE_POS_INTERNAL[ch.gates[1]];
               if (!a || !b) return null;
