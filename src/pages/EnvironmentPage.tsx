@@ -9,6 +9,28 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+
+// Plain-language descriptions per Environment color (the broad terrain you thrive in).
+const ENV_DESCRIPTIONS: Record<string, string> = {
+  Caves: "You thrive in enclosed, contained spaces with clear edges — rooms, nooks, dens.",
+  Markets: "You thrive amid lively exchange — bustling streets, gathering spots, marketplaces.",
+  Kitchens: "You thrive where things are being made — workshops, studios, kitchens, makerspaces.",
+  Mountains: "You thrive at elevation with sweeping perspective — hills, rooftops, high vistas.",
+  Valleys: "You thrive nestled between natural boundaries — valleys, basins, sheltered terrain.",
+  Shores: "You thrive at the edge of two worlds — coastlines, riverbanks, transition zones.",
+};
+
+// Plain-language descriptions per Digestion / "super-cognition" color (how you best take in life).
+const DIG_DESCRIPTIONS: Record<string, string> = {
+  Consecutive: "You digest best with one food/idea at a time, fully, in sequence.",
+  Alternating: "You digest best with variety — alternating tastes and inputs keeps you sharp.",
+  "Open Taste": "You digest best in a relaxed, social setting where flavors stay light.",
+  "Closed Taste": "You digest best in quiet focus — no distractions while you take it in.",
+  Hot: "You digest best with warm food, warm rooms, warm company.",
+  Cold: "You digest best with cool food, cool rooms, calm surroundings.",
+};
+
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   food: <Utensils className="w-4 h-4" />,
@@ -36,6 +58,7 @@ type Suggestion = {
   reason: string;
   tip: string;
   nodalAlignment?: string;
+  imageQuery?: string;
 };
 
 type AIResult = {
@@ -44,6 +67,12 @@ type AIResult = {
   suggestions: Suggestion[];
 };
 
+function imageFor(s: Suggestion) {
+  const q = encodeURIComponent(s.imageQuery || `${s.name} ${s.category}`);
+  return `https://loremflickr.com/320/200/${q}`;
+}
+
+
 const EnvironmentPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
@@ -51,6 +80,7 @@ const EnvironmentPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLabel, setLocationLabel] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,18 +99,24 @@ const EnvironmentPage = () => {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          (pos) => {
+            setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            setLocationLabel("Your current location");
+          },
           () => {
             if (data?.birth_latitude && data?.birth_longitude) {
               setUserLocation({ lat: data.birth_latitude, lng: data.birth_longitude });
+              setLocationLabel(data.birth_location || "Birth location");
             } else {
               setUserLocation({ lat: 40.7128, lng: -74.006 });
-              setLocationError("Using default location. Enable GPS for better results.");
+              setLocationLabel("New York, NY (default)");
+              setLocationError("Enable location or search below for accurate results.");
             }
           }
         );
       } else {
         setUserLocation({ lat: 40.7128, lng: -74.006 });
+        setLocationLabel("New York, NY (default)");
       }
 
       setLoading(false);
@@ -184,27 +220,35 @@ const EnvironmentPage = () => {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {decoded.environment.full}
               </h2>
-              <p className="text-xs text-muted-foreground mb-4">
-                Color {decoded.environment.color} · Tone {decoded.environment.tone} ·{" "}
-                {decoded.environment.colorLabel}
+              <p className="text-sm text-foreground/80 leading-relaxed mt-2 mb-3">
+                {ENV_DESCRIPTIONS[decoded.environment.colorLabel] ??
+                  `Your environment color is ${decoded.environment.colorLabel}.`}
               </p>
 
-              {/* Secondary variables */}
-              <div className="grid grid-cols-2 gap-2 mb-5">
-                {decoded.digestion && (
-                  <VarChip label="Digestion" value={decoded.digestion.full} sub={`${decoded.digestion.color}.${decoded.digestion.tone}`} />
-                )}
-                {decoded.perspective && (
-                  <VarChip label="Perspective" value={decoded.perspective.full} sub={`${decoded.perspective.color}.${decoded.perspective.tone}`} />
-                )}
-                {decoded.motivation && (
-                  <VarChip label="Motivation" value={decoded.motivation.full} sub={`${decoded.motivation.color}.${decoded.motivation.tone}`} />
-                )}
-                <VarChip
-                  label="Environment"
-                  value={decoded.environment.full}
-                  sub={`${decoded.environment.color}.${decoded.environment.tone}`}
-                  accent
+              {decoded.digestion && (
+                <div className="mb-4 p-3 rounded-xl bg-muted/30 border border-border/40">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                    Super-cognition · {decoded.digestion.full}
+                  </p>
+                  <p className="text-xs text-foreground/80 leading-relaxed">
+                    {DIG_DESCRIPTIONS[decoded.digestion.colorLabel] ??
+                      `Your cognition is ${decoded.digestion.colorLabel}.`}
+                  </p>
+                </div>
+              )}
+
+              {/* Location override — accurate, accessible search */}
+              <div className="mb-4">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Search near
+                </p>
+                <LocationAutocomplete
+                  value={locationLabel}
+                  onChange={(name, lat, lon) => {
+                    setUserLocation({ lat, lng: lon });
+                    setLocationLabel(name);
+                    setLocationError(null);
+                  }}
                 />
               </div>
 
@@ -219,6 +263,7 @@ const EnvironmentPage = () => {
                   <><Sparkles className="w-4 h-4 mr-2" /> Find my {decoded.environment.full} spots</>
                 )}
               </Button>
+
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -276,9 +321,16 @@ const EnvironmentPage = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-5"
+                  className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 overflow-hidden"
                 >
-                  <div className="flex items-start gap-3">
+                  <img
+                    src={imageFor(s)}
+                    alt={s.name}
+                    loading="lazy"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="p-5 flex items-start gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${CATEGORY_COLORS[s.category] || "bg-muted text-muted-foreground"}`}>
                       {CATEGORY_ICONS[s.category] || <MapPin className="w-4 h-4" />}
                     </div>
@@ -327,19 +379,5 @@ const EnvironmentPage = () => {
     </div>
   );
 };
-
-function VarChip({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: boolean }) {
-  return (
-    <div
-      className={`rounded-xl px-3 py-2 border ${
-        accent ? "border-primary/40 bg-primary/5" : "border-border/40 bg-muted/30"
-      }`}
-    >
-      <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="text-xs font-semibold text-foreground leading-tight">{value}</p>
-      <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{sub}</p>
-    </div>
-  );
-}
 
 export default EnvironmentPage;

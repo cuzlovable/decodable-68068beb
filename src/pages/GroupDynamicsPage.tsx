@@ -231,45 +231,43 @@ function GroupSimulator({
           </p>
         )}
 
-        <div>
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-            Covered {kind === "penta" ? "skills" : "roles"} ({composite.covered.length}/{canonical.length})
-          </p>
-          {composite.covered.length === 0 ? (
-            <p className="text-xs text-foreground/60">No one in the group carries these gates yet.</p>
-          ) : (
-            <div className="flex flex-wrap gap-1.5">
-              {composite.covered.map((g) => {
-                const mine = youMember.gates.includes(g);
-                return (
-                  <span
-                    key={g}
-                    className={`px-2 py-1 rounded-full text-[10px] font-medium ${
-                      mine ? accentClasses.chip : "bg-muted/40 text-foreground/70"
-                    }`}
-                    title={labelMap[g]}
-                  >
-                    {g} {labelMap[g]}
-                    {mine && " ✦"}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {composite.missing.length > 0 && (
+        {composite.covered.length === canonical.length && !tooSmall && !tooLarge ? (
+          <div className="text-center py-6">
+            <div className="text-4xl mb-2">✨</div>
+            <p className="font-display text-base font-semibold text-foreground mb-1">
+              Your {kind === "penta" ? "Penta" : "Wa"} is complete
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              All {canonical.length} {kind === "penta" ? "skills" : "roles"} are covered by
+              the group. The field is whole.
+            </p>
+          </div>
+        ) : (
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-              Missing ({composite.missing.length})
+              Covered {kind === "penta" ? "skills" : "roles"} ({composite.covered.length}/{canonical.length})
             </p>
-            <div className="flex flex-wrap gap-1.5">
-              {composite.missing.map((g) => (
-                <span key={g} className="px-2 py-1 rounded-full text-[10px] font-medium bg-muted/30 text-muted-foreground border border-dashed border-border/60">
-                  {g} {labelMap[g]}
-                </span>
-              ))}
-            </div>
+            {composite.covered.length === 0 ? (
+              <p className="text-xs text-foreground/60">No one in the group carries these gates yet.</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {composite.covered.map((g) => {
+                  const mine = youMember.gates.includes(g);
+                  return (
+                    <span
+                      key={g}
+                      className={`px-2 py-1 rounded-full text-[10px] font-medium ${
+                        mine ? accentClasses.chip : "bg-muted/40 text-foreground/70"
+                      }`}
+                      title={labelMap[g]}
+                    >
+                      {g} {labelMap[g]}
+                      {mine && " ✦"}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
