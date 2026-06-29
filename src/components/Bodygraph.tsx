@@ -153,7 +153,7 @@ function VariableArrow({
   const tone = Math.round(((v - Math.floor(v)) * 10)) || 1;
   const dir = dirHint ?? (tone <= 3 ? "left" : "right");
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 tabular-nums">
       {dir === "left" && <span style={{ color }} className="text-base leading-none">◀</span>}
       <span
         className="inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold text-white"
@@ -161,6 +161,7 @@ function VariableArrow({
       >
         {color1to6}
       </span>
+      <span className="text-[10px] font-semibold" style={{ color }}>.{tone}</span>
       {dir === "right" && <span style={{ color }} className="text-base leading-none">▶</span>}
     </div>
   );
