@@ -56,25 +56,25 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
     labelAt: [CX, 425],
   },
-  // Heart — small triangle, sits to the right of G (smallest center)
+  // Heart — small downward-pointing triangle, sits diagonally between G and Solar Plexus
   heart: {
-    shape: { kind: "triangle", points: [[CX + 110, 395], [CX + 110, 455], [CX + 165, 425]] },
-    labelAt: [CX + 128, 428],
+    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 145, 460], [CX + 108, 520]] },
+    labelAt: [CX + 108, 478],
   },
   // Sacral — square
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 540, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 588],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 603],
   },
-  // Spleen — horizontal triangle, apex points right toward Sacral
+  // Spleen — regular (equilateral-style) triangle, apex right toward Sacral
   splenic: {
-    shape: { kind: "triangle", points: [[60, 540], [60, 630], [200, 585]] },
-    labelAt: [105, 585],
+    shape: { kind: "triangle", points: [[20, 555], [20, 645], [110, 600]] },
+    labelAt: [50, 600],
   },
   // Solar Plexus — mirror of Spleen, apex points left
   solar: {
-    shape: { kind: "triangle", points: [[540, 540], [540, 630], [400, 585]] },
-    labelAt: [495, 585],
+    shape: { kind: "triangle", points: [[580, 555], [580, 645], [490, 600]] },
+    labelAt: [550, 600],
   },
   // Root — square
   root: {
@@ -103,22 +103,22 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 38, 420], 25: [CX + 38, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 460],
-  // EGO / HEART — 21, 51, 26 stacked on the left edge; 40 at the apex
-  21: [CX + 120, 405], 51: [CX + 120, 425], 26: [CX + 120, 445],
-  40: [CX + 152, 425],
+  // EGO / HEART — downward triangle between G and Solar Plexus
+  21: [CX + 80, 472], 51: [CX + 108, 478], 26: [CX + 95, 502],
+  40: [CX + 125, 492],
   // SPLEEN — top slant 48→44→57, bottom slant 18→28→32, 50 interior
-  48: [82, 555], 44: [120, 568], 57: [165, 583],
-  50: [130, 587],
-  18: [82, 615], 28: [120, 602], 32: [165, 590],
+  48: [32, 568], 44: [62, 580], 57: [92, 595],
+  50: [55, 600],
+  18: [32, 632], 28: [62, 618], 32: [92, 605],
   // SACRAL — top (5, 14, 29), left (34, 27), right (59), bottom (42, 3, 9)
-  5:  [CX - 30, 553], 14: [CX, 553], 29: [CX + 30, 553],
-  34: [CX - 40, 578], 27: [CX - 40, 602],
-  59: [CX + 40, 590],
-  42: [CX - 30, 620], 3:  [CX, 620], 9:  [CX + 30, 620],
-  // SOLAR — top slant 36→22→37 (base→apex), bottom slant 49→55→30, 6 interior
-  36: [518, 555], 22: [480, 568], 37: [435, 583],
-  6:  [470, 587],
-  49: [435, 590], 55: [480, 602], 30: [518, 615],
+  5:  [CX - 30, 568], 14: [CX, 568], 29: [CX + 30, 568],
+  34: [CX - 40, 593], 27: [CX - 40, 617],
+  59: [CX + 40, 605],
+  42: [CX - 30, 635], 3:  [CX, 635], 9:  [CX + 30, 635],
+  // SOLAR — top slant 36→22→37, bottom slant 49→55→30, 6 interior
+  36: [568, 568], 22: [538, 580], 37: [508, 595],
+  6:  [545, 600],
+  49: [508, 605], 55: [538, 618], 30: [568, 632],
   // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
   53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
   54: [CX - 40, 738], 38: [CX - 40, 758],
