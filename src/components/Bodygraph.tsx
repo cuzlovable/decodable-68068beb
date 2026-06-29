@@ -439,7 +439,15 @@ const Bodygraph = ({
               );
             })}
 
-            {/* (Removed decorative 10→ and 34→ stubs per design — no 10–20 or 34–10 visible tube) */}
+            {/* Extra decorative tube: 41 ↔ 27 (per design request) */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[41];
+              const b = GATE_POS_INTERNAL[27];
+              if (!a || !b) return null;
+              return (
+                <TubeChannel a={a} b={b} g1Mode={modeForGate(41)} g2Mode={modeForGate(27)} />
+              );
+            })()}
 
 
             {/* Centers */}
