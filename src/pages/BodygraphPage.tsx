@@ -5,7 +5,6 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
-import DeconditioningChecklist from "@/components/DeconditioningChecklist";
 import { getOpenCenters } from "@/lib/humandesign";
 
 // Fallback used only if the profile somehow has no calculated chart yet.
@@ -93,9 +92,6 @@ const BodygraphPage = () => {
             <h2 className="font-display text-xl font-bold text-foreground">
               {profile?.display_name || "Your"} Bodygraph
             </h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              {openCenters.length} open center{openCenters.length !== 1 ? "s" : ""} detected
-            </p>
           </div>
 
           <Bodygraph
@@ -124,16 +120,6 @@ const BodygraphPage = () => {
           </div>
         </motion.div>
 
-
-        {/* Deconditioning Checklist */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-6"
-        >
-          <DeconditioningChecklist openCenters={openCenters} />
-        </motion.div>
       </div>
     </div>
   );
