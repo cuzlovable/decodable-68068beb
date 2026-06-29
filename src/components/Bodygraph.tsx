@@ -39,12 +39,12 @@ const CX = 300; // chart centerline
 export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
   // Head — upward triangle
   head: {
-    shape: { kind: "triangle", points: [[CX, 30], [CX - 50, 110], [CX + 50, 110]] },
+    shape: { kind: "triangle", points: [[CX, 30], [CX - 55, 115], [CX + 55, 115]] },
     labelAt: [CX, 95],
   },
-  // Ajna — downward triangle, same width as Head
+  // Ajna — downward triangle
   ajna: {
-    shape: { kind: "triangle", points: [[CX - 50, 130], [CX + 50, 130], [CX, 210]] },
+    shape: { kind: "triangle", points: [[CX - 55, 130], [CX + 55, 130], [CX, 215]] },
     labelAt: [CX, 158],
   },
   // Throat — square
@@ -52,27 +52,27 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 235, w: SQ_W, h: SQ_H },
     labelAt: [CX, 280],
   },
-  // G — diamond
+  // G — diamond (enlarged so vertical gate columns at CX±22 sit inside)
   g: {
-    shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
+    shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Heart / Ego — slightly enlarged triangle: top vertex, left vertex, bottom-right vertex
+  // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 105, 455], [CX + 62, 498], [CX + 150, 525]] },
-    labelAt: [CX + 105, 495],
+    shape: { kind: "triangle", points: [[CX + 65, 460], [CX + 160, 475], [CX + 110, 545]] },
+    labelAt: [CX + 112, 500],
   },
   // Sacral — square
   sacral: {
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
     labelAt: [CX, 603],
   },
-  // Spleen — enlarged triangle, apex right toward Sacral (lifted above Sacral to form V with 50-27)
+  // Spleen — triangle, apex right
   splenic: {
     shape: { kind: "triangle", points: [[15, 510], [15, 614], [120, 562]] },
     labelAt: [50, 562],
   },
-  // Solar Plexus — mirror of Spleen, apex points left (lifted above Sacral to form V with 6-59)
+  // Solar Plexus — mirror of Spleen
   solar: {
     shape: { kind: "triangle", points: [[585, 510], [585, 614], [480, 562]] },
     labelAt: [550, 562],
@@ -84,55 +84,52 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
 };
 
-// All gate dots sit INSIDE the bounds of their parent center shape.
-// Coordinates derived to match canonical HD chart layout.
+// All gate dots sit INSIDE their parent shape, aligned in three vertical columns
+// (CX-22, CX, CX+22) wherever possible so ajna→throat→G→sacral→root channels
+// fall on straight vertical lines.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
-  // HEAD — three gates along the bottom edge
-  64: [CX - 25, 102], 61: [CX, 102], 63: [CX + 25, 102],
-  // AJNA — top edge (47, 24, 4), middle (17, 11), apex (43)
-  47: [CX - 28, 142], 24: [CX, 142], 4:  [CX + 28, 142],
-  17: [CX - 16, 170], 11: [CX + 16, 170],
-  43: [CX, 195],
-  // THROAT — top row (62, 23, 56), left col (16, 20), right col (35, 12, 45), bottom row (31, 8, 33)
-  62: [270, 248], 23: [300, 248], 56: [330, 248],
-  16: [262, 272], 20: [262, 295],
-  35: [338, 263], 12: [338, 283], 45: [338, 303],
-  31: [272, 315], 8:  [300, 315], 33: [328, 315],
-  // G — diamond perimeter & interior (gate 10 pushed to left vertex for horizontal exit)
-  1:  [CX, 378],
-  7:  [CX - 22, 398], 13: [CX + 22, 398],
-  10: [CX - 50, 420], 25: [CX + 38, 420],
-  15: [CX - 22, 444], 46: [CX + 22, 444],
-  2:  [CX, 460],
-  // EGO — top vertex (21), interior (51), left vertex (26), bottom-right vertex (40)
-  21: [CX + 108, 475], 51: [CX + 95, 488], 26: [CX + 75, 500],
-  40: [CX + 135, 512],
-  // SPLEEN — top edge from left vertex (48) → 57 → 44 → apex (50); bottom edge 18 (vertex) → 28 → 32
+  // HEAD
+  64: [CX - 22, 105], 61: [CX, 105], 63: [CX + 22, 105],
+  // AJNA — top (47,24,4), mid (17,11), apex (43)
+  47: [CX - 22, 142], 24: [CX, 142], 4:  [CX + 22, 142],
+  17: [CX - 22, 165], 11: [CX + 22, 165],
+  43: [CX, 198],
+  // THROAT — top row, side cols, bottom row
+  62: [CX - 22, 248], 23: [CX, 248], 56: [CX + 22, 248],
+  16: [CX - 40, 272], 20: [CX - 40, 295],
+  35: [CX + 40, 263], 12: [CX + 40, 283], 45: [CX + 40, 303],
+  31: [CX - 22, 315], 8:  [CX, 315], 33: [CX + 22, 315],
+  // G — diamond
+  1:  [CX, 365],
+  7:  [CX - 22, 395], 13: [CX + 22, 395],
+  10: [CX - 40, 420], 25: [CX + 40, 420],
+  15: [CX - 22, 448], 46: [CX + 22, 448],
+  2:  [CX, 478],
+  // EGO — gates inside the downward triangle
+  21: [CX + 95, 485], 26: [CX + 118, 495],
+  40: [CX + 140, 500], 51: [CX + 110, 518],
+  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 552],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — top (5, 14, 29), 34 below top-left, mid (27, 59), bottom (42, 3, 9)
-  5:  [CX - 30, 568], 14: [CX, 568], 29: [CX + 30, 568],
-  34: [CX - 30, 590],
-  27: [CX - 30, 613],
-  59: [CX + 30, 613],
-  42: [CX - 30, 636], 3:  [CX, 636], 9:  [CX + 30, 636],
-  // SOLAR — top-right vertex (36) → 22 → 37 → apex-left (6); bottom 49 → 55 → 30 (vertex)
+  // SACRAL — three columns; 34 left col upper, 27/59 mid row
+  5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
+  34: [CX - 40, 590],
+  27: [CX - 22, 613], 59: [CX + 22, 613],
+  42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
+  // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
   49: [518, 572], 55: [545, 584], 30: [572, 597],
-  // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
-  53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
-  54: [CX - 40, 738], 38: [CX - 40, 758],
-  58: [CX - 40, 778],
+  // ROOT — three columns
+  53: [CX - 22, 712], 60: [CX, 712], 52: [CX + 22, 712],
+  54: [CX - 40, 738], 38: [CX - 40, 758], 58: [CX - 40, 778],
   19: [CX + 40, 738], 39: [CX + 40, 758], 41: [CX + 40, 778],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// Hide visual tubes that overlap/cross awkwardly with neighbors.
-// Per reference: gate 10 should only expose its horizontal exit toward 20;
-// gate 34 should only expose its tube toward 20 (meeting the 20-57 line).
+// Hide tubes that overlap/cross awkwardly with neighbors.
 const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
@@ -164,7 +161,7 @@ function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
 }
 
 function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean }) {
-  const { shape, labelAt } = CENTER_SHAPES[center];
+  const { shape } = CENTER_SHAPES[center];
   const { fill, stroke } = CENTER_COLORS[center];
   return (
     <g>
@@ -174,17 +171,6 @@ function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean 
         isDefined ? stroke : OPEN_GRAY,
         !isDefined,
       )}
-      <text
-        x={labelAt[0]} y={labelAt[1]}
-        textAnchor="middle"
-        fill="hsl(230 20% 30%)"
-        fontSize="10"
-        fontFamily="DM Sans, sans-serif"
-        fontWeight={600}
-        opacity={0.7}
-      >
-        {CENTERS[center].label.toLowerCase()}
-      </text>
     </g>
   );
 }
@@ -220,14 +206,15 @@ function GateEl({
   );
 }
 
-// Tube-style channel: a wide, soft cream band with subtle outline.
-// When active, the band splits at midpoint into the activating side's color.
+type SideMode = "off" | "design" | "personality" | "both";
+
+// Tube-style channel: a cream band that fills with the activating side's color.
+// When a gate is in BOTH Design and Personality, its half splits red/black stacked.
 function TubeChannel({
-  a, b, color1, color2, active, g1Active, g2Active,
+  a, b, g1Mode, g2Mode,
 }: {
   a: [number, number]; b: [number, number];
-  color1: string; color2: string;
-  active: boolean; g1Active: boolean; g2Active: boolean;
+  g1Mode: SideMode; g2Mode: SideMode;
 }) {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
@@ -235,13 +222,31 @@ function TubeChannel({
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
-  const bandW = 9;   // slightly thinner tube
-  const inset = 7;   // shorten so it tucks under the gate circles
+  const bandW = 9;
+  const inset = 7;
+  const halfLen = Math.max(0, len / 2 - inset);
+  const innerH = bandW - 3;
+  const innerY = -bandW / 2 + 1.5;
 
-  // Background band (always rendered as the tube)
+  const renderHalf = (mode: SideMode, x: number) => {
+    if (mode === "off") return null;
+    if (mode === "both") {
+      return (
+        <g>
+          <rect x={x} y={innerY} width={halfLen} height={innerH / 2}
+            fill={DESIGN_C} />
+          <rect x={x} y={innerY + innerH / 2} width={halfLen} height={innerH / 2}
+            fill={PERSON_C} />
+        </g>
+      );
+    }
+    const c = mode === "design" ? DESIGN_C : PERSON_C;
+    return <rect x={x} y={innerY} width={halfLen} height={innerH}
+      rx={innerH / 2} fill={c} />;
+  };
+
   return (
     <g transform={`translate(${mx}, ${my}) rotate(${angle})`}>
-      {/* tube outline + cream fill */}
       <rect
         x={-(len / 2) + inset} y={-bandW / 2}
         width={Math.max(0, len - inset * 2)} height={bandW}
@@ -250,27 +255,8 @@ function TubeChannel({
         stroke={TUBE_EDGE}
         strokeWidth={1}
       />
-      {/* activated half-fills: left half = color1 when g1 active, right half = color2 when g2 active */}
-      {g1Active && (
-        <rect
-          x={-(len / 2) + inset} y={-bandW / 2 + 1.5}
-          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
-          rx={(bandW - 3) / 2}
-          fill={color1}
-        />
-      )}
-      {g2Active && (
-        <rect
-          x={0} y={-bandW / 2 + 1.5}
-          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
-          rx={(bandW - 3) / 2}
-          fill={color2}
-        />
-      )}
-      {active && (
-        <line x1={0} y1={-bandW / 2 + 1} x2={0} y2={bandW / 2 - 1}
-          stroke="hsl(var(--card))" strokeWidth={0.6} opacity={0.5} />
-      )}
+      {renderHalf(g1Mode, -(len / 2) + inset)}
+      {renderHalf(g2Mode, 0)}
     </g>
   );
 }
@@ -396,13 +382,13 @@ const Bodygraph = ({
   const motivation  = (v.motivation as number) ?? (v.personality_motivation as number) ?? (v.awareness as number);
   const perspective = (v.perspective as number) ?? (v.personality_perspective as number) ?? (v.view as number);
 
-  const colorForGate = (g: number) => {
+  const modeForGate = (g: number): SideMode => {
     const inD = designSet.has(g);
     const inP = personalitySet.has(g);
-    if (inD && inP) return DESIGN_C;
-    if (inD) return DESIGN_C;
-    if (inP) return PERSON_C;
-    return TUBE_OFF;
+    if (inD && inP) return "both";
+    if (inD) return "design";
+    if (inP) return "personality";
+    return "off";
   };
 
   return (
@@ -443,40 +429,12 @@ const Bodygraph = ({
               const a = GATE_POS_INTERNAL[ch.gates[0]];
               const b = GATE_POS_INTERNAL[ch.gates[1]];
               if (!a || !b) return null;
-              const g1Active = activeGates.has(ch.gates[0]);
-              const g2Active = activeGates.has(ch.gates[1]);
-              const active = g1Active || g2Active;
               return (
                 <TubeChannel
                   key={ch.id}
                   a={a} b={b}
-                  color1={colorForGate(ch.gates[0])}
-                  color2={colorForGate(ch.gates[1])}
-                  active={active}
-                  g1Active={g1Active}
-                  g2Active={g2Active}
-                />
-              );
-            })}
-
-            {/* Decorative gate stubs — always-visible short tube exits matching reference chart */}
-            {([
-              // gate 10: horizontal tube exiting left until it meets the 20→57 channel line
-              { gate: 10, dx: -94, dy: 0 },
-              // gate 34: diagonal tube up-left until it meets the 20→57 channel line
-              { gate: 34, dx: -190, dy: -80 },
-            ] as Array<{ gate: number; dx: number; dy: number }>).map(({ gate, dx, dy }) => {
-              const p = GATE_POS_INTERNAL[gate];
-              if (!p) return null;
-              const a: [number, number] = p;
-              const b: [number, number] = [p[0] + dx, p[1] + dy];
-              const gActive = activeGates.has(gate);
-              return (
-                <TubeChannel
-                  key={`stub-${gate}`}
-                  a={a} b={b}
-                  color1={colorForGate(gate)} color2={colorForGate(gate)}
-                  active={gActive} g1Active={gActive} g2Active={gActive}
+                  g1Mode={modeForGate(ch.gates[0])}
+                  g2Mode={modeForGate(ch.gates[1])}
                 />
               );
             })}
