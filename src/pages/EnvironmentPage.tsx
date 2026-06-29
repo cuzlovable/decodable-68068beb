@@ -1,13 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Sparkles, MapPin, Utensils, Trees, Heart, Users,
-  Palette, Briefcase, Star, AlertTriangle, Loader2, RefreshCw,
+  Palette, Briefcase, Star, AlertTriangle, Loader2, RefreshCw, Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { decodeAll, type PhsVariables } from "@/lib/phs";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   food: <Utensils className="w-4 h-4" />,
@@ -43,8 +44,6 @@ type AIResult = {
   suggestions: Suggestion[];
 };
 
-const ENVIRONMENT_OPTIONS = ["Kitchens", "Markets", "Caves", "Valleys", "Mountains", "Shores"];
-
 const EnvironmentPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
@@ -52,7 +51,6 @@ const EnvironmentPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [selectedEnv, setSelectedEnv] = useState<string | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,17 +67,10 @@ const EnvironmentPage = () => {
       if (data && !data.onboarding_completed) { navigate("/onboarding"); return; }
       setProfile(data);
 
-      // Use profile's stored environment or default
-      if (data?.south_node_environment) {
-        setSelectedEnv(data.south_node_environment);
-      }
-
-      // Try to get GPS
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
           () => {
-            // Fallback to profile birth location coords or NYC
             if (data?.birth_latitude && data?.birth_longitude) {
               setUserLocation({ lat: data.birth_latitude, lng: data.birth_longitude });
             } else {
@@ -97,8 +88,13 @@ const EnvironmentPage = () => {
     load();
   }, [navigate]);
 
+  const decoded = useMemo(
+    () => decodeAll((profile?.variables ?? null) as PhsVariables | null),
+    [profile?.variables]
+  );
+
   const fetchSuggestions = useCallback(async () => {
-    if (!selectedEnv || !userLocation) return;
+    if (!decoded.environment || !userLocation) return;
 
     setAiLoading(true);
     setResult(null);
@@ -106,14 +102,19 @@ const EnvironmentPage = () => {
     try {
       const { data, error } = await supabase.functions.invoke("environment-suggestions", {
         body: {
-          environment: selectedEnv,
+          // Send the precise color+tone label so the AI grounds in
+          // e.g. "Narrow Valley" instead of generic "Valleys".
+          environment: decoded.environment.full,
+          environmentColor: decoded.environment.colorLabel,
+          environmentTone: decoded.environment.toneLabel,
+          digestion: decoded.digestion?.full,
+          perspective: decoded.perspective?.full,
+          motivation: decoded.motivation?.full,
           latitude: userLocation.lat,
           longitude: userLocation.lng,
           birthDate: profile?.birth_date,
           southNodeGate: profile?.south_node_gate,
           northNodeGate: profile?.north_node_gate,
-          southNodeEnvironment: profile?.south_node_environment,
-          northNodeEnvironment: profile?.north_node_environment,
         },
       });
 
@@ -131,7 +132,7 @@ const EnvironmentPage = () => {
     } finally {
       setAiLoading(false);
     }
-  }, [selectedEnv, userLocation, profile]);
+  }, [decoded, userLocation, profile]);
 
   if (loading) {
     return (
@@ -153,7 +154,7 @@ const EnvironmentPage = () => {
             <div className="w-7 h-7 rounded-full gradient-aura flex items-center justify-center">
               <MapPin className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-            <span className="font-display text-base font-semibold text-foreground">My Environments</span>
+            <span className="font-display text-base font-semibold text-foreground">My Environment</span>
           </div>
           <div className="w-16" />
         </div>
@@ -165,44 +166,65 @@ const EnvironmentPage = () => {
           </div>
         )}
 
-        {/* Environment Selector */}
+        {/* Auto-detected environment card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6 shadow-aura"
         >
-          <h2 className="font-display text-xl font-bold text-foreground mb-1">Design Environment</h2>
-          <p className="text-xs text-muted-foreground mb-4">
-            Select your environment variable to discover where your aura thrives
-          </p>
-
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {ENVIRONMENT_OPTIONS.map((env) => (
-              <button
-                key={env}
-                onClick={() => setSelectedEnv(env)}
-                className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  selectedEnv === env
-                    ? "gradient-aura text-primary-foreground shadow-aura"
-                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                {env}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 mb-1">
+            <Compass className="w-4 h-4 text-primary" />
+            <span className="text-[11px] uppercase tracking-wider text-primary font-medium">
+              Your Design Environment
+            </span>
           </div>
 
-          <Button
-            onClick={fetchSuggestions}
-            disabled={!selectedEnv || !userLocation || aiLoading}
-            className="w-full gradient-aura text-primary-foreground hover:opacity-90"
-          >
-            {aiLoading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Finding locations...</>
-            ) : (
-              <><Sparkles className="w-4 h-4 mr-2" /> Discover My Places</>
-            )}
-          </Button>
+          {decoded.environment ? (
+            <>
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                {decoded.environment.full}
+              </h2>
+              <p className="text-xs text-muted-foreground mb-4">
+                Color {decoded.environment.color} · Tone {decoded.environment.tone} ·{" "}
+                {decoded.environment.colorLabel}
+              </p>
+
+              {/* Secondary variables */}
+              <div className="grid grid-cols-2 gap-2 mb-5">
+                {decoded.digestion && (
+                  <VarChip label="Digestion" value={decoded.digestion.full} sub={`${decoded.digestion.color}.${decoded.digestion.tone}`} />
+                )}
+                {decoded.perspective && (
+                  <VarChip label="Perspective" value={decoded.perspective.full} sub={`${decoded.perspective.color}.${decoded.perspective.tone}`} />
+                )}
+                {decoded.motivation && (
+                  <VarChip label="Motivation" value={decoded.motivation.full} sub={`${decoded.motivation.color}.${decoded.motivation.tone}`} />
+                )}
+                <VarChip
+                  label="Environment"
+                  value={decoded.environment.full}
+                  sub={`${decoded.environment.color}.${decoded.environment.tone}`}
+                  accent
+                />
+              </div>
+
+              <Button
+                onClick={fetchSuggestions}
+                disabled={!userLocation || aiLoading}
+                className="w-full gradient-aura text-primary-foreground hover:opacity-90"
+              >
+                {aiLoading ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Finding {decoded.environment.full} spots…</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" /> Find my {decoded.environment.full} spots</>
+                )}
+              </Button>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Your environment variable hasn't been calculated yet. Finish onboarding so we can decode your color and tone.
+            </p>
+          )}
         </motion.div>
 
         {/* Chiron Return Banner */}
@@ -241,7 +263,7 @@ const EnvironmentPage = () => {
             >
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-display text-lg font-semibold text-foreground">
-                  Your {selectedEnv} Spots
+                  Your {decoded.environment?.full ?? ""} spots
                 </h3>
                 <Button variant="ghost" size="sm" onClick={fetchSuggestions} disabled={aiLoading}>
                   <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
@@ -285,7 +307,7 @@ const EnvironmentPage = () => {
         </AnimatePresence>
 
         {/* Empty state */}
-        {!result && !aiLoading && (
+        {!result && !aiLoading && decoded.environment && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -296,8 +318,8 @@ const EnvironmentPage = () => {
               <MapPin className="w-7 h-7 text-muted-foreground" />
             </div>
             <p className="text-sm text-muted-foreground">
-              Select your environment and tap "Discover" to find<br />
-              where your aura naturally thrives
+              Tap "Find my {decoded.environment.full} spots" to surface<br />
+              where your aura naturally thrives nearby.
             </p>
           </motion.div>
         )}
@@ -305,5 +327,19 @@ const EnvironmentPage = () => {
     </div>
   );
 };
+
+function VarChip({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: boolean }) {
+  return (
+    <div
+      className={`rounded-xl px-3 py-2 border ${
+        accent ? "border-primary/40 bg-primary/5" : "border-border/40 bg-muted/30"
+      }`}
+    >
+      <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="text-xs font-semibold text-foreground leading-tight">{value}</p>
+      <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{sub}</p>
+    </div>
+  );
+}
 
 export default EnvironmentPage;
