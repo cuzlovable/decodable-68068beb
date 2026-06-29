@@ -59,7 +59,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 28, 470], [CX + 158, 482], [CX + 95, 568]] },
+    shape: { kind: "triangle", points: [[CX + 35, 478], [CX + 150, 488], [CX + 95, 555]] },
     labelAt: [CX + 112, 500],
   },
   // Sacral — square
@@ -79,8 +79,8 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Root — square
   root: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 700, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 748],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 735, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 780],
   },
 };
 
@@ -100,14 +100,14 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // G — diamond (tightened so dots sit safely inside)
   1:  [CX, 372],
   7:  [CX - 22, 398], 13: [CX + 22, 398],
-  10: [CX - 35, 420], 25: [CX + 35, 420],
+  10: [CX - 35, 420], 25: [CX + 62, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 51 sits directly below G gate 25; 21 up top; 26 lower-right; 40 at right vertex
-  21: [CX + 52, 482],
-  51: [CX + 35, 500],
-  26: [CX + 88, 555],
-  40: [CX + 138, 492],
+  // EGO — smaller triangle; 51 directly below G gate 25; gates kept inside outline
+  21: [CX + 62, 488],
+  51: [CX + 62, 510],
+  26: [CX + 88, 548],
+  40: [CX + 130, 498],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 545],
   50: [100, 562],
@@ -121,16 +121,16 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
   49: [518, 572], 55: [545, 584], 30: [572, 597],
-  // ROOT — three columns
-  53: [CX - 22, 712], 60: [CX, 712], 52: [CX + 22, 712],
-  54: [CX - 40, 738], 38: [CX - 40, 758], 58: [CX - 40, 778],
-  19: [CX + 40, 738], 39: [CX + 40, 758], 41: [CX + 40, 778],
+  // ROOT — three columns (shifted down for breathing room from Sacral)
+  53: [CX - 22, 747], 60: [CX, 747], 52: [CX + 22, 747],
+  54: [CX - 40, 773], 38: [CX - 40, 793], 58: [CX - 40, 813],
+  19: [CX + 40, 773], 39: [CX + 40, 793], 41: [CX + 40, 813],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// Hide tubes that overlap/cross awkwardly with neighbors.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60"]);
+// Hide tubes that overlap/cross awkwardly with neighbors. 5-15 is the leftmost G↔Sacral tube.
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60", "5-15"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
@@ -412,7 +412,7 @@ const Bodygraph = ({
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
         <div className="flex-1 max-w-[520px]">
-          <svg viewBox="0 0 600 840" className="w-full block" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 600 870" className="w-full block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={DESIGN_C} />
@@ -439,15 +439,16 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tube: 41 ↔ 27 (per design request) */}
-            {(() => {
-              const a = GATE_POS_INTERNAL[41];
-              const b = GATE_POS_INTERNAL[27];
+            {/* Extra decorative tubes: 41↔27 and 40↔27 (per design request) */}
+            {([[41, 27], [40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
+              const a = GATE_POS_INTERNAL[g1];
+              const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
               return (
-                <TubeChannel a={a} b={b} g1Mode={modeForGate(41)} g2Mode={modeForGate(27)} />
+                <TubeChannel key={`extra-${g1}-${g2}`} a={a} b={b}
+                  g1Mode={modeForGate(g1)} g2Mode={modeForGate(g2)} />
               );
-            })()}
+            })}
 
             {/* Decorative stub: gate 10 → 45° up-left, terminating on the 20–57 channel line */}
             {(() => {

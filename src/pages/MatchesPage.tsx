@@ -224,11 +224,8 @@ const MatchesPage = () => {
           className="mt-8 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">For any 1:1 connection.</span>{" "}
-            Matches here aren't just for dating — they surface people whose Human Design
-            (type, authority, cognition/environment, channel pull, profile) naturally clicks
-            with yours, whether that's romance, collaboration, or close friendship. The more
-            you tell us what felt right or off, the sharper your matches get.
+            <span className="font-semibold text-foreground">For any 1:1.</span>{" "}
+            Romance, friendship, or collaboration — these matches click with your design.
           </p>
         </motion.div>
       </div>
