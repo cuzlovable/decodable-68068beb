@@ -9,6 +9,28 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+
+// Plain-language descriptions per Environment color (the broad terrain you thrive in).
+const ENV_DESCRIPTIONS: Record<string, string> = {
+  Caves: "You thrive in enclosed, contained spaces with clear edges — rooms, nooks, dens.",
+  Markets: "You thrive amid lively exchange — bustling streets, gathering spots, marketplaces.",
+  Kitchens: "You thrive where things are being made — workshops, studios, kitchens, makerspaces.",
+  Mountains: "You thrive at elevation with sweeping perspective — hills, rooftops, high vistas.",
+  Valleys: "You thrive nestled between natural boundaries — valleys, basins, sheltered terrain.",
+  Shores: "You thrive at the edge of two worlds — coastlines, riverbanks, transition zones.",
+};
+
+// Plain-language descriptions per Digestion / "super-cognition" color (how you best take in life).
+const DIG_DESCRIPTIONS: Record<string, string> = {
+  Consecutive: "You digest best with one food/idea at a time, fully, in sequence.",
+  Alternating: "You digest best with variety — alternating tastes and inputs keeps you sharp.",
+  "Open Taste": "You digest best in a relaxed, social setting where flavors stay light.",
+  "Closed Taste": "You digest best in quiet focus — no distractions while you take it in.",
+  Hot: "You digest best with warm food, warm rooms, warm company.",
+  Cold: "You digest best with cool food, cool rooms, calm surroundings.",
+};
+
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   food: <Utensils className="w-4 h-4" />,
@@ -36,6 +58,7 @@ type Suggestion = {
   reason: string;
   tip: string;
   nodalAlignment?: string;
+  imageQuery?: string;
 };
 
 type AIResult = {
@@ -43,6 +66,12 @@ type AIResult = {
   chironMessage: string;
   suggestions: Suggestion[];
 };
+
+function imageFor(s: Suggestion) {
+  const q = encodeURIComponent(s.imageQuery || `${s.name} ${s.category}`);
+  return `https://loremflickr.com/320/200/${q}`;
+}
+
 
 const EnvironmentPage = () => {
   const navigate = useNavigate();
