@@ -59,13 +59,13 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 35, 478], [CX + 150, 488], [CX + 95, 555]] },
+    shape: { kind: "triangle", points: [[CX + 35, 498], [CX + 150, 508], [CX + 95, 575]] },
     labelAt: [CX + 112, 500],
   },
-  // Sacral — square
+  // Sacral — square (pushed down to clear G and allow 26-44 channel to cross)
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 603],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 580, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 628],
   },
   // Spleen — triangle, apex right
   splenic: {
@@ -100,23 +100,23 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // G — diamond (tightened so dots sit safely inside)
   1:  [CX, 372],
   7:  [CX - 22, 398], 13: [CX + 22, 398],
-  10: [CX - 35, 420], 25: [CX + 62, 422],
+  10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — smaller triangle; 51 directly below G gate 25; gates kept inside outline
-  21: [CX + 62, 488],
-  51: [CX + 62, 510],
-  26: [CX + 88, 548],
-  40: [CX + 130, 498],
-  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 527], 57: [55, 540], 44: [82, 545],
+  // EGO — gates anchored along left edge of triangle (25→51 channel runs along left side)
+  21: [CX + 85, 510],
+  51: [CX + 55, 528],
+  26: [CX + 105, 545],
+  40: [CX + 125, 525],
+  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32 (44 nudged inside)
+  48: [28, 527], 57: [55, 540], 44: [75, 548],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — 34 & 27 vertical on left, 59 right-side meeting gate 6 tube
-  5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
-  34: [CX - 40, 590],
-  27: [CX - 40, 615], 59: [CX + 40, 615],
-  42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
+  // SACRAL — shifted down with the center; 34 & 27 vertical on left, 59 right meets gate 6
+  5:  [CX - 22, 593], 14: [CX, 593], 29: [CX + 22, 593],
+  34: [CX - 40, 615],
+  27: [CX - 40, 640], 59: [CX + 40, 640],
+  42: [CX - 22, 661], 3:  [CX, 661], 9:  [CX + 22, 661],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
@@ -130,7 +130,7 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 export const GATE_POS = GATE_POS_INTERNAL;
 
 // Hide tubes that overlap/cross awkwardly with neighbors. 5-15 is the leftmost G↔Sacral tube.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60", "5-15"]);
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "5-15"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
@@ -453,7 +453,7 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [187, 382] as [number, number] },
+              { gate: 10, target: [155, 420] as [number, number] },
               { gate: 34, target: [115, 468] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
