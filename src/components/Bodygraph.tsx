@@ -450,23 +450,23 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Decorative stub: gate 10 → 45° up-left, terminating on the 20–57 channel line */}
-            {(() => {
-              const a = GATE_POS_INTERNAL[10];
+            {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
+                Both halves take the originating gate's mode so the entire stub colors when active. */}
+            {([
+              { gate: 10, target: [187, 382] as [number, number] },
+              { gate: 34, target: [115, 468] as [number, number] },
+            ]).map(({ gate, target }) => {
+              const a = GATE_POS_INTERNAL[gate];
               if (!a) return null;
-              // 20 at (CX-40, 295), 57 at (55, 540); 45° ray from 10 hits at ~(187, 382)
-              const b: [number, number] = [187, 382];
-              return <TubeChannel a={a} b={b} g1Mode={modeForGate(10)} g2Mode="off" />;
-            })()}
-
-            {/* Decorative stub: gate 34 → up-left, terminating on the 20–57 channel line */}
-            {(() => {
-              const a = GATE_POS_INTERNAL[34];
-              if (!a) return null;
-              // Closest point on 20–57 line to gate 34 ≈ (115, 468)
-              const b: [number, number] = [115, 468];
-              return <TubeChannel a={a} b={b} g1Mode={modeForGate(34)} g2Mode="off" />;
-            })()}
+              // Extend the target endpoint past the 20-57 tube center so the band visibly overlaps it.
+              const dx = target[0] - a[0];
+              const dy = target[1] - a[1];
+              const len = Math.hypot(dx, dy) || 1;
+              const ext = 14; // covers TubeChannel inset (7) + half of 20-57 band width
+              const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
+              const mode = modeForGate(gate);
+              return <TubeChannel key={`stub-${gate}`} a={a} b={b} g1Mode={mode} g2Mode={mode} />;
+            })}
 
 
             {/* Centers */}
