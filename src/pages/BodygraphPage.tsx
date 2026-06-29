@@ -5,7 +5,6 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
-import { getOpenCenters } from "@/lib/humandesign";
 
 // Fallback used only if the profile somehow has no calculated chart yet.
 const DEMO_DEFINED_GATES = [64, 47, 17, 62, 31, 7, 1, 8, 15, 5, 14, 2, 34, 57, 20];
@@ -55,7 +54,6 @@ const BodygraphPage = () => {
     ? Object.entries(raw.gate_and_line.personality).map(([planet, gl]: [string, any]) => ({ planet, gate: gl[0], line: gl[1] }))
     : undefined;
   const variables = (profile?.variables as any) || undefined;
-  const openCenters = getOpenCenters(definedGates);
 
   if (loading) {
     return (
