@@ -3,12 +3,13 @@ import { motion } from "framer-motion";
 import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/lib/humandesign";
 
 // ─── Bodygraph ──────────────────────────────────────────────────
-const DESIGN_C  = "hsl(0 70% 52%)";     // red (Design)
-const PERSON_C  = "hsl(220 15% 14%)";   // black (Personality)
+const DESIGN_C  = "hsl(0 70% 52%)";    // red (Design)
+const PERSON_C  = "hsl(220 15% 14%)";  // black (Personality)
 const OPEN_GRAY = "hsl(220 12% 72%)";
-const CHANNEL_OFF = "hsl(25 18% 86%)";  // soft taupe tube when inactive
+const TUBE_OFF  = "hsl(30 25% 95%)";   // soft cream tube band (matches reference)
+const TUBE_EDGE = "hsl(25 20% 80%)";   // tube outline
 
-// Branded muted pastels with a grayish hue (pastel orange/blue palette family).
+// Branded muted pastels with a grayish hue.
 const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string }> = {
   head:    { fill: "hsl(40 38% 80%)",  stroke: "hsl(35 28% 55%)"  },
   ajna:    { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
@@ -26,66 +27,107 @@ type Shape =
   | { kind: "rect"; x: number; y: number; w: number; h: number }
   | { kind: "diamond"; cx: number; cy: number; r: number };
 
-// Canvas 560x800 — generous spacing between centers; Ego is the smallest shape.
+// ─── Canonical geometry — modeled after the standard HD chart reference ─
+// Canvas 600 x 840. Centers are balanced in size; Heart is the smallest.
+// Square centers (Throat, Sacral, Root) share the same 100x90 footprint.
+// Head & Ajna triangles share width; Spleen & Solar Plexus are mirrored
+// horizontal triangles flanking the Sacral.
+const SQ_W = 100, SQ_H = 90;
+const CX = 300; // chart centerline
+
 export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
-  head:    { shape: { kind: "triangle", points: [[280, 40], [240, 110], [320, 110]] }, labelAt: [280, 95] },
-  ajna:    { shape: { kind: "triangle", points: [[240, 130], [320, 130], [280, 200]] }, labelAt: [280, 158] },
-  throat:  { shape: { kind: "rect", x: 230, y: 220, w: 100, h: 85 }, labelAt: [280, 265] },
-  g:       { shape: { kind: "diamond", cx: 280, cy: 420, r: 55 }, labelAt: [280, 425] },
-  // EGO — smallest of the 9 centers; pushed right to clear the 12-22 / 35-36 channel lines.
-  heart:   { shape: { kind: "triangle", points: [[460, 400], [438, 450], [485, 450]] }, labelAt: [462, 442] },
-  // SPLEEN — apex points right (toward Sacral). Moved further left for spacing.
-  splenic: { shape: { kind: "triangle", points: [[50, 545], [50, 630], [190, 587]] }, labelAt: [90, 587] },
-  sacral:  { shape: { kind: "rect", x: 230, y: 545, w: 100, h: 85 }, labelAt: [280, 590] },
-  // SOLAR — apex points left (toward Sacral). Moved further right.
-  solar:   { shape: { kind: "triangle", points: [[510, 545], [510, 630], [370, 587]] }, labelAt: [470, 587] },
-  root:    { shape: { kind: "rect", x: 230, y: 680, w: 100, h: 80 }, labelAt: [280, 722] },
+  // Head — upward triangle
+  head: {
+    shape: { kind: "triangle", points: [[CX, 30], [CX - 50, 110], [CX + 50, 110]] },
+    labelAt: [CX, 95],
+  },
+  // Ajna — downward triangle, same width as Head
+  ajna: {
+    shape: { kind: "triangle", points: [[CX - 50, 130], [CX + 50, 130], [CX, 210]] },
+    labelAt: [CX, 158],
+  },
+  // Throat — square
+  throat: {
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 235, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 280],
+  },
+  // G — diamond
+  g: {
+    shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
+    labelAt: [CX, 425],
+  },
+  // Heart — small triangle, sits to the right of G (smallest center)
+  heart: {
+    shape: { kind: "triangle", points: [[CX + 110, 395], [CX + 110, 455], [CX + 165, 425]] },
+    labelAt: [CX + 128, 428],
+  },
+  // Sacral — square
+  sacral: {
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 540, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 588],
+  },
+  // Spleen — horizontal triangle, apex points right toward Sacral
+  splenic: {
+    shape: { kind: "triangle", points: [[60, 540], [60, 630], [200, 585]] },
+    labelAt: [105, 585],
+  },
+  // Solar Plexus — mirror of Spleen, apex points left
+  solar: {
+    shape: { kind: "triangle", points: [[540, 540], [540, 630], [400, 585]] },
+    labelAt: [495, 585],
+  },
+  // Root — square
+  root: {
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 700, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 748],
+  },
 };
 
 // All gate dots sit INSIDE the bounds of their parent center shape.
+// Coordinates derived to match canonical HD chart layout.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
-  // HEAD
-  64: [255, 100], 61: [280, 100], 63: [305, 100],
-  // AJNA
-  47: [252, 142], 24: [280, 142], 4:  [308, 142],
-  17: [262, 168], 11: [298, 168],
-  43: [280, 188],
-  // THROAT
-  62: [250, 235], 23: [280, 235], 56: [310, 235],
-  16: [245, 258], 20: [245, 282],
-  35: [315, 248], 12: [315, 268], 45: [315, 288],
-  31: [250, 295], 8:  [280, 295], 33: [310, 295],
-  // G
-  1:  [280, 378],
-  7:  [256, 392], 13: [304, 392],
-  10: [240, 420], 25: [320, 420],
-  15: [256, 448], 46: [304, 448],
-  2:  [280, 462],
-  // EGO / HEART (smallest)
-  21: [458, 414], 51: [453, 428], 26: [450, 443],
-  40: [475, 443],
-  // SPLEEN — top slant 48→44→57 (base→apex), bottom slant 18→28→32 (base→apex), 50 interior
-  48: [75, 558], 44: [115, 568], 57: [165, 583],
-  50: [125, 587],
-  18: [75, 618], 28: [115, 605], 32: [160, 592],
-  // SACRAL
-  5:  [250, 558], 14: [280, 558], 29: [310, 558],
-  34: [245, 583], 27: [245, 608],
-  59: [315, 595],
-  42: [250, 620], 3:  [280, 620], 9:  [310, 620],
-  // SOLAR — top slant 36→22→37 (base→apex), bottom slant 49→55→30 (apex→base), 6 interior
-  36: [485, 558], 22: [445, 568], 37: [395, 583],
-  6:  [435, 587],
-  49: [395, 593], 55: [445, 605], 30: [485, 618],
-  // ROOT
-  53: [250, 692], 60: [280, 692], 52: [310, 692],
-  54: [245, 720], 38: [245, 740], 58: [245, 758],
-  19: [315, 720], 39: [315, 740], 41: [315, 758],
+  // HEAD — three gates along the bottom edge
+  64: [CX - 25, 102], 61: [CX, 102], 63: [CX + 25, 102],
+  // AJNA — top edge (47, 24, 4), middle (17, 11), apex (43)
+  47: [CX - 28, 142], 24: [CX, 142], 4:  [CX + 28, 142],
+  17: [CX - 16, 170], 11: [CX + 16, 170],
+  43: [CX, 195],
+  // THROAT — top row (62, 23, 56), left (16, 20), right (35, 12, 45), bottom (31, 8, 33)
+  62: [CX - 30, 248], 23: [CX, 248], 56: [CX + 30, 248],
+  16: [CX - 40, 272], 20: [CX - 40, 295],
+  35: [CX + 40, 263], 12: [CX + 40, 287], 45: [CX + 40, 311],
+  31: [CX - 30, 315], 8:  [CX, 315], 33: [CX + 30, 315],
+  // G — diamond perimeter & interior
+  1:  [CX, 378],
+  7:  [CX - 22, 398], 13: [CX + 22, 398],
+  10: [CX - 38, 420], 25: [CX + 38, 420],
+  15: [CX - 22, 444], 46: [CX + 22, 444],
+  2:  [CX, 460],
+  // EGO / HEART — 21, 51, 26 stacked on the left edge; 40 at the apex
+  21: [CX + 120, 405], 51: [CX + 120, 425], 26: [CX + 120, 445],
+  40: [CX + 152, 425],
+  // SPLEEN — top slant 48→44→57, bottom slant 18→28→32, 50 interior
+  48: [82, 555], 44: [120, 568], 57: [165, 583],
+  50: [130, 587],
+  18: [82, 615], 28: [120, 602], 32: [165, 590],
+  // SACRAL — top (5, 14, 29), left (34, 27), right (59), bottom (42, 3, 9)
+  5:  [CX - 30, 553], 14: [CX, 553], 29: [CX + 30, 553],
+  34: [CX - 40, 578], 27: [CX - 40, 602],
+  59: [CX + 40, 590],
+  42: [CX - 30, 620], 3:  [CX, 620], 9:  [CX + 30, 620],
+  // SOLAR — top slant 36→22→37 (base→apex), bottom slant 49→55→30, 6 interior
+  36: [518, 555], 22: [480, 568], 37: [435, 583],
+  6:  [470, 587],
+  49: [435, 590], 55: [480, 602], 30: [518, 615],
+  // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
+  53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
+  54: [CX - 40, 738], 38: [CX - 40, 758],
+  58: [CX - 40, 778],
+  19: [CX + 40, 738], 39: [CX + 40, 758], 41: [CX + 40, 778],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// All canonical channels render as tubes.
 const HIDDEN_CHANNELS = new Set<string>();
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
@@ -173,33 +215,57 @@ function GateEl({
   );
 }
 
-// Tube-style channel: two thick parallel offset lines, split-colored at midpoint.
+// Tube-style channel: a wide, soft cream band with subtle outline.
+// When active, the band splits at midpoint into the activating side's color.
 function TubeChannel({
-  a, b, color1, color2, active,
+  a, b, color1, color2, active, g1Active, g2Active,
 }: {
   a: [number, number]; b: [number, number];
-  color1: string; color2: string; active: boolean;
+  color1: string; color2: string;
+  active: boolean; g1Active: boolean; g2Active: boolean;
 }) {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
   const len = Math.hypot(dx, dy) || 1;
-  const offset = active ? 3.2 : 2.8;
-  const ox = (-dy / len) * offset;
-  const oy = (dx / len) * offset;
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
-  const sw = active ? 4.5 : 3.2;
-  const opacity = active ? 1 : 0.6;
+  const bandW = 12;
+  const inset = 7; // shorten so it tucks under the gate circles
+
+  // Background band (always rendered as the tube)
   return (
-    <g opacity={opacity} strokeLinecap="round">
-      <line x1={a[0] + ox} y1={a[1] + oy} x2={mx + ox} y2={my + oy}
-        stroke={color1} strokeWidth={sw} />
-      <line x1={mx + ox} y1={my + oy} x2={b[0] + ox} y2={b[1] + oy}
-        stroke={color2} strokeWidth={sw} />
-      <line x1={a[0] - ox} y1={a[1] - oy} x2={mx - ox} y2={my - oy}
-        stroke={color1} strokeWidth={sw} />
-      <line x1={mx - ox} y1={my - oy} x2={b[0] - ox} y2={b[1] - oy}
-        stroke={color2} strokeWidth={sw} />
+    <g transform={`translate(${mx}, ${my}) rotate(${angle})`}>
+      {/* tube outline + cream fill */}
+      <rect
+        x={-(len / 2) + inset} y={-bandW / 2}
+        width={Math.max(0, len - inset * 2)} height={bandW}
+        rx={bandW / 2}
+        fill={TUBE_OFF}
+        stroke={TUBE_EDGE}
+        strokeWidth={1}
+      />
+      {/* activated half-fills: left half = color1 when g1 active, right half = color2 when g2 active */}
+      {g1Active && (
+        <rect
+          x={-(len / 2) + inset} y={-bandW / 2 + 1.5}
+          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
+          rx={(bandW - 3) / 2}
+          fill={color1}
+        />
+      )}
+      {g2Active && (
+        <rect
+          x={0} y={-bandW / 2 + 1.5}
+          width={Math.max(0, len / 2 - inset)} height={bandW - 3}
+          rx={(bandW - 3) / 2}
+          fill={color2}
+        />
+      )}
+      {active && (
+        <line x1={0} y1={-bandW / 2 + 1} x2={0} y2={bandW / 2 - 1}
+          stroke="hsl(var(--card))" strokeWidth={0.6} opacity={0.5} />
+      )}
     </g>
   );
 }
@@ -331,7 +397,7 @@ const Bodygraph = ({
     if (inD && inP) return DESIGN_C;
     if (inD) return DESIGN_C;
     if (inP) return PERSON_C;
-    return CHANNEL_OFF;
+    return TUBE_OFF;
   };
 
   return (
@@ -354,8 +420,8 @@ const Bodygraph = ({
 
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
-        <div className="flex-1 max-w-[500px]">
-          <svg viewBox="0 0 560 800" className="w-full block" xmlns="http://www.w3.org/2000/svg">
+        <div className="flex-1 max-w-[520px]">
+          <svg viewBox="0 0 600 840" className="w-full block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={DESIGN_C} />
@@ -365,7 +431,7 @@ const Bodygraph = ({
               </linearGradient>
             </defs>
 
-            {/* Tube channels */}
+            {/* Tube channels (under centers so they tuck behind shapes) */}
             {UNIQUE_CHANNELS.map((ch) => {
               const key = [...ch.gates].sort((x, y) => x - y).join("-");
               if (HIDDEN_CHANNELS.has(key)) return null;
@@ -379,9 +445,11 @@ const Bodygraph = ({
                 <TubeChannel
                   key={ch.id}
                   a={a} b={b}
-                  color1={g1Active ? colorForGate(ch.gates[0]) : CHANNEL_OFF}
-                  color2={g2Active ? colorForGate(ch.gates[1]) : CHANNEL_OFF}
+                  color1={colorForGate(ch.gates[0])}
+                  color2={colorForGate(ch.gates[1])}
                   active={active}
+                  g1Active={g1Active}
+                  g2Active={g2Active}
                 />
               );
             })}
