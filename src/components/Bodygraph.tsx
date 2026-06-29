@@ -429,40 +429,12 @@ const Bodygraph = ({
               const a = GATE_POS_INTERNAL[ch.gates[0]];
               const b = GATE_POS_INTERNAL[ch.gates[1]];
               if (!a || !b) return null;
-              const g1Active = activeGates.has(ch.gates[0]);
-              const g2Active = activeGates.has(ch.gates[1]);
-              const active = g1Active || g2Active;
               return (
                 <TubeChannel
                   key={ch.id}
                   a={a} b={b}
-                  color1={colorForGate(ch.gates[0])}
-                  color2={colorForGate(ch.gates[1])}
-                  active={active}
-                  g1Active={g1Active}
-                  g2Active={g2Active}
-                />
-              );
-            })}
-
-            {/* Decorative gate stubs — always-visible short tube exits matching reference chart */}
-            {([
-              // gate 10: horizontal tube exiting left until it meets the 20→57 channel line
-              { gate: 10, dx: -94, dy: 0 },
-              // gate 34: diagonal tube up-left until it meets the 20→57 channel line
-              { gate: 34, dx: -190, dy: -80 },
-            ] as Array<{ gate: number; dx: number; dy: number }>).map(({ gate, dx, dy }) => {
-              const p = GATE_POS_INTERNAL[gate];
-              if (!p) return null;
-              const a: [number, number] = p;
-              const b: [number, number] = [p[0] + dx, p[1] + dy];
-              const gActive = activeGates.has(gate);
-              return (
-                <TubeChannel
-                  key={`stub-${gate}`}
-                  a={a} b={b}
-                  color1={colorForGate(gate)} color2={colorForGate(gate)}
-                  active={gActive} g1Active={gActive} g2Active={gActive}
+                  g1Mode={modeForGate(ch.gates[0])}
+                  g2Mode={modeForGate(ch.gates[1])}
                 />
               );
             })}
