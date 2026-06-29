@@ -59,7 +59,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 160, 475], [CX + 105, 555]] },
+    shape: { kind: "triangle", points: [[CX + 28, 470], [CX + 158, 482], [CX + 95, 568]] },
     labelAt: [CX + 112, 500],
   },
   // Sacral — square
@@ -103,13 +103,13 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 35, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21, 51, 26 along left edge (parallel to G's right edge); 40 at right vertex
-  21: [CX + 82, 484],
-  51: [CX + 92, 508],
-  26: [CX + 102, 532],
-  40: [CX + 142, 482],
+  // EGO — 51 sits directly below G gate 25; 21 up top; 26 lower-right; 40 at right vertex
+  21: [CX + 52, 482],
+  51: [CX + 35, 500],
+  26: [CX + 88, 555],
+  40: [CX + 138, 492],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 527], 57: [55, 540], 44: [82, 552],
+  48: [28, 527], 57: [55, 540], 44: [82, 545],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
   // SACRAL — 34 & 27 vertical on left, 59 right-side meeting gate 6 tube
@@ -130,7 +130,7 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 export const GATE_POS = GATE_POS_INTERNAL;
 
 // Hide tubes that overlap/cross awkwardly with neighbors.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20"]);
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
@@ -447,6 +447,24 @@ const Bodygraph = ({
               return (
                 <TubeChannel a={a} b={b} g1Mode={modeForGate(41)} g2Mode={modeForGate(27)} />
               );
+            })()}
+
+            {/* Decorative stub: gate 10 → 45° up-left, terminating on the 20–57 channel line */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[10];
+              if (!a) return null;
+              // 20 at (CX-40, 295), 57 at (55, 540); 45° ray from 10 hits at ~(187, 382)
+              const b: [number, number] = [187, 382];
+              return <TubeChannel a={a} b={b} g1Mode={modeForGate(10)} g2Mode="off" />;
+            })()}
+
+            {/* Decorative stub: gate 34 → up-left, terminating on the 20–57 channel line */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[34];
+              if (!a) return null;
+              // Closest point on 20–57 line to gate 34 ≈ (115, 468)
+              const b: [number, number] = [115, 468];
+              return <TubeChannel a={a} b={b} g1Mode={modeForGate(34)} g2Mode="off" />;
             })()}
 
 
