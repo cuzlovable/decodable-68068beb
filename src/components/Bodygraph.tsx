@@ -100,23 +100,23 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // G — diamond (tightened so dots sit safely inside)
   1:  [CX, 372],
   7:  [CX - 22, 398], 13: [CX + 22, 398],
-  10: [CX - 35, 420], 25: [CX + 62, 422],
+  10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — smaller triangle; 51 directly below G gate 25; gates kept inside outline
-  21: [CX + 62, 488],
-  51: [CX + 62, 510],
-  26: [CX + 88, 548],
-  40: [CX + 130, 498],
-  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 527], 57: [55, 540], 44: [82, 545],
+  // EGO — gates anchored along left edge of triangle (25→51 channel runs along left side)
+  21: [CX + 85, 510],
+  51: [CX + 55, 528],
+  26: [CX + 105, 545],
+  40: [CX + 125, 525],
+  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32 (44 nudged inside)
+  48: [28, 527], 57: [55, 540], 44: [75, 548],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — 34 & 27 vertical on left, 59 right-side meeting gate 6 tube
-  5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
-  34: [CX - 40, 590],
-  27: [CX - 40, 615], 59: [CX + 40, 615],
-  42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
+  // SACRAL — shifted down with the center; 34 & 27 vertical on left, 59 right meets gate 6
+  5:  [CX - 22, 593], 14: [CX, 593], 29: [CX + 22, 593],
+  34: [CX - 40, 615],
+  27: [CX - 40, 640], 59: [CX + 40, 640],
+  42: [CX - 22, 661], 3:  [CX, 661], 9:  [CX + 22, 661],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
