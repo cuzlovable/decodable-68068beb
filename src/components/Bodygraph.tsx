@@ -57,11 +57,12 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — tilted further left, raised closer to G (hugs the G center more than Solar)
+  // Ego — rotated further left so 45↔21 and 25↔51 tubes run parallel (no crossing)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 30, 455], [CX + 155, 488], [CX + 115, 555]] },
-    labelAt: [CX + 115, 500],
+    shape: { kind: "triangle", points: [[CX + 15, 458], [CX + 140, 478], [CX + 100, 552]] },
+    labelAt: [CX + 100, 500],
   },
+
   // Sacral — extra space below G
   sacral: {
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
