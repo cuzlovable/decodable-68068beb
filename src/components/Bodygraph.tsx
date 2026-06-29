@@ -59,7 +59,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 35, 478], [CX + 150, 488], [CX + 95, 555]] },
+    shape: { kind: "triangle", points: [[CX + 35, 498], [CX + 150, 508], [CX + 95, 575]] },
     labelAt: [CX + 112, 500],
   },
   // Sacral — square
