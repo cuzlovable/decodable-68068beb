@@ -130,7 +130,10 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-const HIDDEN_CHANNELS = new Set<string>();
+// Hide visual tubes that overlap/cross awkwardly with neighbors.
+// Per reference: gate 10 should only expose its horizontal exit toward 20;
+// gate 34 should only expose its tube toward 20 (meeting the 20-57 line).
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
