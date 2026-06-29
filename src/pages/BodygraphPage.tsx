@@ -5,9 +5,7 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
-import OpenCenterAlerts from "@/components/OpenCenterAlerts";
 import DeconditioningChecklist from "@/components/DeconditioningChecklist";
-import MindGateRinse from "@/components/MindGateRinse";
 import { getOpenCenters } from "@/lib/humandesign";
 
 // Fallback used only if the profile somehow has no calculated chart yet.
@@ -109,42 +107,23 @@ const BodygraphPage = () => {
             variables={variables}
           />
 
-          {/* Legend */}
+          {/* Legend — Design vs Personality */}
           <div className="flex items-center justify-center gap-6 mt-4 text-[11px] text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[hsl(20,85%,70%)]" />
-              Defined
+              <div className="w-3 h-3 rounded-full bg-[hsl(220,15%,15%)]" />
+              <span><span className="font-semibold text-foreground">Design</span> (Body)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full border border-dashed border-[hsl(220,30%,60%)] bg-transparent" />
+              <div className="w-3 h-3 rounded-full bg-[hsl(0,75%,55%)]" />
+              <span><span className="font-semibold text-foreground">Personality</span> (Mind)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full border border-dashed border-[hsl(220,15%,75%)] bg-transparent" />
               Open
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[hsl(258,55%,70%)]" />
-              Mind
             </div>
           </div>
         </motion.div>
 
-        {/* Mind Gate Rinse */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6"
-        >
-          <MindGateRinse definedGates={definedGates} />
-        </motion.div>
-
-        {/* Open Center Alerts */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6"
-        >
-          <OpenCenterAlerts openCenters={openCenters} />
-        </motion.div>
 
         {/* Deconditioning Checklist */}
         <motion.div
