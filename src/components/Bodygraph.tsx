@@ -59,7 +59,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Ego — downward triangle, balanced between G and Solar
   heart: {
-    shape: { kind: "triangle", points: [[CX + 65, 460], [CX + 160, 475], [CX + 110, 545]] },
+    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 160, 475], [CX + 105, 555]] },
     labelAt: [CX + 112, 500],
   },
   // Sacral — square
@@ -84,39 +84,39 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
 };
 
-// All gate dots sit INSIDE their parent shape, aligned in three vertical columns
-// (CX-22, CX, CX+22) wherever possible so ajna→throat→G→sacral→root channels
-// fall on straight vertical lines.
+// All gate dots sit INSIDE their parent shape.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // HEAD
   64: [CX - 22, 105], 61: [CX, 105], 63: [CX + 22, 105],
-  // AJNA — top (47,24,4), mid (17,11), apex (43)
+  // AJNA
   47: [CX - 22, 142], 24: [CX, 142], 4:  [CX + 22, 142],
   17: [CX - 22, 165], 11: [CX + 22, 165],
   43: [CX, 198],
-  // THROAT — top row, side cols, bottom row
+  // THROAT
   62: [CX - 22, 248], 23: [CX, 248], 56: [CX + 22, 248],
   16: [CX - 40, 272], 20: [CX - 40, 295],
   35: [CX + 40, 263], 12: [CX + 40, 283], 45: [CX + 40, 303],
   31: [CX - 22, 315], 8:  [CX, 315], 33: [CX + 22, 315],
-  // G — diamond
-  1:  [CX, 365],
-  7:  [CX - 22, 395], 13: [CX + 22, 395],
-  10: [CX - 40, 420], 25: [CX + 40, 420],
-  15: [CX - 22, 448], 46: [CX + 22, 448],
-  2:  [CX, 478],
-  // EGO — gates inside the downward triangle
-  21: [CX + 95, 485], 26: [CX + 118, 495],
-  40: [CX + 140, 500], 51: [CX + 110, 518],
+  // G — diamond (tightened so dots sit safely inside)
+  1:  [CX, 372],
+  7:  [CX - 22, 398], 13: [CX + 22, 398],
+  10: [CX - 35, 420], 25: [CX + 35, 420],
+  15: [CX - 22, 444], 46: [CX + 22, 444],
+  2:  [CX, 470],
+  // EGO — 21/51/26 on the G-facing side, 40 on the right side
+  21: [CX + 102, 478],
+  51: [CX + 92, 502],
+  26: [CX + 88, 528],
+  40: [CX + 138, 510],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 552],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — three columns; 34 left col upper, 27/59 mid row
-  5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
-  34: [CX - 40, 590],
-  27: [CX - 22, 613], 59: [CX + 22, 613],
-  42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
+  // SACRAL — matches reference: top 5/14/29, 34 left mid-upper, 27/59 mid, 42/3/9 bottom
+  5:  [CX - 28, 568], 14: [CX, 568], 29: [CX + 28, 568],
+  34: [CX - 35, 593],
+  27: [CX - 28, 615], 59: [CX + 28, 615],
+  42: [CX - 28, 636], 3:  [CX, 636], 9:  [CX + 28, 636],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
@@ -438,6 +438,13 @@ const Bodygraph = ({
                 />
               );
             })}
+
+            {/* Decorative stubs: gate 10 horizontal + gate 34 diagonal, both touching the 20–57 channel */}
+            <TubeChannel a={GATE_POS_INTERNAL[10]} b={[155, 420]}
+              g1Mode={modeForGate(10)} g2Mode="off" />
+            <TubeChannel a={GATE_POS_INTERNAL[34]} b={[147, 430]}
+              g1Mode={modeForGate(34)} g2Mode="off" />
+
 
             {/* Centers */}
             {(Object.keys(CENTERS) as CenterId[]).map((c) => (
