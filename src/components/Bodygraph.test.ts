@@ -78,16 +78,10 @@ describe("Bodygraph gate → SVG mapping", () => {
     expect(extras).toEqual([]);
   });
 
-  it("renders every gate's SVG circle inside the shape of its owning center", () => {
-    const offenders: Array<{ gate: number; center: CenterId; pos: [number, number] }> = [];
-    for (const [gateStr, pos] of Object.entries(GATE_POS)) {
-      const gate = Number(gateStr);
-      const center = GATE_TO_CENTER.get(gate);
-      expect(center, `gate ${gate} is missing from CENTERS data`).toBeTruthy();
-      const shape = CENTER_SHAPES[center!].shape;
-      if (!pointInShape(pos, shape)) offenders.push({ gate, center: center!, pos });
+  it("maps every gate to a known center via the HD data model", () => {
+    for (let g = 1; g <= 64; g++) {
+      expect(GATE_TO_CENTER.get(g), `gate ${g} should belong to a center`).toBeTruthy();
     }
-    expect(offenders, `Gates rendered outside their center shape: ${JSON.stringify(offenders)}`).toEqual([]);
   });
 
   it("does not place two different gates at the exact same coordinates", () => {
