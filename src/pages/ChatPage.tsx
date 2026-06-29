@@ -67,7 +67,7 @@ const ChatPage = () => {
           {
             id: "demo-msg-1",
             sender_id: "other",
-            content: `Hey! Looked at our charts side by side and there's a real pull — your Gate 64 finishes one of my channels. Curious to hear how you experience it ✨`,
+            content: `Hey :) your profile caught my eye — how's your week going so far?`,
             created_at: new Date(Date.now() - 3600000).toISOString(),
           },
         ]);

@@ -57,10 +57,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
     labelAt: [CX, 425],
   },
-  // Heart — small downward-pointing triangle, sits diagonally between G and Solar Plexus
+  // Heart / Ego — small triangle with top vertex, left vertex, bottom-right vertex
   heart: {
-    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 145, 460], [CX + 108, 520]] },
-    labelAt: [CX + 108, 478],
+    shape: { kind: "triangle", points: [[CX + 108, 458], [CX + 72, 495], [CX + 140, 520]] },
+    labelAt: [CX + 105, 495],
   },
   // Sacral — square
   sacral: {
@@ -104,22 +104,22 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 38, 420], 25: [CX + 38, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 460],
-  // EGO / HEART — downward triangle between G and Solar Plexus
-  21: [CX + 82, 470], 51: [CX + 108, 476], 26: [CX + 100, 500],
-  40: [CX + 122, 486],
-  // SPLEEN — top slant 48→44→57, bottom slant 18→28→32, 50 interior
-  48: [32, 568], 44: [62, 580], 57: [92, 586],
-  50: [55, 600],
+  // EGO / HEART — top vertex (21), left vertex (26), interior (51), bottom-right vertex (40)
+  21: [CX + 108, 475], 51: [CX + 95, 490], 26: [CX + 82, 498],
+  40: [CX + 130, 510],
+  // SPLEEN — top edge from left vertex (48) → 57 → 44 → apex (50); bottom edge 18 (vertex) → 28 → 32
+  48: [32, 568], 57: [62, 578], 44: [88, 590],
+  50: [70, 600],
   18: [32, 632], 28: [62, 618], 32: [92, 614],
   // SACRAL — top (5, 14, 29), left (34, 27), right (59), bottom (42, 3, 9)
   5:  [CX - 30, 568], 14: [CX, 568], 29: [CX + 30, 568],
   34: [CX - 40, 593], 27: [CX - 40, 617],
   59: [CX + 40, 605],
   42: [CX - 30, 635], 3:  [CX, 635], 9:  [CX + 30, 635],
-  // SOLAR — top slant 36→22→37, bottom slant 49→55→30, 6 interior
-  36: [568, 568], 22: [538, 580], 37: [508, 586],
-  6:  [545, 600],
-  49: [508, 614], 55: [538, 618], 30: [568, 632],
+  // SOLAR — top-right vertex (36) → 22 → 37 → apex-left (6); bottom 49 → 55 → 30 (vertex)
+  36: [568, 568], 22: [538, 578], 37: [512, 590],
+  6:  [505, 600],
+  49: [512, 614], 55: [538, 618], 30: [568, 632],
   // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
   53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
   54: [CX - 40, 738], 38: [CX - 40, 758],
