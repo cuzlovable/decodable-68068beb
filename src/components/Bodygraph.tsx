@@ -103,20 +103,20 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 35, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21/51/26 on the G-facing side, 40 on the right side
-  21: [CX + 102, 478],
-  51: [CX + 92, 502],
-  26: [CX + 88, 528],
-  40: [CX + 138, 510],
+  // EGO — all dots safely inside the downward triangle
+  21: [CX + 108, 482],
+  51: [CX + 100, 503],
+  26: [CX + 98, 525],
+  40: [CX + 130, 500],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 552],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
-  // SACRAL — matches reference: top 5/14/29, 34 left mid-upper, 27/59 mid, 42/3/9 bottom
-  5:  [CX - 28, 568], 14: [CX, 568], 29: [CX + 28, 568],
+  // SACRAL — three columns aligned with G/Root for straight vertical channels
+  5:  [CX - 22, 568], 14: [CX, 568], 29: [CX + 22, 568],
   34: [CX - 35, 593],
-  27: [CX - 28, 615], 59: [CX + 28, 615],
-  42: [CX - 28, 636], 3:  [CX, 636], 9:  [CX + 28, 636],
+  27: [CX - 22, 615], 59: [CX + 22, 615],
+  42: [CX - 22, 636], 3:  [CX, 636], 9:  [CX + 22, 636],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
