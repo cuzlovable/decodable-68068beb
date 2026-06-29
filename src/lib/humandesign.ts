@@ -81,7 +81,7 @@ export const CENTERS: Record<CenterId, Center> = {
   },
   heart: {
     id: "heart",
-    label: "Heart / Ego",
+    label: "Ego",
     theme: "Willpower & Worthiness",
     openTheme: "Trying to prove your worth",
     dontStatement: "Don't try to prove your worth today.",
