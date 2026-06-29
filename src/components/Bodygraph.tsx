@@ -442,8 +442,9 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tube: 40↔27 (Ego to Sacral) */}
-            {([[40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
+            {/* Extra decorative tube: 40↔37 (Ego to Solar Plexus) */}
+            {([[40, 37]] as Array<[number, number]>).map(([g1, g2]) => {
+
               const a = GATE_POS_INTERNAL[g1];
               const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
