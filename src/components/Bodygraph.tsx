@@ -57,15 +57,15 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — downward triangle, balanced between G and Solar
+  // Ego — shifted right & up, rotated CCW for a left-leaning tilt
   heart: {
-    shape: { kind: "triangle", points: [[CX + 35, 498], [CX + 150, 508], [CX + 95, 575]] },
-    labelAt: [CX + 112, 500],
+    shape: { kind: "triangle", points: [[CX + 45, 478], [CX + 160, 500], [CX + 120, 565]] },
+    labelAt: [CX + 120, 510],
   },
-  // Sacral — square (pushed down to clear G and allow 26-44 channel to cross)
+  // Sacral — pushed further down so the 26-44 channel has clear airspace below G
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 580, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 628],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 605, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 653],
   },
   // Spleen — triangle, apex right
   splenic: {
@@ -77,10 +77,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "triangle", points: [[585, 510], [585, 614], [480, 562]] },
     labelAt: [550, 562],
   },
-  // Root — square
+  // Root — square (pushed down with Sacral)
   root: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 735, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 780],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 755, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 800],
   },
 };
 
@@ -103,28 +103,28 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — gates anchored along left edge of triangle (25→51 channel runs along left side)
-  21: [CX + 85, 510],
-  51: [CX + 55, 528],
-  26: [CX + 105, 545],
-  40: [CX + 125, 525],
+  // EGO — tilted left; 21 along top edge, 51 along upper-left edge, 26 lower edge, 40 right vertex
+  21: [CX + 90, 495],
+  51: [CX + 70, 508],
+  26: [CX + 100, 545],
+  40: [CX + 140, 515],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32 (44 nudged inside)
   48: [28, 527], 57: [55, 540], 44: [75, 548],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
   // SACRAL — shifted down with the center; 34 & 27 vertical on left, 59 right meets gate 6
-  5:  [CX - 22, 593], 14: [CX, 593], 29: [CX + 22, 593],
-  34: [CX - 40, 615],
-  27: [CX - 40, 640], 59: [CX + 40, 640],
-  42: [CX - 22, 661], 3:  [CX, 661], 9:  [CX + 22, 661],
+  5:  [CX - 22, 618], 14: [CX, 618], 29: [CX + 22, 618],
+  34: [CX - 40, 640],
+  27: [CX - 40, 665], 59: [CX + 40, 665],
+  42: [CX - 22, 686], 3:  [CX, 686], 9:  [CX + 22, 686],
   // SOLAR — mirror of spleen
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
   49: [518, 572], 55: [545, 584], 30: [572, 597],
-  // ROOT — three columns (shifted down for breathing room from Sacral)
-  53: [CX - 22, 747], 60: [CX, 747], 52: [CX + 22, 747],
-  54: [CX - 40, 773], 38: [CX - 40, 793], 58: [CX - 40, 813],
-  19: [CX + 40, 773], 39: [CX + 40, 793], 41: [CX + 40, 813],
+  // ROOT — three columns (pushed down to keep gap from Sacral)
+  53: [CX - 22, 767], 60: [CX, 767], 52: [CX + 22, 767],
+  54: [CX - 40, 793], 38: [CX - 40, 813], 58: [CX - 40, 833],
+  19: [CX + 40, 793], 39: [CX + 40, 813], 41: [CX + 40, 833],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
@@ -439,8 +439,8 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tubes: 41↔27 and 40↔27 (per design request) */}
-            {([[41, 27], [40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
+            {/* Extra decorative tubes: 41↔27 and 40↔6 */}
+            {([[41, 27], [40, 6]] as Array<[number, number]>).map(([g1, g2]) => {
               const a = GATE_POS_INTERNAL[g1];
               const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
@@ -453,7 +453,6 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [155, 420] as [number, number] },
               { gate: 34, target: [115, 468] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
