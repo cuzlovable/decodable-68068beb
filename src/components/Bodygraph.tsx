@@ -161,7 +161,7 @@ function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
 }
 
 function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean }) {
-  const { shape, labelAt } = CENTER_SHAPES[center];
+  const { shape } = CENTER_SHAPES[center];
   const { fill, stroke } = CENTER_COLORS[center];
   return (
     <g>
@@ -171,17 +171,6 @@ function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean 
         isDefined ? stroke : OPEN_GRAY,
         !isDefined,
       )}
-      <text
-        x={labelAt[0]} y={labelAt[1]}
-        textAnchor="middle"
-        fill="hsl(230 20% 30%)"
-        fontSize="10"
-        fontFamily="DM Sans, sans-serif"
-        fontWeight={600}
-        opacity={0.7}
-      >
-        {CENTERS[center].label.toLowerCase()}
-      </text>
     </g>
   );
 }
