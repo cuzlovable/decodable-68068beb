@@ -67,16 +67,17 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
     labelAt: [CX, 683],
   },
-  // Spleen — triangle, apex right (pulled left to add space between Spleen and G)
+  // Spleen — triangle, apex right (lowered toward Root, away from G)
   splenic: {
-    shape: { kind: "triangle", points: [[15, 510], [15, 614], [95, 562]] },
-    labelAt: [45, 562],
+    shape: { kind: "triangle", points: [[15, 565], [15, 669], [95, 617]] },
+    labelAt: [45, 617],
   },
-  // Solar Plexus — mirror of Spleen (pulled right to add space between Solar and G)
+  // Solar Plexus — mirror of Spleen (lowered toward Root, away from G)
   solar: {
-    shape: { kind: "triangle", points: [[585, 510], [585, 614], [505, 562]] },
-    labelAt: [555, 562],
+    shape: { kind: "triangle", points: [[585, 565], [585, 669], [505, 617]] },
+    labelAt: [555, 617],
   },
+
 
   // Root — square (pushed down with Sacral)
   root: {
@@ -110,18 +111,19 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   26: [CX + 95, 525],
   40: [CX + 140, 510],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 527], 57: [50, 540], 44: [70, 550],
-  50: [80, 562],
-  18: [28, 597], 28: [50, 584], 32: [72, 572],
+  48: [28, 582], 57: [50, 595], 44: [70, 605],
+  50: [80, 617],
+  18: [28, 652], 28: [50, 639], 32: [72, 627],
   // SACRAL — shifted with the center
   5:  [CX - 22, 648], 14: [CX, 648], 29: [CX + 22, 648],
   34: [CX - 40, 670],
   27: [CX - 40, 695], 59: [CX + 40, 695],
   42: [CX - 22, 716], 3:  [CX, 716], 9:  [CX + 22, 716],
   // SOLAR — mirror of spleen
-  36: [572, 527], 22: [550, 540], 37: [530, 550],
-  6:  [520, 562],
-  49: [528, 572], 55: [550, 584], 30: [572, 597],
+  36: [572, 582], 22: [550, 595], 37: [530, 605],
+  6:  [520, 617],
+  49: [528, 627], 55: [550, 639], 30: [572, 652],
+
 
   // ROOT — three columns
   53: [CX - 22, 797], 60: [CX, 797], 52: [CX + 22, 797],
