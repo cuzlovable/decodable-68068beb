@@ -105,21 +105,21 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 460],
   // EGO / HEART — downward triangle between G and Solar Plexus
-  21: [CX + 80, 472], 51: [CX + 108, 478], 26: [CX + 95, 502],
-  40: [CX + 125, 492],
+  21: [CX + 82, 470], 51: [CX + 108, 476], 26: [CX + 100, 500],
+  40: [CX + 122, 486],
   // SPLEEN — top slant 48→44→57, bottom slant 18→28→32, 50 interior
-  48: [32, 568], 44: [62, 580], 57: [92, 595],
+  48: [32, 568], 44: [62, 580], 57: [92, 586],
   50: [55, 600],
-  18: [32, 632], 28: [62, 618], 32: [92, 605],
+  18: [32, 632], 28: [62, 618], 32: [92, 614],
   // SACRAL — top (5, 14, 29), left (34, 27), right (59), bottom (42, 3, 9)
   5:  [CX - 30, 568], 14: [CX, 568], 29: [CX + 30, 568],
   34: [CX - 40, 593], 27: [CX - 40, 617],
   59: [CX + 40, 605],
   42: [CX - 30, 635], 3:  [CX, 635], 9:  [CX + 30, 635],
   // SOLAR — top slant 36→22→37, bottom slant 49→55→30, 6 interior
-  36: [568, 568], 22: [538, 580], 37: [508, 595],
+  36: [568, 568], 22: [538, 580], 37: [508, 586],
   6:  [545, 600],
-  49: [508, 605], 55: [538, 618], 30: [568, 632],
+  49: [508, 614], 55: [538, 618], 30: [568, 632],
   // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
   53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
   54: [CX - 40, 738], 38: [CX - 40, 758],
@@ -231,8 +231,8 @@ function TubeChannel({
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
-  const bandW = 12;
-  const inset = 7; // shorten so it tucks under the gate circles
+  const bandW = 9;   // slightly thinner tube
+  const inset = 7;   // shorten so it tucks under the gate circles
 
   // Background band (always rendered as the tube)
   return (
