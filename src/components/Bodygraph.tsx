@@ -459,6 +459,28 @@ const Bodygraph = ({
               );
             })}
 
+            {/* Decorative gate stubs — always-visible short tube exits matching reference chart */}
+            {([
+              // gate 10: short horizontal tube exiting left from G-center left vertex
+              { gate: 10, dx: -42, dy: 0 },
+              // gate 34: short tube exiting up-left to meet the 20-57 channel line
+              { gate: 34, dx: -34, dy: -18 },
+            ] as Array<{ gate: number; dx: number; dy: number }>).map(({ gate, dx, dy }) => {
+              const p = GATE_POS_INTERNAL[gate];
+              if (!p) return null;
+              const a: [number, number] = p;
+              const b: [number, number] = [p[0] + dx, p[1] + dy];
+              const gActive = activeGates.has(gate);
+              return (
+                <TubeChannel
+                  key={`stub-${gate}`}
+                  a={a} b={b}
+                  color1={colorForGate(gate)} color2={colorForGate(gate)}
+                  active={gActive} g1Active={gActive} g2Active={gActive}
+                />
+              );
+            })}
+
             {/* Centers */}
             {(Object.keys(CENTERS) as CenterId[]).map((c) => (
               <CenterEl key={c} center={c} isDefined={definedCenters.has(c)} />
