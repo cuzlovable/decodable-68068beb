@@ -453,7 +453,7 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [187, 382] as [number, number] },
+              { gate: 10, target: [155, 420] as [number, number] },
               { gate: 34, target: [115, 468] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
