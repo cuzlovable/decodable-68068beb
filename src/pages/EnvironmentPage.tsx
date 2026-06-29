@@ -11,16 +11,12 @@ import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 
-// What "Environment" means in PHS (Primary Health System).
+// Concise PHS explainers — only the essentials.
 const ENVIRONMENT_EXPLAINER =
-  "Your Environment is the type of physical space where your body and decision-making work best. " +
-  "It's decoded from your Design Node — a Color (the broad terrain) and a Tone (the sub-quality). " +
-  "Live, work, and rest in this kind of place and your nervous system settles; the right answers come faster.";
+  "The kind of physical space where your body and decisions work best.";
 
-// What "Determination / Super-cognition" means in PHS.
 const DIGESTION_EXPLAINER =
-  "Your Determination (also called Super-cognition) is how your body best takes in food, information, and stimulus. " +
-  "It's decoded from your Design Sun/Earth — Color sets the mode, Tone refines it.";
+  "How your body best takes in food, information, and stimulus.";
 
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
