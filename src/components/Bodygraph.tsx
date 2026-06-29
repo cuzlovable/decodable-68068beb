@@ -79,8 +79,8 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Root — square
   root: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 700, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 748],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 735, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 780],
   },
 };
 
