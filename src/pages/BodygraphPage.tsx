@@ -110,11 +110,11 @@ const BodygraphPage = () => {
           {/* Legend — Design vs Personality */}
           <div className="flex items-center justify-center gap-6 mt-4 text-[11px] text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[hsl(220,15%,15%)]" />
+              <div className="w-3 h-3 rounded-full bg-[hsl(0,75%,55%)]" />
               <span><span className="font-semibold text-foreground">Design</span> (Body)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-[hsl(0,75%,55%)]" />
+              <div className="w-3 h-3 rounded-full bg-[hsl(220,15%,15%)]" />
               <span><span className="font-semibold text-foreground">Personality</span> (Mind)</span>
             </div>
             <div className="flex items-center gap-1.5">

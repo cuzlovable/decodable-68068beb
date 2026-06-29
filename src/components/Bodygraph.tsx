@@ -9,8 +9,8 @@ import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/li
 //   Sacral: red, Root: red.
 // Design (Body) data + black on LEFT. Personality (Mind) data + red on RIGHT.
 
-const DESIGN_C  = "hsl(220 15% 15%)";   // black/dark
-const PERSON_C  = "hsl(0 75% 55%)";     // red
+const DESIGN_C  = "hsl(0 75% 55%)";     // red (Design / Body)
+const PERSON_C  = "hsl(220 15% 15%)";   // black (Personality / Mind)
 const OPEN_GRAY = "hsl(220 15% 75%)";
 const CHANNEL_OFF = "hsl(220 15% 88%)";
 
@@ -34,51 +34,55 @@ type Shape =
 export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, number] }> = {
   // Head: triangle pointing UP (apex at top)
   head:    { shape: { kind: "triangle", points: [[200, 50], [150, 140], [250, 140]] }, labelAt: [200, 162] },
-  // Ajna: triangle pointing DOWN (apex at bottom)
+  // Ajna: triangle pointing DOWN
   ajna:    { shape: { kind: "triangle", points: [[150, 170], [250, 170], [200, 260]] }, labelAt: [200, 282] },
   throat:  { shape: { kind: "rect", x: 160, y: 300, w: 80, h: 80 }, labelAt: [200, 398] },
   g:       { shape: { kind: "diamond", cx: 200, cy: 450, r: 48 }, labelAt: [200, 520] },
-  // Heart moved right to clear G diamond (G spans x 152–248)
-  heart:   { shape: { kind: "triangle", points: [[310, 420], [310, 480], [260, 450]] }, labelAt: [318, 500] },
-  splenic: { shape: { kind: "triangle", points: [[60, 530], [60, 620], [148, 575]] }, labelAt: [80, 645] },
+  // Heart: sideways triangle, apex left toward G — sits between G and Solar
+  heart:   { shape: { kind: "triangle", points: [[290, 415], [290, 485], [235, 450]] }, labelAt: [305, 505] },
+  // Spleen pulled further LEFT for a balanced awareness triangle (Ajna / Spleen / Solar)
+  splenic: { shape: { kind: "triangle", points: [[30, 520], [30, 630], [125, 575]] }, labelAt: [55, 650] },
   sacral:  { shape: { kind: "rect", x: 160, y: 525, w: 80, h: 80 }, labelAt: [200, 622] },
-  solar:   { shape: { kind: "triangle", points: [[340, 530], [340, 620], [252, 575]] }, labelAt: [320, 645] },
+  // Solar pulled further RIGHT
+  solar:   { shape: { kind: "triangle", points: [[370, 520], [370, 630], [275, 575]] }, labelAt: [345, 650] },
   root:    { shape: { kind: "rect", x: 160, y: 660, w: 80, h: 70 }, labelAt: [200, 748] },
 };
 
-// Gate anchor points (also used as channel endpoints)
+// Gates placed on the OUTLINE perimeter of each center shape.
 const GATE_POS_INTERNAL: Record<number, [number, number]> = {
-  // HEAD (apex top, base y=140)
-  64: [170, 120], 61: [200, 120], 63: [230, 120],
-  // AJNA (base y=170, apex y=260)
-  47: [170, 190], 24: [200, 190], 4: [230, 190],
-  17: [180, 215], 11: [220, 215],
-  43: [200, 235],
-  // THROAT
-  62: [170, 312], 23: [200, 312], 56: [230, 312],
-  16: [170, 340], 35: [230, 340], 8: [200, 340],
-  20: [170, 360], 31: [230, 360],
-  12: [185, 372], 45: [200, 372], 33: [215, 372],
-  // G
-  1:  [200, 415], 13: [220, 440], 7:  [200, 432],
-  10: [175, 450], 25: [225, 450],
-  15: [185, 468], 46: [215, 468], 2:  [200, 482],
-  // HEART (moved right)
-  21: [300, 432], 51: [300, 468], 26: [280, 438], 40: [280, 462],
-  // SPLEEN
-  48: [78, 545], 44: [85, 575], 32: [85, 605],
-  57: [105, 562], 50: [120, 580], 28: [120, 598], 18: [140, 580],
-  // SACRAL
-  5: [175, 540], 14: [200, 540], 29: [225, 540],
-  59: [175, 565], 9:  [200, 565], 3:  [225, 565],
-  42: [175, 590], 27: [200, 590], 34: [225, 590],
-  // SOLAR
-  36: [322, 545], 22: [315, 575], 49: [315, 605],
-  6:  [295, 562], 30: [280, 580], 55: [280, 598], 37: [260, 580],
-  // ROOT
-  53: [175, 675], 60: [200, 675], 52: [225, 675],
-  19: [175, 695], 39: [200, 695], 41: [225, 695],
-  58: [175, 715], 38: [200, 715], 54: [225, 715],
+  // HEAD — base edge
+  64: [170, 140], 61: [200, 140], 63: [230, 140],
+  // AJNA — top edge + slanted edges + apex
+  47: [160, 170], 24: [200, 170], 4: [240, 170],
+  17: [175, 215], 11: [225, 215],
+  43: [200, 255],
+  // THROAT — outline
+  62: [170, 300], 23: [200, 300], 56: [230, 300],
+  16: [240, 325], 20: [240, 355],
+  33: [175, 380], 8: [192, 380], 45: [208, 380], 31: [225, 380],
+  35: [160, 325], 12: [160, 355],
+  // G — diamond perimeter
+  1:  [200, 402], 13: [176, 426], 25: [224, 426],
+  10: [152, 450], 46: [248, 450],
+  7:  [176, 474], 2:  [200, 498], 15: [224, 474],
+  // HEART — perimeter
+  21: [290, 420], 51: [290, 480], 26: [260, 435], 40: [260, 465],
+  // SPLEEN — left edge + edges toward apex
+  48: [30, 535], 44: [30, 575], 32: [30, 615],
+  57: [60, 545], 50: [95, 562], 28: [60, 605], 18: [95, 588],
+  // SACRAL — outline (34 interior)
+  5: [170, 525], 14: [200, 525], 29: [230, 525],
+  9:  [160, 565], 59: [240, 565],
+  42: [170, 605], 27: [200, 605], 3:  [230, 605],
+  34: [200, 565],
+  // SOLAR — right edge + edges toward apex
+  36: [370, 535], 22: [370, 575], 49: [370, 615],
+  6:  [340, 545], 30: [305, 562], 37: [340, 605], 55: [305, 588],
+  // ROOT — outline (54 interior)
+  53: [170, 660], 60: [200, 660], 52: [230, 660],
+  19: [160, 695], 39: [240, 695],
+  41: [175, 730], 58: [200, 730], 38: [225, 730],
+  54: [200, 695],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
