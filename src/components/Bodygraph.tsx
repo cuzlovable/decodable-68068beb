@@ -254,13 +254,11 @@ const Bodygraph = ({
               </pattern>
             </defs>
 
-            {/* ── 4 Variable arrows ALL at top, flanking Head & Ajna ── */}
-            {/* Design (red) on LEFT pointing left */}
-            <VariableArrow x={6}   y={92}  dir="left"  number1={vars.digestion}   number2={vars.environment} side="personality" />
-            <VariableArrow x={6}   y={210} dir="left"  number1={motivationVal}    number2={vars.perspective} side="personality" />
-            {/* Personality (dark) on RIGHT pointing right */}
-            <VariableArrow x={318} y={92}  dir="right" number1={vars.digestion}   number2={vars.environment} side="design" />
-            <VariableArrow x={318} y={210} dir="right" number1={motivationVal}    number2={vars.perspective} side="design" />
+            {/* ── 4 Variable arrows at top: Design (dark) top, Personality (red) below ── */}
+            <VariableArrow x={6}   y={92}  value={vars.digestion}   side="design" />
+            <VariableArrow x={336} y={92}  value={vars.environment} side="design" />
+            <VariableArrow x={6}   y={210} value={motivationVal}    side="personality" />
+            <VariableArrow x={336} y={210} value={vars.perspective} side="personality" />
 
             {/* Channels (under centers) */}
             {UNIQUE_CHANNELS.map((ch) => {
