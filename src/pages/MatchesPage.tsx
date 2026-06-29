@@ -29,7 +29,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     profile: "4/6",
     authority: "Splenic",
     chemistryScore: 82,
-    dominantTheme: "High Electromagnetic Pull",
+    dominantTheme: "Your channels finish each other's sentences",
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
@@ -42,7 +42,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     profile: "1/3",
     authority: "Sacral",
     chemistryScore: 71,
-    dominantTheme: "Deep Companionship",
+    dominantTheme: "Slow-burn, builds-a-life-together energy",
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
@@ -55,7 +55,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     profile: "3/5",
     authority: "Emotional",
     chemistryScore: 65,
-    dominantTheme: "Teacher-Student Dynamic",
+    dominantTheme: "They teach you something you can't unsee",
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
@@ -68,12 +68,13 @@ const DEMO_MATCHES: MatchProfile[] = [
     profile: "5/1",
     authority: "Ego Manifested",
     chemistryScore: 58,
-    dominantTheme: "Power Struggle Potential",
+    dominantTheme: "Spicy chemistry — handle with informed consent",
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
   },
 ];
+
 
 const MatchesPage = () => {
   const navigate = useNavigate();
@@ -223,11 +224,11 @@ const MatchesPage = () => {
           className="mt-8 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">Electromagnetic Priority.</span>{" "}
-            Matches are ranked by gate-to-gate connections. Electromagnetic pulls
-            are weighted highest — these are the connections where you complete each
-            other's channels.
+            <span className="font-semibold text-foreground">Channel chemistry first.</span>{" "}
+            Matches are ranked by gate-to-gate connections — the ones that finish each
+            other's channels rise to the top.
           </p>
+
         </motion.div>
       </div>
     </div>

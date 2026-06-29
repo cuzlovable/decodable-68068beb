@@ -6,76 +6,73 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  CENTERS,
-  UNIQUE_CHANNELS,
-  getDefinedCenters,
-  type CenterId,
-} from "@/lib/humandesign";
+
+// Canonical gate sets (per Ra Uru Hu / Penta-Wa research).
+// Penta = small group (3–5). These gates carry the "skills" the small group needs.
+const PENTA_GATES = [5, 15, 2, 14, 29, 46, 7, 31, 1, 8, 13, 33];
+// Wa = larger group. These gates carry the "roles" a larger group recognizes.
+const WA_GATES = [45, 21, 25, 51, 59, 6, 2, 14, 3, 60, 27, 50];
+
+// Short skill labels for individual Penta gates.
+const PENTA_GATE_NAMES: Record<number, string> = {
+  5: "Rhythm", 15: "Flow", 2: "Direction", 14: "Resources", 29: "Commitment",
+  46: "Body love", 7: "Leadership", 31: "Influence", 1: "Self-expression",
+  8: "Contribution", 13: "Listener", 33: "Memory",
+};
+// Short role labels for individual Wa gates.
+const WA_GATE_NAMES: Record<number, string> = {
+  45: "The Gatherer", 21: "The Controller", 25: "Innocence", 51: "Shock",
+  59: "Intimacy", 6: "Friction", 2: "Direction", 14: "Resources",
+  3: "Order", 60: "Acceptance", 27: "Caring", 50: "Values",
+};
 
 type GroupGuidance = {
-  pentaRole: string;
-  pentaSkills: string;
+  pentaLine: string;
   pentaTip: string;
-  waRole: string;
-  waPresence: string;
+  waLine: string;
   waTip: string;
 };
 
+// Tight, type-tailored copy. One sentence per slot.
 const GUIDANCE_BY_TYPE: Record<string, GroupGuidance> = {
   Manifestor: {
-    pentaRole: "Initiator & Alpha catalyst",
-    pentaSkills: "You set the direction of the Penta. Your urge to start things becomes a usable skill the group rallies behind.",
-    pentaTip: "Inform the 2–4 others before you move. In a small group, an uninformed Manifestor creates resistance fast.",
-    waRole: "Alpha of the Wa — the one the larger group looks to for the spark.",
-    waPresence: "Large groups feel your impact even when you say little. You're not here to manage the Wa — you're here to ignite it and exit.",
-    waTip: "Drop the vision, let Generators and Projectors carry it. Lingering in the Wa drains you.",
+    pentaLine: "You're the spark in a Penta — initiate, then inform the others.",
+    pentaTip: "Tell the 2–4 others before you move. Uninformed = resistance.",
+    waLine: "You ignite the Wa, then exit. Lingering drains you.",
+    waTip: "Drop the vision; let Generators and Projectors carry it.",
   },
   Generator: {
-    pentaRole: "Sacral engine of the Penta",
-    pentaSkills: "Your sustainable life-force is the Penta's actual fuel. Small groups feel productive because of you.",
-    pentaTip: "Only respond to what genuinely lights you up — the Penta will absorb whatever you sacrally commit to.",
-    waRole: "Builder of the Wa — the worker bee whose response shapes what the larger group can actually accomplish.",
-    waPresence: "Large groups can over-amplify your sacral. You'll feel pulled in many directions.",
-    waTip: "Use your strategy (respond) ruthlessly in a Wa. If it's not a gut yes, it's not yours to carry.",
+    pentaLine: "You're the engine of the Penta — your sacral yes is the fuel.",
+    pentaTip: "Only respond to what truly lights you up. The Penta runs on that.",
+    waLine: "You're the builder of the Wa — what you commit to gets built.",
+    waTip: "If it's not a gut yes, it's not yours to carry.",
   },
   "Manifesting Generator": {
-    pentaRole: "Multi-skill engine of the Penta",
-    pentaSkills: "You bring speed and several skills at once. The Penta uses you to shortcut steps and skip the unnecessary.",
-    pentaTip: "Inform after you respond — small groups need to know which direction you just jumped in.",
-    waRole: "Accelerator of the Wa — the one who shows the larger group what's actually possible at speed.",
-    waPresence: "You'll out-pace most of the Wa. That's by design, not a flaw.",
+    pentaLine: "You bring speed + multi-skill to the Penta.",
+    pentaTip: "Respond first, then inform — small groups need to know where you jumped.",
+    waLine: "You show the Wa what's possible at speed.",
     waTip: "Don't slow down to match the group's tempo. Inform, then move.",
   },
   Projector: {
-    pentaRole: "Guide & recognizer inside the Penta",
-    pentaSkills: "Your skill is seeing the others. In a small group your perspective on energy and efficiency is gold — but only when invited.",
-    pentaTip: "Wait for the invitation from the Penta. Unsolicited guidance creates bitterness for you and resistance in them.",
-    waRole: "Role-holder of the Wa — the one a larger group recognizes for wisdom about systems and people.",
-    waPresence: "Large groups can be exhausting. Your aura is focused, not designed to absorb a Wa for long.",
-    waTip: "Pick your Wa carefully and step out to recharge. Recognition in the right Wa is your career.",
+    pentaLine: "You're the guide of the Penta — your perspective is gold when invited.",
+    pentaTip: "Wait for the invitation. Unsolicited guidance creates bitterness.",
+    waLine: "The Wa recognizes you for wisdom about people and systems.",
+    waTip: "Pick your Wa carefully and step out to recharge.",
   },
   Reflector: {
-    pentaRole: "Mirror of the Penta",
-    pentaSkills: "You reflect back the health of the small group with precision few can match. The Penta becomes self-aware through you.",
-    pentaTip: "Notice what feels off — that's data about the Penta, not about you.",
-    waRole: "Sampler of the Wa — you read the larger group's collective energy as a single field.",
-    waPresence: "A healthy Wa lights you up; an unhealthy one will mark you for days.",
-    waTip: "Honor your lunar cycle before committing to any Wa. Wait 28 days on big decisions.",
+    pentaLine: "You mirror the Penta's health back to it with precision.",
+    pentaTip: "What feels off is data about the group, not about you.",
+    waLine: "You read the Wa's collective field as a single energy.",
+    waTip: "Wait a lunar cycle before committing to any Wa.",
   },
 };
 
 const DEFAULT_GUIDANCE: GroupGuidance = {
-  pentaRole: "Contributing member of the Penta",
-  pentaSkills: "Once your chart is calculated, your specific small-group skill set will show up here.",
-  pentaTip: "Complete onboarding to unlock your personalized Penta guidance.",
-  waRole: "Participant in the Wa",
-  waPresence: "Larger groups will use only the parts of your design that fit the collective field.",
-  waTip: "Your Wa role will appear once your chart finishes processing.",
+  pentaLine: "Finish onboarding to unlock your Penta line.",
+  pentaTip: "Your personalized small-group tip will appear here.",
+  waLine: "Finish onboarding to unlock your Wa line.",
+  waTip: "Your personalized large-group tip will appear here.",
 };
-
-// Demo "your" gates — would come from your calculated chart in production
-const YOUR_DEMO_GATES = [64, 47, 17, 62, 31, 7, 1, 8, 15, 5, 14, 2, 34, 57, 20];
 
 type Member = { id: string; name: string; gates: number[] };
 
@@ -90,57 +87,62 @@ function parseGates(input: string): number[] {
   );
 }
 
-function GroupSimulator({ kind, accent }: { kind: "penta" | "wa"; accent: "primary" | "sky" }) {
-  const maxMembers = kind === "penta" ? 4 : 30; // Penta = self + 4 others, Wa = larger
+function GroupSimulator({
+  kind,
+  accent,
+  userName,
+  userGates,
+}: {
+  kind: "penta" | "wa";
+  accent: "primary" | "sky";
+  userName: string;
+  userGates: number[];
+}) {
+  const canonical = kind === "penta" ? PENTA_GATES : WA_GATES;
+  const canonicalSet = useMemo(() => new Set(canonical), [canonical]);
+  const labelMap = kind === "penta" ? PENTA_GATE_NAMES : WA_GATE_NAMES;
+
+  const maxMembers = kind === "penta" ? 4 : 30; // self + 4 others = Penta; Wa = larger
   const minTotal = kind === "penta" ? 3 : 6;
-  const [members, setMembers] = useState<Member[]>([]);
+
+  // Auto-seed "you" — name from profile, gates filtered to the canonical set so the
+  // user immediately sees which Penta/Wa skills/roles they personally carry.
+  const youMember: Member = useMemo(
+    () => ({
+      id: "you",
+      name: userName || "You",
+      gates: userGates.filter((g) => canonicalSet.has(g)),
+    }),
+    [userName, userGates, canonicalSet]
+  );
+
+  const [others, setOthers] = useState<Member[]>([]);
   const [name, setName] = useState("");
   const [gateInput, setGateInput] = useState("");
 
   const addMember = () => {
-    const gates = parseGates(gateInput);
+    const gates = parseGates(gateInput).filter((g) => canonicalSet.has(g));
     if (!name.trim() || gates.length === 0) return;
-    if (members.length >= maxMembers) return;
-    setMembers((m) => [...m, { id: crypto.randomUUID(), name: name.trim(), gates }]);
+    if (others.length >= maxMembers) return;
+    setOthers((m) => [...m, { id: crypto.randomUUID(), name: name.trim(), gates }]);
     setName("");
     setGateInput("");
   };
 
-  const removeMember = (id: string) => setMembers((m) => m.filter((x) => x.id !== id));
+  const removeMember = (id: string) => setOthers((m) => m.filter((x) => x.id !== id));
 
-  // Composite calculation: you + all members
   const composite = useMemo(() => {
-    const all = new Set<number>(YOUR_DEMO_GATES);
-    members.forEach((m) => m.gates.forEach((g) => all.add(g)));
-    const allGates = Array.from(all);
-
-    // New channels = active in group but not in your solo chart
-    const yourSet = new Set(YOUR_DEMO_GATES);
-    const allSet = all;
-    const groupChannels = UNIQUE_CHANNELS.filter(
-      (ch) => allSet.has(ch.gates[0]) && allSet.has(ch.gates[1])
-    );
-    const newChannels = groupChannels.filter(
-      (ch) => !(yourSet.has(ch.gates[0]) && yourSet.has(ch.gates[1]))
-    );
-
-    const definedCenters = getDefinedCenters(allGates);
-    const yourDefined = getDefinedCenters(YOUR_DEMO_GATES);
-    const newDefined: CenterId[] = (Object.keys(CENTERS) as CenterId[]).filter(
-      (c) => definedCenters.has(c) && !yourDefined.has(c)
-    );
-
+    const groupGates = new Set<number>();
+    [youMember, ...others].forEach((m) => m.gates.forEach((g) => groupGates.add(g)));
+    const covered = canonical.filter((g) => groupGates.has(g));
+    const missing = canonical.filter((g) => !groupGates.has(g));
     return {
-      totalPeople: members.length + 1,
-      totalGates: allGates.length,
-      groupChannels,
-      newChannels,
-      definedCenters: Array.from(definedCenters),
-      newDefined,
+      totalPeople: 1 + others.length,
+      covered,
+      missing,
     };
-  }, [members]);
+  }, [youMember, others, canonical]);
 
-  const valid = composite.totalPeople >= minTotal;
   const tooSmall = kind === "penta" && composite.totalPeople < 3;
   const tooLarge = kind === "penta" && composite.totalPeople > 5;
   const accentClasses =
@@ -157,12 +159,12 @@ function GroupSimulator({ kind, accent }: { kind: "penta" | "wa"; accent: "prima
         </h3>
       </div>
       <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-        Add the other members' defined gates to see which new channels form between you and which
-        centers the group lights up together.
-        {kind === "penta" ? " (Penta = 3–5 people total)" : " (Wa = 6+ people)"}
+        Add the other members' defined gates to see which of the {canonical.length}{" "}
+        {kind === "penta" ? "Penta skills" : "Wa roles"} the group covers between you.
+        {kind === "penta" ? " (3–5 people total.)" : " (6+ people.)"}
       </p>
 
-      {/* Add member form */}
+      {/* Add member */}
       <div className="space-y-2 mb-4">
         <Input
           placeholder="Member name"
@@ -171,14 +173,14 @@ function GroupSimulator({ kind, accent }: { kind: "penta" | "wa"; accent: "prima
           className="rounded-xl"
         />
         <Input
-          placeholder="Their defined gates (e.g. 34, 57, 10, 20)"
+          placeholder="Their defined gates (e.g. 5, 15, 7, 31)"
           value={gateInput}
           onChange={(e) => setGateInput(e.target.value)}
           className="rounded-xl font-mono text-xs"
         />
         <Button
           onClick={addMember}
-          disabled={!name.trim() || parseGates(gateInput).length === 0 || members.length >= maxMembers}
+          disabled={!name.trim() || parseGates(gateInput).filter(g => canonicalSet.has(g)).length === 0 || others.length >= maxMembers}
           className={`w-full rounded-xl ${accentClasses.btn}`}
           size="sm"
         >
@@ -186,103 +188,96 @@ function GroupSimulator({ kind, accent }: { kind: "penta" | "wa"; accent: "prima
         </Button>
       </div>
 
-      {/* Members list */}
-      {members.length > 0 && (
-        <div className="space-y-2 mb-4">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-            Group ({composite.totalPeople} including you)
-          </p>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
-            <span className="text-xs font-semibold text-foreground flex-1">You</span>
-            <span className="text-[10px] text-muted-foreground font-mono">
-              {YOUR_DEMO_GATES.length} gates
-            </span>
-          </div>
-          {members.map((m) => (
-            <div key={m.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
-              <span className="text-xs font-semibold text-foreground flex-1 truncate">{m.name}</span>
-              <span className="text-[10px] text-muted-foreground font-mono">{m.gates.length} gates</span>
-              <button
-                onClick={() => removeMember(m.id)}
-                className="text-muted-foreground hover:text-destructive"
-                aria-label={`Remove ${m.name}`}
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
+      {/* Members list — "you" always first, auto-populated */}
+      <div className="space-y-2 mb-4">
+        <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+          Group ({composite.totalPeople} including you)
+        </p>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/20">
+          <span className="text-xs font-semibold text-foreground flex-1">
+            {youMember.name} <span className="text-muted-foreground font-normal">(you)</span>
+          </span>
+          <span className="text-[10px] text-muted-foreground font-mono">
+            {youMember.gates.length}/{canonical.length} {kind === "penta" ? "skills" : "roles"}
+          </span>
         </div>
-      )}
+        {others.map((m) => (
+          <div key={m.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/30 border border-border/40">
+            <span className="text-xs font-semibold text-foreground flex-1 truncate">{m.name}</span>
+            <span className="text-[10px] text-muted-foreground font-mono">
+              {m.gates.length}/{canonical.length}
+            </span>
+            <button
+              onClick={() => removeMember(m.id)}
+              className="text-muted-foreground hover:text-destructive"
+              aria-label={`Remove ${m.name}`}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
 
       {/* Composite results */}
-      {members.length > 0 && (
-        <div className={`p-4 rounded-2xl border ${accentClasses.ring} bg-background/40 space-y-4`}>
-          {tooSmall && (
-            <p className="text-xs text-amber-600">
-              A Penta needs at least 3 people. Add {3 - composite.totalPeople} more.
-            </p>
-          )}
-          {tooLarge && (
-            <p className="text-xs text-amber-600">
-              That's larger than a Penta (max 5). Consider switching to the Wa tab.
-            </p>
-          )}
+      <div className={`p-4 rounded-2xl border ${accentClasses.ring} bg-background/40 space-y-4`}>
+        {tooSmall && (
+          <p className="text-xs text-amber-600">
+            A Penta needs at least 3 people. Add {3 - composite.totalPeople} more.
+          </p>
+        )}
+        {tooLarge && (
+          <p className="text-xs text-amber-600">
+            That's larger than a Penta (max 5). Switch to the Wa tab.
+          </p>
+        )}
 
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-              Channels formed in the group
-            </p>
-            {composite.groupChannels.length === 0 ? (
-              <p className="text-xs text-foreground/60">No channels form yet.</p>
-            ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {composite.groupChannels.map((ch) => {
-                  const isNew = composite.newChannels.some((n) => n.id === ch.id);
-                  return (
-                    <span
-                      key={ch.id}
-                      className={`px-2 py-1 rounded-full text-[10px] font-medium ${
-                        isNew ? accentClasses.chip : "bg-muted/40 text-foreground/70"
-                      }`}
-                      title={ch.theme}
-                    >
-                      {ch.gates[0]}–{ch.gates[1]} {ch.name}
-                      {isNew && " ✦"}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-              Centers defined together ({composite.definedCenters.length}/9)
-            </p>
+        <div>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+            Covered {kind === "penta" ? "skills" : "roles"} ({composite.covered.length}/{canonical.length})
+          </p>
+          {composite.covered.length === 0 ? (
+            <p className="text-xs text-foreground/60">No one in the group carries these gates yet.</p>
+          ) : (
             <div className="flex flex-wrap gap-1.5">
-              {composite.definedCenters.map((c) => {
-                const isNew = composite.newDefined.includes(c);
+              {composite.covered.map((g) => {
+                const mine = youMember.gates.includes(g);
                 return (
                   <span
-                    key={c}
+                    key={g}
                     className={`px-2 py-1 rounded-full text-[10px] font-medium ${
-                      isNew ? accentClasses.chip : "bg-muted/40 text-foreground/70"
+                      mine ? accentClasses.chip : "bg-muted/40 text-foreground/70"
                     }`}
+                    title={labelMap[g]}
                   >
-                    {CENTERS[c].label}
-                    {isNew && " ✦"}
+                    {g} {labelMap[g]}
+                    {mine && " ✦"}
                   </span>
                 );
               })}
             </div>
-          </div>
-
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
-            ✦ = newly formed by the group. The {kind === "penta" ? "Penta" : "Wa"} uses these to
-            shape its collective skill set — even gates you don't carry can light up through others.
-          </p>
+          )}
         </div>
-      )}
+
+        {composite.missing.length > 0 && (
+          <div>
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+              Missing ({composite.missing.length})
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {composite.missing.map((g) => (
+                <span key={g} className="px-2 py-1 rounded-full text-[10px] font-medium bg-muted/30 text-muted-foreground border border-dashed border-border/60">
+                  {g} {labelMap[g]}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p className="text-[10px] text-muted-foreground leading-relaxed">
+          ✦ = a {kind === "penta" ? "Penta skill" : "Wa role"} you personally carry. Each gate is a viable
+          trait on its own; in the group it gets activated as a {kind === "penta" ? "skill" : "role"}.
+        </p>
+      </div>
     </div>
   );
 }
@@ -318,6 +313,8 @@ const GroupDynamicsPage = () => {
 
   const type: string = profile?.energy_type || "";
   const guidance = GUIDANCE_BY_TYPE[type] || DEFAULT_GUIDANCE;
+  const userName: string = profile?.display_name || "You";
+  const userGates: number[] = Array.isArray(profile?.defined_gates) ? profile.defined_gates : [];
 
   return (
     <div className="min-h-screen gradient-celestial px-4 py-6">
@@ -330,8 +327,8 @@ const GroupDynamicsPage = () => {
             </Button>
           </Link>
           <div>
-            <h1 className="font-display text-xl font-bold text-foreground">Penta & Wa Dynamics</h1>
-            <p className="text-xs text-muted-foreground">How your energy lands in small & large groups</p>
+            <h1 className="font-display text-xl font-bold text-foreground">Penta & Wa</h1>
+            <p className="text-xs text-muted-foreground">Your energy in small & large groups</p>
           </div>
         </div>
 
@@ -344,13 +341,13 @@ const GroupDynamicsPage = () => {
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-xs uppercase tracking-wider text-primary font-medium">
-              From Traits → Skills → Roles
+              Traits → Skills → Roles
             </span>
           </div>
           <p className="text-sm text-foreground/80 leading-relaxed">
-            In your own chart you have <span className="font-semibold">traits</span>. In a Penta (3–5 people)
-            those become <span className="font-semibold">skills</span>. In a Wa (a larger group) they
-            become <span className="font-semibold">roles</span>.
+            Each of your gates is a <span className="font-semibold">trait</span> on its own.
+            In a Penta (3–5 people) certain gates show up as <span className="font-semibold">skills</span>.
+            In a Wa (larger group) certain gates show up as <span className="font-semibold">roles</span>.
           </p>
           {type && (
             <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
@@ -385,14 +382,13 @@ const GroupDynamicsPage = () => {
                 </div>
               </div>
 
-              <Field label="Your skill in a Penta" value={guidance.pentaRole} />
-              <p className="text-sm text-foreground/80 leading-relaxed mb-4">{guidance.pentaSkills}</p>
-              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+              <p className="text-sm text-foreground/80 leading-relaxed mb-3">{guidance.pentaLine}</p>
+              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 mb-2">
                 <p className="text-[11px] uppercase tracking-wider text-primary font-medium mb-1">Tip</p>
                 <p className="text-xs text-foreground/80 leading-relaxed">{guidance.pentaTip}</p>
               </div>
 
-              <GroupSimulator kind="penta" accent="primary" />
+              <GroupSimulator kind="penta" accent="primary" userName={userName} userGates={userGates} />
             </motion.div>
           </TabsContent>
 
@@ -408,18 +404,17 @@ const GroupDynamicsPage = () => {
                 </div>
                 <div>
                   <h2 className="font-display text-lg font-semibold text-foreground">Wa</h2>
-                  <p className="text-xs text-muted-foreground">Large group · teams, rooms, communities</p>
+                  <p className="text-xs text-muted-foreground">Large group · teams & communities</p>
                 </div>
               </div>
 
-              <Field label="Your role in a Wa" value={guidance.waRole} />
-              <p className="text-sm text-foreground/80 leading-relaxed mb-4">{guidance.waPresence}</p>
-              <div className="p-3 rounded-xl bg-sky-500/5 border border-sky-400/20">
+              <p className="text-sm text-foreground/80 leading-relaxed mb-3">{guidance.waLine}</p>
+              <div className="p-3 rounded-xl bg-sky-500/5 border border-sky-400/20 mb-2">
                 <p className="text-[11px] uppercase tracking-wider text-sky-500 font-medium mb-1">Tip</p>
                 <p className="text-xs text-foreground/80 leading-relaxed">{guidance.waTip}</p>
               </div>
 
-              <GroupSimulator kind="wa" accent="sky" />
+              <GroupSimulator kind="wa" accent="sky" userName={userName} userGates={userGates} />
             </motion.div>
           </TabsContent>
         </Tabs>
@@ -431,22 +426,13 @@ const GroupDynamicsPage = () => {
           className="mt-6 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            The group takes only what it needs — channels outside your assigned skill set aren't
-            used while you're inside the {`Penta or Wa`}.
+            The group only activates the gates it needs. Gates outside the Penta/Wa set are still
+            your traits — they just don't get used by the group.
           </p>
         </motion.div>
       </div>
     </div>
   );
 };
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="mb-3">
-      <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1">{label}</p>
-      <p className="font-display text-base font-semibold text-foreground">{value}</p>
-    </div>
-  );
-}
 
 export default GroupDynamicsPage;
