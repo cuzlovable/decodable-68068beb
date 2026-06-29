@@ -5,6 +5,7 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
+import referenceChart from "@/assets/bodygraph-reference.jpg";
 
 // Fallback used only if the profile somehow has no calculated chart yet.
 const DEMO_DEFINED_GATES = [64, 47, 17, 62, 31, 7, 1, 8, 15, 5, 14, 2, 34, 57, 20];
@@ -13,6 +14,8 @@ const BodygraphPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [overlayOn, setOverlayOn] = useState(false);
+  const [overlayOpacity, setOverlayOpacity] = useState(0.45);
 
   useEffect(() => {
     const load = async () => {
@@ -92,14 +95,50 @@ const BodygraphPage = () => {
             </h2>
           </div>
 
-          <Bodygraph
-            definedGates={definedGates}
-            designGates={designGates}
-            personalityGates={personalityGates}
-            designPlanets={designPlanets as any}
-            personalityPlanets={personalityPlanets as any}
-            variables={variables}
-          />
+          <div className="relative">
+            <Bodygraph
+              definedGates={definedGates}
+              designGates={designGates}
+              personalityGates={personalityGates}
+              designPlanets={designPlanets as any}
+              personalityPlanets={personalityPlanets as any}
+              variables={variables}
+            />
+            {overlayOn && (
+              <img
+                src={referenceChart}
+                alt="Reference bodygraph overlay for alignment QA"
+                aria-hidden
+                className="pointer-events-none absolute inset-0 w-full h-full object-contain mix-blend-multiply"
+                style={{ opacity: overlayOpacity }}
+              />
+            )}
+          </div>
+
+          {/* Dev: alignment overlay */}
+          <div className="mt-3 flex items-center justify-center gap-3 text-[11px] text-muted-foreground">
+            <label className="flex items-center gap-1.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overlayOn}
+                onChange={(e) => setOverlayOn(e.target.checked)}
+              />
+              Reference overlay
+            </label>
+            {overlayOn && (
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={overlayOpacity}
+                onChange={(e) => setOverlayOpacity(parseFloat(e.target.value))}
+                className="w-32"
+                aria-label="Overlay opacity"
+              />
+            )}
+          </div>
+
 
           {/* Legend — Design vs Personality */}
           <div className="flex items-center justify-center gap-6 mt-4 text-[11px] text-muted-foreground flex-wrap">
