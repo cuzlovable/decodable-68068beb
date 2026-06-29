@@ -61,7 +61,7 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   62: [185, 300], 23: [210, 300], 56: [235, 300],   // top → Ajna
   16: [170, 336], 20: [170, 365],                    // left → Spleen / body
   35: [250, 324], 12: [250, 354],                    // right → Solar
-  33: [184, 380], 8: [210, 380], 31: [236, 380], 45: [250, 375], // bottom/right → G/Heart
+  31: [184, 380], 8: [210, 380], 33: [236, 380], 45: [250, 375], // bottom/right → G/Heart
   // G — diamond perimeter
   13: [186, 426], 1:  [210, 402], 7:  [234, 426],   // top → Throat
   25: [258, 450],                                    // right vertex → Heart
