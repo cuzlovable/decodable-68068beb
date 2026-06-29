@@ -45,11 +45,23 @@ const ChatPage = () => {
           .single();
 
         // Demo partner info
-        const demoPartners: Record<string, { name: string; type: EnergyType; profile: string }> = {
-          "demo-match-1": { name: "Luna", type: "Projector", profile: "4/6" },
-          "demo-match-2": { name: "Orion", type: "Generator", profile: "1/3" },
-          "demo-match-3": { name: "Celeste", type: "Manifesting Generator", profile: "3/5" },
-          "demo-match-4": { name: "Atlas", type: "Manifestor", profile: "5/1" },
+        const demoPartners: Record<string, { name: string; type: EnergyType; profile: string; opener: string }> = {
+          "demo-match-1": {
+            name: "Luna", type: "Projector", profile: "4/6",
+            opener: "Okay, your energy reads so steady — I had to say hi. What's been quietly lighting you up lately?",
+          },
+          "demo-match-2": {
+            name: "Orion", type: "Generator", profile: "1/3",
+            opener: "Your profile made me smile. What's a small thing that's actually made your week feel good?",
+          },
+          "demo-match-3": {
+            name: "Celeste", type: "Manifesting Generator", profile: "3/5",
+            opener: "You look like someone juggling five exciting things at once — which one's winning right now?",
+          },
+          "demo-match-4": {
+            name: "Atlas", type: "Manifestor", profile: "5/1",
+            opener: "Straight up — your vibe caught me. What are you building or chasing these days?",
+          },
         };
         const partner = demoPartners[matchId || ""] || demoPartners["demo-match-1"];
         setPartnerName(partner.name);
@@ -67,7 +79,7 @@ const ChatPage = () => {
           {
             id: "demo-msg-1",
             sender_id: "other",
-            content: `Hey :) your profile caught my eye — how's your week going so far?`,
+            content: partner.opener,
             created_at: new Date(Date.now() - 3600000).toISOString(),
           },
         ]);
