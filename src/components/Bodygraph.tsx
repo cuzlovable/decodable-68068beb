@@ -103,11 +103,11 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 35, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — each gate sits where its pairing tube meets the triangle
-  21: [CX + 85, 472],   // → throat 45 (up)
-  51: [CX + 88, 495],   // → G 25 (left)
-  26: [CX + 95, 525],   // → spleen 44 (down-left)
-  40: [CX + 125, 515],  // → solar 37 (right)
+  // EGO — 21, 51, 26 along left edge (parallel to G's right edge); 40 at right vertex
+  21: [CX + 82, 484],
+  51: [CX + 92, 508],
+  26: [CX + 102, 532],
+  40: [CX + 142, 482],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 552],
   50: [100, 562],
@@ -439,7 +439,15 @@ const Bodygraph = ({
               );
             })}
 
-            {/* (Removed decorative 10→ and 34→ stubs per design — no 10–20 or 34–10 visible tube) */}
+            {/* Extra decorative tube: 41 ↔ 27 (per design request) */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[41];
+              const b = GATE_POS_INTERNAL[27];
+              if (!a || !b) return null;
+              return (
+                <TubeChannel a={a} b={b} g1Mode={modeForGate(41)} g2Mode={modeForGate(27)} />
+              );
+            })()}
 
 
             {/* Centers */}
