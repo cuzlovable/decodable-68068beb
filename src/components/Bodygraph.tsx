@@ -56,25 +56,25 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
     labelAt: [CX, 425],
   },
-  // Heart — small triangle, sits to the right of G (smallest center)
+  // Heart — small downward-pointing triangle, sits diagonally between G and Solar Plexus
   heart: {
-    shape: { kind: "triangle", points: [[CX + 110, 395], [CX + 110, 455], [CX + 165, 425]] },
-    labelAt: [CX + 128, 428],
+    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 145, 460], [CX + 108, 520]] },
+    labelAt: [CX + 108, 478],
   },
   // Sacral — square
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 540, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 588],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 603],
   },
-  // Spleen — horizontal triangle, apex points right toward Sacral
+  // Spleen — regular (equilateral-style) triangle, apex right toward Sacral
   splenic: {
-    shape: { kind: "triangle", points: [[60, 540], [60, 630], [200, 585]] },
-    labelAt: [105, 585],
+    shape: { kind: "triangle", points: [[20, 555], [20, 645], [110, 600]] },
+    labelAt: [50, 600],
   },
   // Solar Plexus — mirror of Spleen, apex points left
   solar: {
-    shape: { kind: "triangle", points: [[540, 540], [540, 630], [400, 585]] },
-    labelAt: [495, 585],
+    shape: { kind: "triangle", points: [[580, 555], [580, 645], [490, 600]] },
+    labelAt: [550, 600],
   },
   // Root — square
   root: {
