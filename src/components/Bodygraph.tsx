@@ -21,7 +21,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   ajna:    { shape: { kind: "triangle", points: [[125, 170], [255, 170], [190, 265]] }, labelAt: [190, 282] },
   throat:  { shape: { kind: "rect", x: 140, y: 285, w: 100, h: 110 }, labelAt: [190, 410] },
   g:       { shape: { kind: "diamond", cx: 190, cy: 445, r: 58 }, labelAt: [190, 519] },
-  heart:   { shape: { kind: "triangle", points: [[278, 410], [278, 480], [218, 445]] }, labelAt: [310, 495] },
+  heart:   { shape: { kind: "triangle", points: [[312, 410], [312, 480], [255, 445]] }, labelAt: [320, 495] },
   splenic: { shape: { kind: "triangle", points: [[35, 530], [35, 640], [165, 585]] }, labelAt: [40, 660] },
   sacral:  { shape: { kind: "rect", x: 140, y: 515, w: 100, h: 100 }, labelAt: [190, 630] },
   solar:   { shape: { kind: "triangle", points: [[345, 530], [345, 640], [215, 585]] }, labelAt: [340, 660] },
@@ -59,9 +59,9 @@ export const GATE_POS: Record<number, [number, number]> = {
   10: [156, 445], 25: [224, 445],
   15: [170, 462], 46: [212, 462],
   2:  [190, 478],
-  // HEART (sideways tri, apex left at 218,445)
-  21: [262, 422], 51: [266, 444],
-  26: [244, 437], 40: [252, 462],
+  // HEART (sideways tri, apex left at 255,445)
+  21: [296, 422], 51: [300, 444],
+  26: [278, 438], 40: [288, 462],
   // SPLEEN (sideways tri, apex right at 165,585)
   48: [56, 548], 44: [64, 575], 32: [64, 605],
   57: [88, 562], 50: [102, 585],
@@ -133,19 +133,22 @@ function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean 
 }
 
 function VariableArrow({
-  x, y, dir, number1, number2, side,
-}: { x: number; y: number; dir: "left" | "right"; number1: number; number2: number; side: "design" | "personality" }) {
+  x, y, value, side,
+}: { x: number; y: number; value: number; side: "design" | "personality" }) {
   const color = side === "personality" ? PERSON_C : DESIGN_C;
-  const w = 56, h = 22;
+  // value is encoded as color + tone/10; tone 1-3 → arrow points left, 4-6 → right.
+  const color1to6 = Math.max(1, Math.min(6, Math.floor(value) || 1));
+  const tone = Math.round(((value - Math.floor(value)) * 10)) || 1;
+  const dir: "left" | "right" = tone <= 3 ? "left" : "right";
+  const w = 38, h = 20;
   const arrow = dir === "right"
-    ? `${x},${y - h/2} ${x + w - 12},${y - h/2} ${x + w - 12},${y - h/2 - 5} ${x + w},${y} ${x + w - 12},${y + h/2 + 5} ${x + w - 12},${y + h/2} ${x},${y + h/2}`
-    : `${x + w},${y - h/2} ${x + 12},${y - h/2} ${x + 12},${y - h/2 - 5} ${x},${y} ${x + 12},${y + h/2 + 5} ${x + 12},${y + h/2} ${x + w},${y + h/2}`;
-  const labelStartX = dir === "right" ? x + 8 : x + 18;
+    ? `${x},${y - h/2} ${x + w - 10},${y - h/2} ${x + w - 10},${y - h/2 - 4} ${x + w},${y} ${x + w - 10},${y + h/2 + 4} ${x + w - 10},${y + h/2} ${x},${y + h/2}`
+    : `${x + w},${y - h/2} ${x + 10},${y - h/2} ${x + 10},${y - h/2 - 4} ${x},${y} ${x + 10},${y + h/2 + 4} ${x + 10},${y + h/2} ${x + w},${y + h/2}`;
+  const labelX = dir === "right" ? x + (w - 10) / 2 : x + (w + 10) / 2;
   return (
     <g>
       <polygon points={arrow} fill={color} opacity={0.95} />
-      <text x={labelStartX} y={y + 3.5} fontSize="10" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{number1}</text>
-      <text x={labelStartX + 18} y={y + 3.5} fontSize="10" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{number2}</text>
+      <text x={labelX} y={y + 3.5} textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{color1to6}</text>
     </g>
   );
 }
@@ -206,8 +209,38 @@ const Bodygraph = ({
   const fmt = (g: number, line: number) => `${g}.${line}`;
 
   // ── Render planet rows as HTML boxes (better mobile responsiveness) ──
+  // Canonical Human Design planet order with name aliases the API may use.
+  const PLANET_ALIASES: Record<string, string[]> = {
+    Sun: ["sun"],
+    Earth: ["earth"],
+    "N. Node": ["north node", "n. node", "north_node", "northnode", "node north", "node_n", "n.node"],
+    "S. Node": ["south node", "s. node", "south_node", "southnode", "node south", "node_s", "s.node"],
+    Moon: ["moon"],
+    Mercury: ["mercury"],
+    Venus: ["venus"],
+    Mars: ["mars"],
+    Jupiter: ["jupiter"],
+    Saturn: ["saturn"],
+    Uranus: ["uranus"],
+    Neptune: ["neptune"],
+    Pluto: ["pluto"],
+  };
+  const normalize = (s?: string) => (s ?? "").toLowerCase().replace(/[._\s-]+/g, " ").trim();
+  const sortByCanonical = (list: Array<{ gate: number; line: number; planet?: string }>) => {
+    const byName: Record<string, { gate: number; line: number; planet?: string }> = {};
+    for (const item of list) {
+      const n = normalize(item.planet);
+      for (const [canon, aliases] of Object.entries(PLANET_ALIASES)) {
+        if (aliases.includes(n) || normalize(canon) === n) { byName[canon] = item; break; }
+      }
+    }
+    return PLANETS.map((p) => byName[p.name]);
+  };
+
   const PlanetCol = ({ side }: { side: "design" | "personality" }) => {
-    const list = side === "design" ? dPlanets : pPlanets;
+    const raw = side === "design" ? dPlanets : pPlanets;
+    // If items carry planet names, sort canonically; else fall back to incoming order.
+    const list = raw.some((it: any) => it?.planet) ? sortByCanonical(raw) : raw;
     const colorClass = side === "design" ? "text-foreground" : "text-[hsl(14,78%,50%)]";
     return (
       <div className="flex flex-col gap-1 w-[68px] sm:w-[80px] shrink-0">
@@ -251,13 +284,11 @@ const Bodygraph = ({
               </pattern>
             </defs>
 
-            {/* ── 4 Variable arrows ALL at top, flanking Head & Ajna ── */}
-            {/* Design (red) on LEFT pointing left */}
-            <VariableArrow x={6}   y={92}  dir="left"  number1={vars.digestion}   number2={vars.environment} side="personality" />
-            <VariableArrow x={6}   y={210} dir="left"  number1={motivationVal}    number2={vars.perspective} side="personality" />
-            {/* Personality (dark) on RIGHT pointing right */}
-            <VariableArrow x={318} y={92}  dir="right" number1={vars.digestion}   number2={vars.environment} side="design" />
-            <VariableArrow x={318} y={210} dir="right" number1={motivationVal}    number2={vars.perspective} side="design" />
+            {/* ── 4 Variable arrows at top: Design (dark) top, Personality (red) below ── */}
+            <VariableArrow x={6}   y={92}  value={vars.digestion}   side="design" />
+            <VariableArrow x={336} y={92}  value={vars.environment} side="design" />
+            <VariableArrow x={6}   y={210} value={motivationVal}    side="personality" />
+            <VariableArrow x={336} y={210} value={vars.perspective} side="personality" />
 
             {/* Channels (under centers) */}
             {UNIQUE_CHANNELS.map((ch) => {
