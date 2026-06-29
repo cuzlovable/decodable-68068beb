@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/lib/humandesign";
 
 // ─── Bodygraph ──────────────────────────────────────────────────
-const DESIGN_C  = "hsl(0 70% 52%)";    // red (Design)
-const PERSON_C  = "hsl(220 15% 14%)";  // black (Personality)
+// Brand-tinted: red with a gentle gray hue; black softened to charcoal with gray hue.
+const DESIGN_C  = "hsl(2 48% 50%)";     // red, hint of gray (Design)
+const PERSON_C  = "hsl(220 10% 24%)";   // charcoal, hint of gray (Personality)
 const OPEN_GRAY = "hsl(220 12% 72%)";
-const TUBE_OFF  = "hsl(30 25% 95%)";   // soft cream tube band (matches reference)
-const TUBE_EDGE = "hsl(25 20% 80%)";   // tube outline
+const TUBE_OFF  = "hsl(30 25% 95%)";    // soft cream tube band (matches reference)
+const TUBE_EDGE = "hsl(25 18% 78%)";    // tube outline
 
 // Branded muted pastels with a grayish hue.
 const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string }> = {
