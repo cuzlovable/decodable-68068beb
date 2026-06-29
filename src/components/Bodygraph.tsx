@@ -67,16 +67,17 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
     labelAt: [CX, 683],
   },
-  // Spleen — triangle, apex right
+  // Spleen — triangle, apex right (pulled left to add space between Spleen and G)
   splenic: {
-    shape: { kind: "triangle", points: [[15, 510], [15, 614], [120, 562]] },
-    labelAt: [50, 562],
+    shape: { kind: "triangle", points: [[15, 510], [15, 614], [95, 562]] },
+    labelAt: [45, 562],
   },
-  // Solar Plexus — mirror of Spleen
+  // Solar Plexus — mirror of Spleen (pulled right to add space between Solar and G)
   solar: {
-    shape: { kind: "triangle", points: [[585, 510], [585, 614], [480, 562]] },
-    labelAt: [550, 562],
+    shape: { kind: "triangle", points: [[585, 510], [585, 614], [505, 562]] },
+    labelAt: [555, 562],
   },
+
   // Root — square (pushed down with Sacral)
   root: {
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 785, w: SQ_W, h: SQ_H },
@@ -108,19 +109,20 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   51: [CX + 115, 485],
   26: [CX + 95, 525],
   40: [CX + 140, 510],
-  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32 (44 nudged inside)
-  48: [28, 527], 57: [55, 540], 44: [75, 548],
-  50: [100, 562],
-  18: [28, 597], 28: [55, 584], 32: [82, 572],
+  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
+  48: [28, 527], 57: [50, 540], 44: [70, 550],
+  50: [80, 562],
+  18: [28, 597], 28: [50, 584], 32: [72, 572],
   // SACRAL — shifted with the center
   5:  [CX - 22, 648], 14: [CX, 648], 29: [CX + 22, 648],
   34: [CX - 40, 670],
   27: [CX - 40, 695], 59: [CX + 40, 695],
   42: [CX - 22, 716], 3:  [CX, 716], 9:  [CX + 22, 716],
   // SOLAR — mirror of spleen
-  36: [572, 527], 22: [545, 540], 37: [518, 552],
-  6:  [500, 562],
-  49: [518, 572], 55: [545, 584], 30: [572, 597],
+  36: [572, 527], 22: [550, 540], 37: [530, 550],
+  6:  [520, 562],
+  49: [528, 572], 55: [550, 584], 30: [572, 597],
+
   // ROOT — three columns
   53: [CX - 22, 797], 60: [CX, 797], 52: [CX + 22, 797],
   54: [CX - 40, 823], 38: [CX - 40, 843], 58: [CX - 40, 863],
@@ -129,8 +131,9 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// Hide tubes that overlap/cross awkwardly with neighbors. 5-15 is the leftmost G↔Sacral tube.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "5-15"]);
+// Hide tubes that overlap/cross awkwardly with neighbors.
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20"]);
+
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
@@ -439,8 +442,8 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tube: 40↔6 */}
-            {([[40, 6]] as Array<[number, number]>).map(([g1, g2]) => {
+            {/* Extra decorative tube: 40↔27 (Ego to Sacral) */}
+            {([[40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
               const a = GATE_POS_INTERNAL[g1];
               const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
@@ -449,6 +452,7 @@ const Bodygraph = ({
                   g1Mode={modeForGate(g1)} g2Mode={modeForGate(g2)} />
               );
             })}
+
 
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
