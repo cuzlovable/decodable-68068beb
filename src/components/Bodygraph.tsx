@@ -439,15 +439,16 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tube: 41 ↔ 27 (per design request) */}
-            {(() => {
-              const a = GATE_POS_INTERNAL[41];
-              const b = GATE_POS_INTERNAL[27];
+            {/* Extra decorative tubes: 41↔27 and 40↔27 (per design request) */}
+            {([[41, 27], [40, 27]] as Array<[number, number]>).map(([g1, g2]) => {
+              const a = GATE_POS_INTERNAL[g1];
+              const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
               return (
-                <TubeChannel a={a} b={b} g1Mode={modeForGate(41)} g2Mode={modeForGate(27)} />
+                <TubeChannel key={`extra-${g1}-${g2}`} a={a} b={b}
+                  g1Mode={modeForGate(g1)} g2Mode={modeForGate(g2)} />
               );
-            })()}
+            })}
 
             {/* Decorative stub: gate 10 → 45° up-left, terminating on the 20–57 channel line */}
             {(() => {
