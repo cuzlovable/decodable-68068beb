@@ -133,19 +133,22 @@ function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean 
 }
 
 function VariableArrow({
-  x, y, dir, number1, number2, side,
-}: { x: number; y: number; dir: "left" | "right"; number1: number; number2: number; side: "design" | "personality" }) {
+  x, y, value, side,
+}: { x: number; y: number; value: number; side: "design" | "personality" }) {
   const color = side === "personality" ? PERSON_C : DESIGN_C;
-  const w = 56, h = 22;
+  // value is encoded as color + tone/10; tone 1-3 → arrow points left, 4-6 → right.
+  const color1to6 = Math.max(1, Math.min(6, Math.floor(value) || 1));
+  const tone = Math.round(((value - Math.floor(value)) * 10)) || 1;
+  const dir: "left" | "right" = tone <= 3 ? "left" : "right";
+  const w = 38, h = 20;
   const arrow = dir === "right"
-    ? `${x},${y - h/2} ${x + w - 12},${y - h/2} ${x + w - 12},${y - h/2 - 5} ${x + w},${y} ${x + w - 12},${y + h/2 + 5} ${x + w - 12},${y + h/2} ${x},${y + h/2}`
-    : `${x + w},${y - h/2} ${x + 12},${y - h/2} ${x + 12},${y - h/2 - 5} ${x},${y} ${x + 12},${y + h/2 + 5} ${x + 12},${y + h/2} ${x + w},${y + h/2}`;
-  const labelStartX = dir === "right" ? x + 8 : x + 18;
+    ? `${x},${y - h/2} ${x + w - 10},${y - h/2} ${x + w - 10},${y - h/2 - 4} ${x + w},${y} ${x + w - 10},${y + h/2 + 4} ${x + w - 10},${y + h/2} ${x},${y + h/2}`
+    : `${x + w},${y - h/2} ${x + 10},${y - h/2} ${x + 10},${y - h/2 - 4} ${x},${y} ${x + 10},${y + h/2 + 4} ${x + 10},${y + h/2} ${x + w},${y + h/2}`;
+  const labelX = dir === "right" ? x + (w - 10) / 2 : x + (w + 10) / 2;
   return (
     <g>
       <polygon points={arrow} fill={color} opacity={0.95} />
-      <text x={labelStartX} y={y + 3.5} fontSize="10" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{number1}</text>
-      <text x={labelStartX + 18} y={y + 3.5} fontSize="10" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{number2}</text>
+      <text x={labelX} y={y + 3.5} textAnchor="middle" fontSize="11" fontWeight="700" fill="white" fontFamily="DM Sans, sans-serif">{color1to6}</text>
     </g>
   );
 }
