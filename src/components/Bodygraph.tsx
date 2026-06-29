@@ -33,11 +33,11 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   g:       { shape: { kind: "diamond", cx: 250, cy: 410, r: 55 }, labelAt: [250, 415] },
   // Heart sits clearly right of G — triangle: top apex, left base, right base
   heart:   { shape: { kind: "triangle", points: [[380, 400], [335, 475], [425, 475]] }, labelAt: [380, 460] },
-  // Spleen — apex points right toward Sacral
-  splenic: { shape: { kind: "triangle", points: [[40, 510], [40, 640], [170, 575]] }, labelAt: [75, 580] },
+  // Spleen — apex points right toward Sacral. Sized to match Ajna/Throat.
+  splenic: { shape: { kind: "triangle", points: [[60, 520], [60, 615], [170, 568]] }, labelAt: [90, 580] },
   sacral:  { shape: { kind: "rect", x: 200, y: 510, w: 100, h: 85 }, labelAt: [250, 555] },
-  // Solar — apex points left toward Sacral
-  solar:   { shape: { kind: "triangle", points: [[460, 510], [460, 640], [330, 575]] }, labelAt: [425, 580] },
+  // Solar — apex points left toward Sacral. Mirror of Spleen.
+  solar:   { shape: { kind: "triangle", points: [[440, 520], [440, 615], [330, 568]] }, labelAt: [410, 580] },
   root:    { shape: { kind: "rect", x: 200, y: 620, w: 100, h: 80 }, labelAt: [250, 660] },
 };
 
@@ -64,19 +64,19 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // HEART — 21/51/26 left edge (top→bottom), 40 right apex (per reference)
   21: [378, 418], 51: [358, 448], 26: [346, 472],
   40: [418, 472],
-  // SPLEEN — top slant 48/57/44, bottom slant 32/28/18, 50 near apex interior
-  48: [50, 522], 57: [95, 548], 44: [140, 572],
-  50: [150, 588],
-  32: [50, 628], 28: [95, 604], 18: [140, 580],
+  // SPLEEN — top slant 48/57/44 (apex→base), bottom slant 18/28/32 LEFT→RIGHT, 50 interior
+  48: [70, 528], 57: [110, 545], 44: [150, 563],
+  50: [120, 578],
+  18: [70, 608], 28: [110, 590], 32: [150, 572],
   // SACRAL — top, side cols, bottom
   5:  [220, 510], 14: [250, 510], 29: [280, 510],
   34: [200, 535], 27: [200, 570],
   59: [300, 545],
   42: [220, 595], 3:  [250, 595], 9:  [280, 595],
-  // SOLAR — top slant 36/22/37, bottom slant 49/55/30, 6 near apex
-  36: [450, 522], 22: [405, 548], 37: [360, 572],
-  6:  [345, 580],
-  49: [450, 628], 55: [405, 604], 30: [360, 580],
+  // SOLAR — top slant 37/22/36 (apex→base), bottom slant 49/55/30 LEFT→RIGHT (apex→base), 6 interior
+  37: [350, 563], 22: [390, 545], 36: [430, 528],
+  6:  [340, 578],
+  49: [350, 572], 55: [390, 590], 30: [430, 608],
   // ROOT — top row, left col (root↔spleen), right col (root↔solar)
   53: [220, 620], 60: [250, 620], 52: [280, 620],
   54: [200, 645], 38: [200, 670], 58: [200, 695],
@@ -85,8 +85,8 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// Channels we intentionally don't render as a direct line.
-const HIDDEN_CHANNELS = new Set<string>(["10-57"]);
+// All canonical channels render as tubes.
+const HIDDEN_CHANNELS = new Set<string>();
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
