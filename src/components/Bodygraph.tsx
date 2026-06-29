@@ -439,8 +439,8 @@ const Bodygraph = ({
               );
             })}
 
-            {/* Extra decorative tubes: 41↔27 and 40↔6 */}
-            {([[41, 27], [40, 6]] as Array<[number, number]>).map(([g1, g2]) => {
+            {/* Extra decorative tube: 40↔6 */}
+            {([[40, 6]] as Array<[number, number]>).map(([g1, g2]) => {
               const a = GATE_POS_INTERNAL[g1];
               const b = GATE_POS_INTERNAL[g2];
               if (!a || !b) return null;
