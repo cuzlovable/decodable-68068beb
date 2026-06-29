@@ -57,11 +57,12 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — tilted further left, raised closer to G (hugs the G center more than Solar)
+  // Ego — rotated further left so 45↔21 and 25↔51 tubes run parallel (no crossing)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 30, 455], [CX + 155, 488], [CX + 115, 555]] },
-    labelAt: [CX + 115, 500],
+    shape: { kind: "triangle", points: [[CX + 15, 458], [CX + 140, 478], [CX + 100, 552]] },
+    labelAt: [CX + 100, 500],
   },
+
   // Sacral — extra space below G
   sacral: {
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
@@ -105,11 +106,12 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — gates inside the left-tilted triangle
-  21: [CX + 75, 472],
-  51: [CX + 115, 485],
-  26: [CX + 95, 525],
-  40: [CX + 140, 510],
+  // EGO — gates re-anchored so 45↔21 and 25↔51 tubes stay parallel
+  21: [CX + 40, 472],
+  51: [CX + 80, 488],
+  26: [CX + 80, 528],
+  40: [CX + 125, 508],
+
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 582], 57: [50, 595], 44: [70, 605],
   50: [80, 617],
