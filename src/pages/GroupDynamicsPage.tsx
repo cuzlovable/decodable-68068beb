@@ -402,10 +402,6 @@ const GroupDynamicsPage = () => {
               </div>
 
               <p className="text-sm text-foreground/80 leading-relaxed mb-3">{guidance.waLine}</p>
-              <div className="p-3 rounded-xl bg-sky-500/5 border border-sky-400/20 mb-2">
-                <p className="text-[11px] uppercase tracking-wider text-sky-500 font-medium mb-1">Tip</p>
-                <p className="text-xs text-foreground/80 leading-relaxed">{guidance.waTip}</p>
-              </div>
 
               <GroupSimulator kind="wa" accent="sky" userName={userName} userGates={userGates} />
             </motion.div>
