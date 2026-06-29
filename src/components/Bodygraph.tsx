@@ -167,7 +167,7 @@ function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean 
     <g>
       {shapeEl(
         shape,
-        isDefined ? fill : "transparent",
+        isDefined ? fill : "hsl(var(--card))",
         isDefined ? stroke : OPEN_GRAY,
         !isDefined,
       )}
