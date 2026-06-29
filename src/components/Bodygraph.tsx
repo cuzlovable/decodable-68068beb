@@ -382,13 +382,13 @@ const Bodygraph = ({
   const motivation  = (v.motivation as number) ?? (v.personality_motivation as number) ?? (v.awareness as number);
   const perspective = (v.perspective as number) ?? (v.personality_perspective as number) ?? (v.view as number);
 
-  const colorForGate = (g: number) => {
+  const modeForGate = (g: number): SideMode => {
     const inD = designSet.has(g);
     const inP = personalitySet.has(g);
-    if (inD && inP) return DESIGN_C;
-    if (inD) return DESIGN_C;
-    if (inP) return PERSON_C;
-    return TUBE_OFF;
+    if (inD && inP) return "both";
+    if (inD) return "design";
+    if (inP) return "personality";
+    return "off";
   };
 
   return (
