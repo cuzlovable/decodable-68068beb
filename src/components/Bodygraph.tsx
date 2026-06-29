@@ -21,7 +21,7 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   ajna:    { shape: { kind: "triangle", points: [[125, 170], [255, 170], [190, 265]] }, labelAt: [190, 282] },
   throat:  { shape: { kind: "rect", x: 140, y: 285, w: 100, h: 110 }, labelAt: [190, 410] },
   g:       { shape: { kind: "diamond", cx: 190, cy: 445, r: 58 }, labelAt: [190, 519] },
-  heart:   { shape: { kind: "triangle", points: [[278, 410], [278, 480], [218, 445]] }, labelAt: [310, 495] },
+  heart:   { shape: { kind: "triangle", points: [[312, 410], [312, 480], [255, 445]] }, labelAt: [320, 495] },
   splenic: { shape: { kind: "triangle", points: [[35, 530], [35, 640], [165, 585]] }, labelAt: [40, 660] },
   sacral:  { shape: { kind: "rect", x: 140, y: 515, w: 100, h: 100 }, labelAt: [190, 630] },
   solar:   { shape: { kind: "triangle", points: [[345, 530], [345, 640], [215, 585]] }, labelAt: [340, 660] },
