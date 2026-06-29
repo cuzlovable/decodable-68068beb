@@ -321,9 +321,16 @@ const EnvironmentPage = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-5"
+                  className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 overflow-hidden"
                 >
-                  <div className="flex items-start gap-3">
+                  <img
+                    src={imageFor(s)}
+                    alt={s.name}
+                    loading="lazy"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    className="w-full h-32 object-cover"
+                  />
+                  <div className="p-5 flex items-start gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${CATEGORY_COLORS[s.category] || "bg-muted text-muted-foreground"}`}>
                       {CATEGORY_ICONS[s.category] || <MapPin className="w-4 h-4" />}
                     </div>
