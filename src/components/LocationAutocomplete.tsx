@@ -88,7 +88,11 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
           placeholder="Start typing your birth city..."
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => results.length > 0 && setIsOpen(true)}
+          onFocus={(e) => {
+            // Select all so typing replaces auto-filled labels like "Your current location"
+            e.currentTarget.select();
+            if (results.length > 0) setIsOpen(true);
+          }}
           className={`pl-10 ${className}`}
         />
         {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />}
