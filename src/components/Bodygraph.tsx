@@ -57,10 +57,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
     labelAt: [CX, 425],
   },
-  // Heart — small downward-pointing triangle, sits diagonally between G and Solar Plexus
+  // Heart / Ego — small triangle with top vertex, left vertex, bottom-right vertex
   heart: {
-    shape: { kind: "triangle", points: [[CX + 70, 460], [CX + 145, 460], [CX + 108, 520]] },
-    labelAt: [CX + 108, 478],
+    shape: { kind: "triangle", points: [[CX + 108, 458], [CX + 72, 495], [CX + 140, 520]] },
+    labelAt: [CX + 105, 495],
   },
   // Sacral — square
   sacral: {
