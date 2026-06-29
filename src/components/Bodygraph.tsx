@@ -173,7 +173,7 @@ function GateEl({
   );
 }
 
-// Tube-style channel: two parallel offset lines, split-colored at midpoint
+// Tube-style channel: two thick parallel offset lines, split-colored at midpoint.
 function TubeChannel({
   a, b, color1, color2, active,
 }: {
@@ -183,23 +183,23 @@ function TubeChannel({
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
   const len = Math.hypot(dx, dy) || 1;
-  const offset = 2.2;
+  const offset = active ? 3.2 : 2.8;
   const ox = (-dy / len) * offset;
   const oy = (dx / len) * offset;
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
-  const sw = active ? 1.6 : 1;
-  const opacity = active ? 1 : 0.5;
+  const sw = active ? 4.5 : 3.2;
+  const opacity = active ? 1 : 0.6;
   return (
-    <g opacity={opacity}>
+    <g opacity={opacity} strokeLinecap="round">
       <line x1={a[0] + ox} y1={a[1] + oy} x2={mx + ox} y2={my + oy}
-        stroke={color1} strokeWidth={sw} strokeLinecap="round" />
+        stroke={color1} strokeWidth={sw} />
       <line x1={mx + ox} y1={my + oy} x2={b[0] + ox} y2={b[1] + oy}
-        stroke={color2} strokeWidth={sw} strokeLinecap="round" />
+        stroke={color2} strokeWidth={sw} />
       <line x1={a[0] - ox} y1={a[1] - oy} x2={mx - ox} y2={my - oy}
-        stroke={color1} strokeWidth={sw} strokeLinecap="round" />
+        stroke={color1} strokeWidth={sw} />
       <line x1={mx - ox} y1={my - oy} x2={b[0] - ox} y2={b[1] - oy}
-        stroke={color2} strokeWidth={sw} strokeLinecap="round" />
+        stroke={color2} strokeWidth={sw} />
     </g>
   );
 }
