@@ -57,15 +57,15 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — shifted right & up, rotated CCW for a left-leaning tilt
+  // Ego — tilted further left, raised closer to G (hugs the G center more than Solar)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 45, 478], [CX + 160, 500], [CX + 120, 565]] },
-    labelAt: [CX + 120, 510],
+    shape: { kind: "triangle", points: [[CX + 30, 455], [CX + 155, 488], [CX + 115, 555]] },
+    labelAt: [CX + 115, 500],
   },
-  // Sacral — pushed further down so the 26-44 channel has clear airspace below G
+  // Sacral — extra space below G
   sacral: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 605, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 653],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 683],
   },
   // Spleen — triangle, apex right
   splenic: {
@@ -79,8 +79,8 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
   },
   // Root — square (pushed down with Sacral)
   root: {
-    shape: { kind: "rect", x: CX - SQ_W / 2, y: 755, w: SQ_W, h: SQ_H },
-    labelAt: [CX, 800],
+    shape: { kind: "rect", x: CX - SQ_W / 2, y: 785, w: SQ_W, h: SQ_H },
+    labelAt: [CX, 830],
   },
 };
 
