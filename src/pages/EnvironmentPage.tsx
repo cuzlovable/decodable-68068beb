@@ -80,6 +80,7 @@ const EnvironmentPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [result, setResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationLabel, setLocationLabel] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -98,18 +99,24 @@ const EnvironmentPage = () => {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          (pos) => {
+            setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            setLocationLabel("Your current location");
+          },
           () => {
             if (data?.birth_latitude && data?.birth_longitude) {
               setUserLocation({ lat: data.birth_latitude, lng: data.birth_longitude });
+              setLocationLabel(data.birth_location || "Birth location");
             } else {
               setUserLocation({ lat: 40.7128, lng: -74.006 });
-              setLocationError("Using default location. Enable GPS for better results.");
+              setLocationLabel("New York, NY (default)");
+              setLocationError("Enable location or search below for accurate results.");
             }
           }
         );
       } else {
         setUserLocation({ lat: 40.7128, lng: -74.006 });
+        setLocationLabel("New York, NY (default)");
       }
 
       setLoading(false);
@@ -213,27 +220,35 @@ const EnvironmentPage = () => {
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {decoded.environment.full}
               </h2>
-              <p className="text-xs text-muted-foreground mb-4">
-                Color {decoded.environment.color} · Tone {decoded.environment.tone} ·{" "}
-                {decoded.environment.colorLabel}
+              <p className="text-sm text-foreground/80 leading-relaxed mt-2 mb-3">
+                {ENV_DESCRIPTIONS[decoded.environment.colorLabel] ??
+                  `Your environment color is ${decoded.environment.colorLabel}.`}
               </p>
 
-              {/* Secondary variables */}
-              <div className="grid grid-cols-2 gap-2 mb-5">
-                {decoded.digestion && (
-                  <VarChip label="Digestion" value={decoded.digestion.full} sub={`${decoded.digestion.color}.${decoded.digestion.tone}`} />
-                )}
-                {decoded.perspective && (
-                  <VarChip label="Perspective" value={decoded.perspective.full} sub={`${decoded.perspective.color}.${decoded.perspective.tone}`} />
-                )}
-                {decoded.motivation && (
-                  <VarChip label="Motivation" value={decoded.motivation.full} sub={`${decoded.motivation.color}.${decoded.motivation.tone}`} />
-                )}
-                <VarChip
-                  label="Environment"
-                  value={decoded.environment.full}
-                  sub={`${decoded.environment.color}.${decoded.environment.tone}`}
-                  accent
+              {decoded.digestion && (
+                <div className="mb-4 p-3 rounded-xl bg-muted/30 border border-border/40">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+                    Super-cognition · {decoded.digestion.full}
+                  </p>
+                  <p className="text-xs text-foreground/80 leading-relaxed">
+                    {DIG_DESCRIPTIONS[decoded.digestion.colorLabel] ??
+                      `Your cognition is ${decoded.digestion.colorLabel}.`}
+                  </p>
+                </div>
+              )}
+
+              {/* Location override — accurate, accessible search */}
+              <div className="mb-4">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Search near
+                </p>
+                <LocationAutocomplete
+                  value={locationLabel}
+                  onChange={(name, lat, lon) => {
+                    setUserLocation({ lat, lng: lon });
+                    setLocationLabel(name);
+                    setLocationError(null);
+                  }}
                 />
               </div>
 
@@ -248,6 +263,7 @@ const EnvironmentPage = () => {
                   <><Sparkles className="w-4 h-4 mr-2" /> Find my {decoded.environment.full} spots</>
                 )}
               </Button>
+
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
