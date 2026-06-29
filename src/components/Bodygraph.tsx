@@ -449,6 +449,24 @@ const Bodygraph = ({
               );
             })()}
 
+            {/* Decorative stub: gate 10 → 45° up-left, terminating on the 20–57 channel line */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[10];
+              if (!a) return null;
+              // 20 at (CX-40, 295), 57 at (55, 540); 45° ray from 10 hits at ~(187, 382)
+              const b: [number, number] = [187, 382];
+              return <TubeChannel a={a} b={b} g1Mode={modeForGate(10)} g2Mode="off" />;
+            })()}
+
+            {/* Decorative stub: gate 34 → up-left, terminating on the 20–57 channel line */}
+            {(() => {
+              const a = GATE_POS_INTERNAL[34];
+              if (!a) return null;
+              // Closest point on 20–57 line to gate 34 ≈ (115, 468)
+              const b: [number, number] = [115, 468];
+              return <TubeChannel a={a} b={b} g1Mode={modeForGate(34)} g2Mode="off" />;
+            })()}
+
 
             {/* Centers */}
             {(Object.keys(CENTERS) as CenterId[]).map((c) => (
