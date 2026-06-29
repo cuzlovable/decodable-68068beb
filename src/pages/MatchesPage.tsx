@@ -148,7 +148,7 @@ const MatchesPage = () => {
           </Link>
           <div>
             <h1 className="font-display text-xl font-bold text-foreground">High Chemistry</h1>
-            <p className="text-xs text-muted-foreground">Matches ranked by gate-to-gate synastry</p>
+            <p className="text-xs text-muted-foreground">1:1 connections — dates, collaborators, friends</p>
           </div>
         </div>
 
@@ -224,12 +224,12 @@ const MatchesPage = () => {
           className="mt-8 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">Channel chemistry first.</span>{" "}
-            Matches are ranked by gate-to-gate connections — the ones that finish each
-            other's channels rise to the top.
+            <span className="font-semibold text-foreground">For any 1:1 connection.</span>{" "}
+            Matches here aren't just for dating — they surface people whose Human Design
+            (type, authority, cognition/environment, channel pull, profile) naturally clicks
+            with yours, whether that's romance, collaboration, or close friendship. The more
+            you tell us what felt right or off, the sharper your matches get.
           </p>
-
-        </motion.div>
       </div>
     </div>
   );
