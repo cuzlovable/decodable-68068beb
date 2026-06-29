@@ -9,8 +9,8 @@ import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/li
 //   Sacral: red, Root: red.
 // Design (Body) data + black on LEFT. Personality (Mind) data + red on RIGHT.
 
-const DESIGN_C  = "hsl(220 15% 15%)";   // black/dark
-const PERSON_C  = "hsl(0 75% 55%)";     // red
+const DESIGN_C  = "hsl(0 75% 55%)";     // red (Design / Body)
+const PERSON_C  = "hsl(220 15% 15%)";   // black (Personality / Mind)
 const OPEN_GRAY = "hsl(220 15% 75%)";
 const CHANNEL_OFF = "hsl(220 15% 88%)";
 
