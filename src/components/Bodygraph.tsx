@@ -240,7 +240,7 @@ const Bodygraph = ({
   const PlanetCol = ({ side }: { side: "design" | "personality" }) => {
     const raw = side === "design" ? dPlanets : pPlanets;
     // If items carry planet names, sort canonically; else fall back to incoming order.
-    const list = raw.some((it) => it?.planet) ? sortByCanonical(raw) : raw;
+    const list = raw.some((it: any) => it?.planet) ? sortByCanonical(raw) : raw;
     const colorClass = side === "design" ? "text-foreground" : "text-[hsl(14,78%,50%)]";
     return (
       <div className="flex flex-col gap-1 w-[68px] sm:w-[80px] shrink-0">
