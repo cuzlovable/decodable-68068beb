@@ -439,6 +439,13 @@ const Bodygraph = ({
               );
             })}
 
+            {/* Decorative stubs: gate 10 horizontal + gate 34 diagonal, both touching the 20–57 channel */}
+            <TubeChannel a={GATE_POS_INTERNAL[10]} b={[155, 420]}
+              g1Mode={modeForGate(10)} g2Mode="off" />
+            <TubeChannel a={GATE_POS_INTERNAL[34]} b={[147, 430]}
+              g1Mode={modeForGate(34)} g2Mode="off" />
+
+
             {/* Centers */}
             {(Object.keys(CENTERS) as CenterId[]).map((c) => (
               <CenterEl key={c} center={c} isDefined={definedCenters.has(c)} />
