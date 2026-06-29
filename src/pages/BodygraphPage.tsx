@@ -5,9 +5,7 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import Bodygraph from "@/components/Bodygraph";
-import OpenCenterAlerts from "@/components/OpenCenterAlerts";
 import DeconditioningChecklist from "@/components/DeconditioningChecklist";
-import MindGateRinse from "@/components/MindGateRinse";
 import { getOpenCenters } from "@/lib/humandesign";
 
 // Fallback used only if the profile somehow has no calculated chart yet.
