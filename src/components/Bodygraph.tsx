@@ -297,23 +297,15 @@ const Bodygraph = ({
       transition={{ duration: 0.4 }}
       className={className}
     >
-      {/* Top arrows row */}
-      <div className="flex items-center justify-center gap-8 mb-3">
-        <div className="flex flex-col items-center gap-1">
+      {/* Top arrows: 2x2 grid — Design (left), Personality (right) */}
+      <div className="flex items-center justify-center gap-12 mb-3">
+        <div className="grid grid-cols-1 gap-1.5">
           <VariableArrow value={digestion} side="design" />
-          <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: DESIGN_C }}>Dig</span>
-        </div>
-        <div className="flex flex-col items-center gap-1">
           <VariableArrow value={environment} side="design" />
-          <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: DESIGN_C }}>Env</span>
         </div>
-        <div className="flex flex-col items-center gap-1">
+        <div className="grid grid-cols-1 gap-1.5">
           <VariableArrow value={motivation} side="personality" />
-          <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: PERSON_C }}>Mot</span>
-        </div>
-        <div className="flex flex-col items-center gap-1">
           <VariableArrow value={perspective} side="personality" />
-          <span className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: PERSON_C }}>View</span>
         </div>
       </div>
 
