@@ -100,14 +100,14 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   // G — diamond (tightened so dots sit safely inside)
   1:  [CX, 372],
   7:  [CX - 22, 398], 13: [CX + 22, 398],
-  10: [CX - 35, 420], 25: [CX + 35, 420],
+  10: [CX - 35, 420], 25: [CX + 62, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 51 sits directly below G gate 25; 21 up top; 26 lower-right; 40 at right vertex
-  21: [CX + 52, 482],
-  51: [CX + 35, 500],
-  26: [CX + 88, 555],
-  40: [CX + 138, 492],
+  // EGO — smaller triangle; 51 directly below G gate 25; gates kept inside outline
+  21: [CX + 62, 488],
+  51: [CX + 62, 510],
+  26: [CX + 88, 548],
+  40: [CX + 130, 498],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 527], 57: [55, 540], 44: [82, 545],
   50: [100, 562],
@@ -121,16 +121,16 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   36: [572, 527], 22: [545, 540], 37: [518, 552],
   6:  [500, 562],
   49: [518, 572], 55: [545, 584], 30: [572, 597],
-  // ROOT — three columns
-  53: [CX - 22, 712], 60: [CX, 712], 52: [CX + 22, 712],
-  54: [CX - 40, 738], 38: [CX - 40, 758], 58: [CX - 40, 778],
-  19: [CX + 40, 738], 39: [CX + 40, 758], 41: [CX + 40, 778],
+  // ROOT — three columns (shifted down for breathing room from Sacral)
+  53: [CX - 22, 747], 60: [CX, 747], 52: [CX + 22, 747],
+  54: [CX - 40, 773], 38: [CX - 40, 793], 58: [CX - 40, 813],
+  19: [CX + 40, 773], 39: [CX + 40, 793], 41: [CX + 40, 813],
 };
 
 export const GATE_POS = GATE_POS_INTERNAL;
 
-// Hide tubes that overlap/cross awkwardly with neighbors.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60"]);
+// Hide tubes that overlap/cross awkwardly with neighbors. 5-15 is the leftmost G↔Sacral tube.
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "3-60", "5-15"]);
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
   const strokeW = dashed ? 1.5 : 2;
