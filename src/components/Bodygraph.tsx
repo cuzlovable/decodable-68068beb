@@ -103,13 +103,13 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 35, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21, 51, 26 along left edge (parallel to G's right edge); 40 at right vertex
-  21: [CX + 82, 484],
-  51: [CX + 92, 508],
-  26: [CX + 102, 532],
-  40: [CX + 142, 482],
+  // EGO — 51 sits directly below G gate 25; 21 up top; 26 lower-right; 40 at right vertex
+  21: [CX + 52, 482],
+  51: [CX + 35, 500],
+  26: [CX + 88, 555],
+  40: [CX + 138, 492],
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 527], 57: [55, 540], 44: [82, 552],
+  48: [28, 527], 57: [55, 540], 44: [82, 545],
   50: [100, 562],
   18: [28, 597], 28: [55, 584], 32: [82, 572],
   // SACRAL — 34 & 27 vertical on left, 59 right-side meeting gate 6 tube
