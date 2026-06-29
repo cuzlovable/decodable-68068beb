@@ -237,14 +237,14 @@ function GroupSimulator({
               Your {kind === "penta" ? "Penta" : "Wa"} is complete
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              All {canonical.length} {kind === "penta" ? "skills" : "roles"} are covered by
+              All {canonical.length} {kind === "penta" ? "skills" : "roles"} are present in
               the group. The field is whole.
             </p>
           </div>
         ) : (
           <div>
             <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
-              Covered {kind === "penta" ? "skills" : "roles"} ({composite.covered.length}/{canonical.length})
+              {kind === "penta" ? "Skills" : "Roles"} ({composite.covered.length}/{canonical.length})
             </p>
             {composite.covered.length === 0 ? (
               <p className="text-xs text-foreground/60">No one in the group carries these gates yet.</p>

@@ -57,9 +57,9 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 55 },
     labelAt: [CX, 425],
   },
-  // Heart / Ego — small triangle with top vertex, left vertex, bottom-right vertex
+  // Heart / Ego — slightly enlarged triangle: top vertex, left vertex, bottom-right vertex
   heart: {
-    shape: { kind: "triangle", points: [[CX + 108, 458], [CX + 72, 495], [CX + 140, 520]] },
+    shape: { kind: "triangle", points: [[CX + 105, 455], [CX + 62, 498], [CX + 150, 525]] },
     labelAt: [CX + 105, 495],
   },
   // Sacral — square
@@ -67,14 +67,14 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 555, w: SQ_W, h: SQ_H },
     labelAt: [CX, 603],
   },
-  // Spleen — regular (equilateral-style) triangle, apex right toward Sacral
+  // Spleen — enlarged triangle, apex right toward Sacral
   splenic: {
-    shape: { kind: "triangle", points: [[20, 555], [20, 645], [110, 600]] },
+    shape: { kind: "triangle", points: [[15, 548], [15, 652], [120, 600]] },
     labelAt: [50, 600],
   },
   // Solar Plexus — mirror of Spleen, apex points left
   solar: {
-    shape: { kind: "triangle", points: [[580, 555], [580, 645], [490, 600]] },
+    shape: { kind: "triangle", points: [[585, 548], [585, 652], [480, 600]] },
     labelAt: [550, 600],
   },
   // Root — square
@@ -104,22 +104,22 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 38, 420], 25: [CX + 38, 420],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 460],
-  // EGO / HEART — top vertex (21), left vertex (26), interior (51), bottom-right vertex (40)
-  21: [CX + 108, 475], 51: [CX + 95, 488], 26: [CX + 80, 500],
-  40: [CX + 130, 510],
+  // EGO / HEART — top vertex (21), interior (51), left vertex (26), bottom-right vertex (40)
+  21: [CX + 108, 475], 51: [CX + 95, 488], 26: [CX + 75, 500],
+  40: [CX + 135, 512],
   // SPLEEN — top edge from left vertex (48) → 57 → 44 → apex (50); bottom edge 18 (vertex) → 28 → 32
-  48: [32, 568], 57: [60, 580], 44: [88, 592],
-  50: [70, 605],
-  18: [32, 632], 28: [62, 620], 32: [86, 610],
+  48: [28, 565], 57: [55, 578], 44: [82, 590],
+  50: [100, 600],
+  18: [28, 635], 28: [55, 622], 32: [82, 610],
   // SACRAL — top (5, 14, 29), left (34, 27), right (59), bottom (42, 3, 9)
   5:  [CX - 30, 568], 14: [CX, 568], 29: [CX + 30, 568],
   34: [CX - 40, 593], 27: [CX - 40, 617],
   59: [CX + 40, 605],
   42: [CX - 30, 635], 3:  [CX, 635], 9:  [CX + 30, 635],
   // SOLAR — top-right vertex (36) → 22 → 37 → apex-left (6); bottom 49 → 55 → 30 (vertex)
-  36: [568, 568], 22: [540, 580], 37: [514, 592],
-  6:  [498, 605],
-  49: [514, 610], 55: [540, 620], 30: [568, 632],
+  36: [572, 565], 22: [545, 578], 37: [518, 590],
+  6:  [500, 600],
+  49: [518, 610], 55: [545, 622], 30: [572, 635],
   // ROOT — top (53, 60, 52), left (54, 38, 58), right (19, 39, 41)
   53: [CX - 30, 712], 60: [CX, 712], 52: [CX + 30, 712],
   54: [CX - 40, 738], 38: [CX - 40, 758],
