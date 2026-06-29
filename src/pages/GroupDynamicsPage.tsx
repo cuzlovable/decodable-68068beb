@@ -380,10 +380,6 @@ const GroupDynamicsPage = () => {
               </div>
 
               <p className="text-sm text-foreground/80 leading-relaxed mb-3">{guidance.pentaLine}</p>
-              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 mb-2">
-                <p className="text-[11px] uppercase tracking-wider text-primary font-medium mb-1">Tip</p>
-                <p className="text-xs text-foreground/80 leading-relaxed">{guidance.pentaTip}</p>
-              </div>
 
               <GroupSimulator kind="penta" accent="primary" userName={userName} userGates={userGates} />
             </motion.div>
