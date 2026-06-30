@@ -109,11 +109,11 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — equilateral: 21 top vertex, 26 bottom vertex (same x), 40 right vertex, 51 mid of left edge
-  21: [CX + 74, 469],
-  51: [CX + 74, 505],
-  26: [CX + 74, 541],
-  40: [CX + 137, 505],
+  // EGO — equilateral; dots pulled inward from vertices so full circles sit inside the triangle
+  21: [CX + 82, 482],
+  51: [CX + 82, 505],
+  26: [CX + 82, 528],
+  40: [CX + 122, 505],
 
 
 
