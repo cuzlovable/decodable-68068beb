@@ -438,6 +438,25 @@ const Bodygraph = ({
               </linearGradient>
             </defs>
 
+            {/* Human silhouette backdrop — light bluish-gray, sits behind chart */}
+            <g opacity="0.18" fill="hsl(212 22% 72%)" stroke="none" pointerEvents="none">
+              {/* head */}
+              <ellipse cx="300" cy="95" rx="55" ry="65" />
+              {/* neck */}
+              <rect x="282" y="150" width="36" height="30" rx="8" />
+              {/* torso — broad shoulders tapering to waist */}
+              <path d="M180,210 Q300,180 420,210 L405,470 Q300,500 195,470 Z" />
+              {/* hips / pelvis */}
+              <path d="M195,470 Q300,500 405,470 L420,650 Q300,690 180,650 Z" />
+              {/* arms */}
+              <path d="M180,215 Q120,260 110,420 Q105,560 140,690 L170,690 Q150,560 155,420 Q165,280 210,235 Z" />
+              <path d="M420,215 Q480,260 490,420 Q495,560 460,690 L430,690 Q450,560 445,420 Q435,280 390,235 Z" />
+              {/* legs */}
+              <path d="M210,650 Q230,760 245,870 L295,870 Q295,760 290,650 Z" />
+              <path d="M390,650 Q370,760 355,870 L305,870 Q305,760 310,650 Z" />
+            </g>
+
+
             {/* Tube channels (under centers so they tuck behind shapes) */}
             {UNIQUE_CHANNELS.map((ch) => {
               const key = [...ch.gates].sort((x, y) => x - y).join("-");
