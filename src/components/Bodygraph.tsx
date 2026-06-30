@@ -57,11 +57,12 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — left edge holds 21 (top vertex), 51 (mid-edge), 26 (bottom vertex); 40 is the right vertex
+  // Ego — rotated clockwise & smaller; left edge holds 21 (top vertex), 51 (mid), 26 (bottom vertex)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 30, 460], [CX + 155, 500], [CX + 90, 545]] },
-    labelAt: [CX + 100, 505],
+    shape: { kind: "triangle", points: [[CX + 75, 470], [CX + 150, 500], [CX + 70, 540]] },
+    labelAt: [CX + 100, 510],
   },
+
 
 
   // Sacral — extra space below G
@@ -69,16 +70,17 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
     labelAt: [CX, 683],
   },
-  // Spleen — triangle, apex right (lowered toward Root, away from G)
+  // Spleen — triangle, apex right (sits low, close to Root)
   splenic: {
-    shape: { kind: "triangle", points: [[15, 565], [15, 669], [95, 617]] },
-    labelAt: [45, 617],
+    shape: { kind: "triangle", points: [[15, 600], [15, 704], [95, 652]] },
+    labelAt: [45, 652],
   },
-  // Solar Plexus — mirror of Spleen (lowered toward Root, away from G)
+  // Solar Plexus — mirror of Spleen
   solar: {
-    shape: { kind: "triangle", points: [[585, 565], [585, 669], [505, 617]] },
-    labelAt: [555, 617],
+    shape: { kind: "triangle", points: [[585, 600], [585, 704], [505, 652]] },
+    labelAt: [555, 652],
   },
+
 
 
   // Root — square (pushed down with Sacral)
@@ -107,27 +109,29 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21, 51, 26 sit along the LEFT edge (21 & 26 at vertices, 51 midpoint); 40 at right vertex
-  21: [CX + 30, 460],
-  51: [CX + 60, 502],
-  26: [CX + 90, 545],
-  40: [CX + 155, 500],
+  // EGO — 21 top vertex (right-shifted), 26 bottom-left vertex, 51 midpoint of left edge, 40 right vertex
+  21: [CX + 75, 470],
+  51: [CX + 72, 505],
+  26: [CX + 70, 540],
+  40: [CX + 150, 500],
 
 
 
-  // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
-  48: [28, 582], 57: [50, 595], 44: [70, 605],
-  50: [80, 617],
-  18: [28, 652], 28: [50, 639], 32: [72, 627],
+
+  // SPLEEN — shifted down with center
+  48: [28, 617], 57: [50, 630], 44: [70, 640],
+  50: [80, 652],
+  18: [28, 687], 28: [50, 674], 32: [72, 662],
   // SACRAL — shifted with the center
   5:  [CX - 22, 648], 14: [CX, 648], 29: [CX + 22, 648],
   34: [CX - 40, 670],
   27: [CX - 40, 695], 59: [CX + 40, 695],
   42: [CX - 22, 716], 3:  [CX, 716], 9:  [CX + 22, 716],
   // SOLAR — mirror of spleen
-  36: [572, 582], 22: [550, 595], 37: [530, 605],
-  6:  [520, 617],
-  49: [528, 627], 55: [550, 639], 30: [572, 652],
+  36: [572, 617], 22: [550, 630], 37: [530, 640],
+  6:  [520, 652],
+  49: [528, 662], 55: [550, 674], 30: [572, 687],
+
 
 
   // ROOT — three columns
@@ -423,7 +427,7 @@ const Bodygraph = ({
 
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
-        <div className="flex-1 max-w-[520px]">
+        <div className="flex-1 max-w-[400px]">
           <svg viewBox="0 0 600 900" className="w-full block" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
