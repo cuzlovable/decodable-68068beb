@@ -57,11 +57,12 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — rotated further left so 45↔21 and 25↔51 tubes run parallel (no crossing)
+  // Ego — left edge holds 21 (top vertex), 51 (mid-edge), 26 (bottom vertex); 40 is the right vertex
   heart: {
-    shape: { kind: "triangle", points: [[CX + 15, 458], [CX + 140, 478], [CX + 100, 552]] },
-    labelAt: [CX + 100, 500],
+    shape: { kind: "triangle", points: [[CX + 30, 460], [CX + 155, 500], [CX + 90, 545]] },
+    labelAt: [CX + 100, 505],
   },
+
 
   // Sacral — extra space below G
   sacral: {
@@ -106,11 +107,12 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21 placed to the RIGHT of 51 so the 45↔21 tube sits to the right of 25↔51
-  21: [CX + 90, 472],
-  51: [CX + 50, 488],
-  26: [CX + 80, 528],
-  40: [CX + 125, 508],
+  // EGO — 21, 51, 26 sit along the LEFT edge (21 & 26 at vertices, 51 midpoint); 40 at right vertex
+  21: [CX + 30, 460],
+  51: [CX + 60, 502],
+  26: [CX + 90, 545],
+  40: [CX + 155, 500],
+
 
 
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
@@ -137,7 +139,7 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
 export const GATE_POS = GATE_POS_INTERNAL;
 
 // Hide tubes that overlap/cross awkwardly with neighbors.
-const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20"]);
+const HIDDEN_CHANNELS = new Set<string>(["10-57", "10-34", "34-57", "10-20", "20-34"]);
 
 
 function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
@@ -465,16 +467,17 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [210, 365] as [number, number] },
-              { gate: 34, target: [115, 468] as [number, number] },
+              { gate: 10, target: [172.5, 420] as [number, number] },
+              { gate: 34, target: [137.5, 470] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
               if (!a) return null;
-              // Extend the target endpoint past the 20-57 tube center so the band visibly overlaps it.
+              // Extend past the 20-57 tube center so the stub visibly meets it (inset 7.5 + half band ~4.5).
               const dx = target[0] - a[0];
               const dy = target[1] - a[1];
               const len = Math.hypot(dx, dy) || 1;
-              const ext = 6; // half of 20-57 band width so the stub fully touches it
+              const ext = 12;
+
 
               const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
               const mode = modeForGate(gate);
