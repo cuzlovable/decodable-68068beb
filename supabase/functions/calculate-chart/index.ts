@@ -81,38 +81,54 @@ serve(async (req) => {
       throw new Error("birth_date, birth_time, and birth_location are required");
     }
 
-    // 1) Resolve IANA timezone. Try the full location, then progressively
-    //    simpler queries (drop trailing comma segments, then just the city).
-    const queryVariants = Array.from(new Set([
-      birth_location,
-      birth_location.split(",").slice(0, 2).join(",").trim(),
-      birth_location.split(",")[0].trim(),
-    ].filter(Boolean)));
-
+    // 1) Resolve IANA timezone. Prefer the lat/lon the client already
+    //    resolved via Nominatim — that works for ANY place (county, region,
+    //    neighborhood) without depending on HDHub's narrower location index.
+    //    Only fall back to HDHub's /locations/search when no coords were sent.
     type LocResult = { latitude: number; longitude: number; timezone: string; label: string };
-    let results: LocResult[] = [];
-    console.log("[calculate-chart v2] variants:", queryVariants);
-    for (const q of queryVariants) {
-      const search = await hdhub<{ results: LocResult[] }>(
-        `/locations/search?query=${encodeURIComponent(q)}`,
-        { method: "GET" },
-        apiKey,
-      );
-      console.log("[calculate-chart v2]", q, "->", search.results?.length ?? 0);
-      if (search.results?.length) { results = search.results; break; }
-    }
-    if (!results.length) throw new Error(`Location not found: ${birth_location}`);
+    let lat = typeof latitude === "number" ? latitude : 0;
+    let lon = typeof longitude === "number" ? longitude : 0;
+    let timezone: string | undefined;
 
-    let best = results[0];
-    if (typeof latitude === "number" && typeof longitude === "number" && latitude !== 0) {
-      best = results.reduce((acc, r) =>
-        haversine(latitude, longitude, r.latitude, r.longitude) <
-        haversine(latitude, longitude, acc.latitude, acc.longitude)
-          ? r
-          : acc,
-      );
+    if (lat !== 0 || lon !== 0) {
+      try {
+        const tzRes = await fetch(
+          `https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`,
+        );
+        if (tzRes.ok) {
+          const tzJson = await tzRes.json();
+          timezone = tzJson.timeZone;
+        }
+      } catch (e) {
+        console.warn("[calculate-chart] timeapi.io failed:", e);
+      }
     }
-    const timezone = best.timezone;
+
+    if (!timezone) {
+      const queryVariants = Array.from(new Set([
+        birth_location,
+        birth_location.split(",").slice(0, 2).join(",").trim(),
+        birth_location.split(",")[0].trim(),
+      ].filter(Boolean)));
+      let results: LocResult[] = [];
+      for (const q of queryVariants) {
+        const search = await hdhub<{ results: LocResult[] }>(
+          `/locations/search?query=${encodeURIComponent(q)}`,
+          { method: "GET" },
+          apiKey,
+        );
+        if (search.results?.length) { results = search.results; break; }
+      }
+      if (!results.length) throw new Error(`Location not found: ${birth_location}`);
+      const best = (lat !== 0 || lon !== 0)
+        ? results.reduce((acc, r) =>
+            haversine(lat, lon, r.latitude, r.longitude) <
+            haversine(lat, lon, acc.latitude, acc.longitude) ? r : acc)
+        : results[0];
+      timezone = best.timezone;
+      lat = lat || best.latitude;
+      lon = lon || best.longitude;
+    }
 
     // 2) Resolve the local date/time + IANA tz into an offset-bearing ISO string.
     const time = birth_time.length === 5 ? birth_time : birth_time.slice(0, 5);
