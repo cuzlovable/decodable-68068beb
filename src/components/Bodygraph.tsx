@@ -467,16 +467,17 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [210, 365] as [number, number] },
-              { gate: 34, target: [115, 468] as [number, number] },
+              { gate: 10, target: [172.5, 420] as [number, number] },
+              { gate: 34, target: [137.5, 470] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
               if (!a) return null;
-              // Extend the target endpoint past the 20-57 tube center so the band visibly overlaps it.
+              // Extend past the 20-57 tube center so the stub visibly meets it (inset 7.5 + half band ~4.5).
               const dx = target[0] - a[0];
               const dy = target[1] - a[1];
               const len = Math.hypot(dx, dy) || 1;
-              const ext = 6; // half of 20-57 band width so the stub fully touches it
+              const ext = 12;
+
 
               const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
               const mode = modeForGate(gate);
