@@ -107,11 +107,12 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21 placed to the RIGHT of 51 so the 45↔21 tube sits to the right of 25↔51
-  21: [CX + 90, 472],
-  51: [CX + 50, 488],
-  26: [CX + 80, 528],
-  40: [CX + 125, 508],
+  // EGO — 21, 51, 26 sit along the LEFT edge (21 & 26 at vertices, 51 midpoint); 40 at right vertex
+  21: [CX + 30, 460],
+  51: [CX + 60, 502],
+  26: [CX + 90, 545],
+  40: [CX + 155, 500],
+
 
 
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
