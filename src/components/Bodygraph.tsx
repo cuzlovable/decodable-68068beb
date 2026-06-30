@@ -57,10 +57,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — rotated clockwise & smaller; left edge holds 21 (top vertex), 51 (mid), 26 (bottom vertex)
+  // Ego — rotated further clockwise; 21 top vertex shifted right, 26 bottom vertex pulled left
   heart: {
-    shape: { kind: "triangle", points: [[CX + 75, 470], [CX + 150, 500], [CX + 70, 540]] },
-    labelAt: [CX + 100, 510],
+    shape: { kind: "triangle", points: [[CX + 95, 468], [CX + 150, 505], [CX + 60, 540]] },
+    labelAt: [CX + 105, 510],
   },
 
 
@@ -109,11 +109,11 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21 top vertex (right-shifted), 26 bottom-left vertex, 51 midpoint of left edge, 40 right vertex
-  21: [CX + 75, 470],
-  51: [CX + 72, 505],
-  26: [CX + 70, 540],
-  40: [CX + 150, 500],
+  // EGO — rotated right: 21 top vertex, 26 bottom-left vertex, 51 midpoint of left edge, 40 right vertex
+  21: [CX + 95, 468],
+  51: [CX + 78, 504],
+  26: [CX + 60, 540],
+  40: [CX + 150, 505],
 
 
 
@@ -476,14 +476,15 @@ const Bodygraph = ({
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
               if (!a) return null;
-              // Extend past the 20-57 tube center so the stub visibly meets it (inset 7.5 + half band ~4.5).
+              // Stop at the near edge of the 20-57 tube band (half tube width ~4.5px) so the stub
+              // touches the channel without crossing it.
               const dx = target[0] - a[0];
               const dy = target[1] - a[1];
               const len = Math.hypot(dx, dy) || 1;
-              const ext = 12;
+              const pullback = 4.5;
 
 
-              const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
+              const b: [number, number] = [target[0] - (dx / len) * pullback, target[1] - (dy / len) * pullback];
               const mode = modeForGate(gate);
               return <TubeChannel key={`stub-${gate}`} a={a} b={b} g1Mode={mode} g2Mode={mode} />;
             })}
