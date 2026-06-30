@@ -57,10 +57,10 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — rotated further clockwise; 21 top vertex shifted right, 26 bottom vertex pulled left
+  // Ego — equilateral triangle (all sides equal ~72px)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 95, 468], [CX + 150, 505], [CX + 60, 540]] },
-    labelAt: [CX + 105, 510],
+    shape: { kind: "triangle", points: [[CX + 74, 469], [CX + 137, 505], [CX + 74, 541]] },
+    labelAt: [CX + 95, 510],
   },
 
 
