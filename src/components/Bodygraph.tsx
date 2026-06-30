@@ -106,11 +106,12 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — gates re-anchored so 45↔21 and 25↔51 tubes stay parallel
-  21: [CX + 40, 472],
-  51: [CX + 80, 488],
+  // EGO — 21 placed to the RIGHT of 51 so the 45↔21 tube sits to the right of 25↔51
+  21: [CX + 90, 472],
+  51: [CX + 50, 488],
   26: [CX + 80, 528],
   40: [CX + 125, 508],
+
 
   // SPLEEN — top edge 48→57→44→50(apex); bottom 18→28→32
   48: [28, 582], 57: [50, 595], 44: [70, 605],
