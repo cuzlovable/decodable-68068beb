@@ -2,6 +2,7 @@
 // API key is read from the HDHUB_API_KEY secret — never exposed to clients.
 // Docs: https://humandesignhub.app/en/docs
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
