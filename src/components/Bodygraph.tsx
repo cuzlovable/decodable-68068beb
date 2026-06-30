@@ -463,7 +463,7 @@ const Bodygraph = ({
             {/* Decorative stubs: gates 10 & 34 → extend to fully touch the 20-57 channel tube.
                 Both halves take the originating gate's mode so the entire stub colors when active. */}
             {([
-              { gate: 10, target: [155, 420] as [number, number] },
+              { gate: 10, target: [210, 365] as [number, number] },
               { gate: 34, target: [115, 468] as [number, number] },
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
@@ -472,7 +472,8 @@ const Bodygraph = ({
               const dx = target[0] - a[0];
               const dy = target[1] - a[1];
               const len = Math.hypot(dx, dy) || 1;
-              const ext = 14; // covers TubeChannel inset (7) + half of 20-57 band width
+              const ext = 6; // half of 20-57 band width so the stub fully touches it
+
               const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
               const mode = modeForGate(gate);
               return <TubeChannel key={`stub-${gate}`} a={a} b={b} g1Mode={mode} g2Mode={mode} />;
