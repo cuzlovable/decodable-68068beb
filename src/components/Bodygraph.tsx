@@ -70,16 +70,17 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "rect", x: CX - SQ_W / 2, y: 635, w: SQ_W, h: SQ_H },
     labelAt: [CX, 683],
   },
-  // Spleen — triangle, apex right (lowered toward Root, away from G)
+  // Spleen — triangle, apex right (sits low, close to Root)
   splenic: {
-    shape: { kind: "triangle", points: [[15, 565], [15, 669], [95, 617]] },
-    labelAt: [45, 617],
+    shape: { kind: "triangle", points: [[15, 600], [15, 704], [95, 652]] },
+    labelAt: [45, 652],
   },
-  // Solar Plexus — mirror of Spleen (lowered toward Root, away from G)
+  // Solar Plexus — mirror of Spleen
   solar: {
-    shape: { kind: "triangle", points: [[585, 565], [585, 669], [505, 617]] },
-    labelAt: [555, 617],
+    shape: { kind: "triangle", points: [[585, 600], [585, 704], [505, 652]] },
+    labelAt: [555, 652],
   },
+
 
 
   // Root — square (pushed down with Sacral)
