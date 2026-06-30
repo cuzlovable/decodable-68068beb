@@ -57,11 +57,12 @@ export const CENTER_SHAPES: Record<CenterId, { shape: Shape; labelAt: [number, n
     shape: { kind: "diamond", cx: CX, cy: 420, r: 62 },
     labelAt: [CX, 425],
   },
-  // Ego — left edge holds 21 (top vertex), 51 (mid-edge), 26 (bottom vertex); 40 is the right vertex
+  // Ego — rotated clockwise & smaller; left edge holds 21 (top vertex), 51 (mid), 26 (bottom vertex)
   heart: {
-    shape: { kind: "triangle", points: [[CX + 30, 460], [CX + 155, 500], [CX + 90, 545]] },
-    labelAt: [CX + 100, 505],
+    shape: { kind: "triangle", points: [[CX + 75, 470], [CX + 150, 500], [CX + 70, 540]] },
+    labelAt: [CX + 100, 510],
   },
+
 
 
   // Sacral — extra space below G
