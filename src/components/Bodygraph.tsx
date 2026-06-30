@@ -109,11 +109,11 @@ const GATE_POS_INTERNAL: Record<number, [number, number]> = {
   10: [CX - 35, 420], 25: [CX + 50, 422],
   15: [CX - 22, 444], 46: [CX + 22, 444],
   2:  [CX, 470],
-  // EGO — 21 top vertex (right-shifted), 26 bottom-left vertex, 51 midpoint of left edge, 40 right vertex
-  21: [CX + 75, 470],
-  51: [CX + 72, 505],
-  26: [CX + 70, 540],
-  40: [CX + 150, 500],
+  // EGO — rotated right: 21 top vertex, 26 bottom-left vertex, 51 midpoint of left edge, 40 right vertex
+  21: [CX + 95, 468],
+  51: [CX + 78, 504],
+  26: [CX + 60, 540],
+  40: [CX + 150, 505],
 
 
 
