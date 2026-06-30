@@ -476,14 +476,15 @@ const Bodygraph = ({
             ]).map(({ gate, target }) => {
               const a = GATE_POS_INTERNAL[gate];
               if (!a) return null;
-              // Extend past the 20-57 tube center so the stub visibly meets it (inset 7.5 + half band ~4.5).
+              // Stop at the near edge of the 20-57 tube band (half tube width ~4.5px) so the stub
+              // touches the channel without crossing it.
               const dx = target[0] - a[0];
               const dy = target[1] - a[1];
               const len = Math.hypot(dx, dy) || 1;
-              const ext = 12;
+              const pullback = 4.5;
 
 
-              const b: [number, number] = [target[0] + (dx / len) * ext, target[1] + (dy / len) * ext];
+              const b: [number, number] = [target[0] - (dx / len) * pullback, target[1] - (dy / len) * pullback];
               const mode = modeForGate(gate);
               return <TubeChannel key={`stub-${gate}`} a={a} b={b} g1Mode={mode} g2Mode={mode} />;
             })}
