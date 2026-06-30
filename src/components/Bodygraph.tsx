@@ -230,8 +230,9 @@ function TubeChannel({
   const mx = (a[0] + b[0]) / 2;
   const my = (a[1] + b[1]) / 2;
   const bandW = 9;
-  const inset = 7;
+  const inset = 0; // tubes extend all the way to the gate dots so they touch end-to-end
   const halfLen = Math.max(0, len / 2 - inset);
+
   const innerH = bandW - 3;
   const innerY = -bandW / 2 + 1.5;
 
