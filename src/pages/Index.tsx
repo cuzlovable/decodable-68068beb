@@ -104,6 +104,7 @@ const Index = () => {
             >
               {[
                 { label: "Generator", color: "bg-aura-peach/20 text-aura-peach" },
+                { label: "Generator", color: "bg-aura-peach/20 text-aura-peach" },
                 { label: "Manifestor", color: "bg-aura-sky/20 text-aura-sky" },
                 { label: "Projector", color: "bg-aura-glow/30 text-foreground" },
                 { label: "Reflector", color: "bg-aura-lavender/20 text-aura-lavender" },
