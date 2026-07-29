@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 
 @layer base {
   :root {
@@ -45,7 +45,7 @@
     --sidebar-border: 30 20% 88%;
     --sidebar-ring: 24 90% 65%;
 
-    /* Custom AuraMatch tokens */
+    /* Custom AuraMate tokens */
     --aura-peach: 24 90% 65%;
     --aura-sky: 215 60% 72%;
     --aura-lavender: 260 50% 78%;
@@ -110,11 +110,16 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Playfair Display", serif;
   }
 }
 

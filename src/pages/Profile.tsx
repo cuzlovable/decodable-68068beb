@@ -12,14 +12,15 @@ const Profile = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/auth"); return; }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .single();
+      const { data } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
 
       if (data && !data.onboarding_completed) {
         navigate("/onboarding");
@@ -53,7 +54,7 @@ const Profile = () => {
             <div className="w-8 h-8 rounded-full gradient-aura flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-semibold text-foreground">AuraMatch</span>
+            <span className="font-display text-lg font-semibold text-foreground">AuraMate</span>
           </div>
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground">
             <LogOut className="w-4 h-4 mr-1" /> Sign Out
