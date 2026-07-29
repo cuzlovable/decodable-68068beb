@@ -75,7 +75,6 @@ const DEMO_MATCHES: MatchProfile[] = [
   },
 ];
 
-
 const MatchesPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -83,8 +82,13 @@ const MatchesPage = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/auth"); return; }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
 
       // Try to load real matches, fall back to demo
       const { data: realMatches } = await supabase
@@ -94,17 +98,12 @@ const MatchesPage = () => {
 
       if (realMatches && realMatches.length > 0) {
         // Load partner profiles for real matches
-        const partnerIds = realMatches.map(m =>
-          m.user_a === session.user.id ? m.user_b : m.user_a
-        );
-        const { data: profiles } = await supabase
-          .from("profiles")
-          .select("*")
-          .in("user_id", partnerIds);
+        const partnerIds = realMatches.map((m) => (m.user_a === session.user.id ? m.user_b : m.user_a));
+        const { data: profiles } = await supabase.from("profiles").select("*").in("user_id", partnerIds);
 
-        const mapped: MatchProfile[] = realMatches.map(m => {
+        const mapped: MatchProfile[] = realMatches.map((m) => {
           const partnerId = m.user_a === session.user.id ? m.user_b : m.user_a;
-          const p = profiles?.find(pr => pr.user_id === partnerId);
+          const p = profiles?.find((pr) => pr.user_id === partnerId);
           return {
             id: partnerId,
             matchId: m.id,
@@ -183,9 +182,7 @@ const MatchesPage = () => {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-display text-lg font-semibold text-foreground mb-0.5">
-                        {match.displayName}
-                      </h3>
+                      <h3 className="font-display text-lg font-semibold text-foreground mb-0.5">{match.displayName}</h3>
                       {/* Primary headline: Type + Profile */}
                       <p className="text-sm font-medium text-primary">
                         {match.profile} {match.authority} {match.energyType}
@@ -224,8 +221,8 @@ const MatchesPage = () => {
           className="mt-8 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">For any 1:1.</span>{" "}
-            Romance, friendship, or collaboration — these matches click with your design.
+            <span className="font-semibold text-foreground">For any 1:1.</span> The better matches click with your
+            design, the more calibrated with your feedback.
           </p>
         </motion.div>
       </div>
