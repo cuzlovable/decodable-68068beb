@@ -100,7 +100,7 @@ const Index = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 1 }}
-              className="flex justify-center gap-4 mt-6 flex-wrap"
+              className="flex justify-center gap-4 mt-10 flex-wrap"
             >
               {[
                 { label: "Generator", color: "bg-aura-peach/20 text-aura-peach" },
@@ -122,7 +122,7 @@ const Index = () => {
 
         {/* Footer */}
         <footer className="text-center py-6 text-xs text-muted-foreground/60">
-          © 2026 AuraMatch · Designed by the cosmos
+          © 2026 AuraMate · Designed by the cosmos
         </footer>
       </div>
     </div>
