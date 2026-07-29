@@ -28,7 +28,7 @@ const Index = () => {
             <div className="w-9 h-9 rounded-full gradient-aura flex items-center justify-center shadow-aura">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">AuraMatch</span>
+            <span className="font-display text-xl font-semibold text-foreground">AuraMate</span>
           </motion.div>
         </nav>
 
@@ -100,7 +100,7 @@ const Index = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 1 }}
-              className="flex justify-center gap-4 mt-10 flex-wrap"
+              className="flex justify-center gap-4 mt-6 flex-wrap"
             >
               {[
                 { label: "Generator", color: "bg-aura-peach/20 text-aura-peach" },
