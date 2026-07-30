@@ -438,32 +438,22 @@ const Bodygraph = ({
               </linearGradient>
             </defs>
 
-            {/* Human silhouette backdrop — subtle light bluish-gray outline, top half only */}
-            <g opacity="0.18" fill="hsl(220 20% 78%)" stroke="none" pointerEvents="none">
+            {/* Human silhouette backdrop — light bluish-gray, sits behind chart */}
+            <g opacity="0.18" fill="hsl(212 22% 72%)" stroke="none" pointerEvents="none">
               {/* head */}
-              <ellipse cx="300" cy="82" rx="54" ry="64" />
+              <ellipse cx="300" cy="95" rx="55" ry="65" />
               {/* neck */}
-              <path d="M280 138 L320 138 L324 168 L276 168 Z" />
-              {/* torso — broad shoulders tapering to waist, ending at hips */}
-              <path d="
-                M276 168
-                C230 182, 190 210, 180 255
-                C170 300, 172 360, 182 420
-                L185 470
-                C188 490, 200 510, 225 518
-                L240 525
-                L300 545
-                L360 525
-                L375 518
-                C400 510, 412 490, 415 470
-                L418 420
-                C428 360, 430 300, 420 255
-                C410 210, 370 182, 324 168
-                Z
-              " />
+              <rect x="282" y="150" width="36" height="30" rx="8" />
+              {/* torso — broad shoulders tapering to waist */}
+              <path d="M180,210 Q300,180 420,210 L405,470 Q300,500 195,470 Z" />
+              {/* hips / pelvis */}
+              <path d="M195,470 Q300,500 405,470 L420,650 Q300,690 180,650 Z" />
               {/* arms */}
-              <path d="M182 230 C140 265, 130 340, 135 420 C140 500, 155 590, 170 690 L200 690 C190 590, 180 500, 185 420 C190 360, 205 295, 215 250 Z" />
-              <path d="M418 230 C460 265, 470 340, 465 420 C460 500, 445 590, 430 690 L400 690 C410 590, 420 500, 415 420 C410 360, 395 295, 385 250 Z" />
+              <path d="M180,215 Q120,260 110,420 Q105,560 140,690 L170,690 Q150,560 155,420 Q165,280 210,235 Z" />
+              <path d="M420,215 Q480,260 490,420 Q495,560 460,690 L430,690 Q450,560 445,420 Q435,280 390,235 Z" />
+              {/* legs */}
+              <path d="M210,650 Q230,760 245,870 L295,870 Q295,760 290,650 Z" />
+              <path d="M390,650 Q370,760 355,870 L305,870 Q305,760 310,650 Z" />
             </g>
 
 
