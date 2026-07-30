@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Sparkles, Compass, Home, Users, Theater, MapPin, Loader2,
@@ -7,7 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { nodalProfile, ageFrom, type NodalProfile } from "@/lib/nodes";
+import { nodalProfile, ageFrom, ordinal, HOUSE_LABELS, type NodalProfile } from "@/lib/nodes";
+import { fetchNodeHouses, hasAstroApiKey } from "@/lib/astro";
 
 type Place = {
   id: string;
@@ -27,11 +28,15 @@ const NodeCard = ({
   badge,
   window: windowLabel,
   active,
+  houseOverride,
+  houseLoading,
 }: {
   data: NodalProfile;
   badge: string;
   window: string;
   active: boolean;
+  houseOverride?: { ordinal: string; label: string } | null;
+  houseLoading?: boolean;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 16 }}
@@ -59,10 +64,14 @@ const NodeCard = ({
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">House</p>
         <p className="font-display text-xl font-bold text-foreground leading-none flex items-center gap-1.5">
           <Compass className="w-4 h-4 text-primary" />
-          {data.house ? `${data.house.ordinal}` : "—"}
+          {houseLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            (houseOverride ?? data.house)?.ordinal ?? "—"
+          )}
         </p>
         <p className="text-[11px] text-foreground/70 mt-1">
-          {data.house ? data.house.label : "Add your birth date"}
+          {(houseOverride ?? data.house)?.label ?? "Add your birth date"}
         </p>
       </div>
     </div>
@@ -91,6 +100,10 @@ export const NodalEnvironments = ({
   southGate,
   northGate,
   birthDate,
+  birthTime,
+  latitude,
+  longitude,
+  northNodeLongitude,
   location,
   locationLabel,
   ascSignIndex,
@@ -98,18 +111,58 @@ export const NodalEnvironments = ({
   southGate?: number | null;
   northGate?: number | null;
   birthDate?: string | null;
+  birthTime?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  northNodeLongitude?: number | null;
   location: { lat: number; lng: number } | null;
   locationLabel?: string;
   ascSignIndex?: number | null;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [houses, setHouses] = useState<{ north: number; south: number } | null>(null);
+  const [housesLoading, setHousesLoading] = useState(false);
 
   const south = nodalProfile(southGate, birthDate, "south", ascSignIndex);
   const north = nodalProfile(northGate, birthDate, "north", ascSignIndex);
   const age = ageFrom(birthDate);
   const postTransition = age !== null && age >= 40;
   const activeNode = postTransition ? north ?? south : south ?? north;
+
+  // External astrology API (with local Placidus fallback) for node house numbers.
+  useEffect(() => {
+    const ready =
+      Boolean(birthDate && birthTime) &&
+      typeof latitude === "number" &&
+      typeof longitude === "number" &&
+      typeof northNodeLongitude === "number";
+    if (!ready) return;
+    let cancelled = false;
+    setHousesLoading(true);
+    fetchNodeHouses(
+      {
+        date: birthDate as string,
+        time: birthTime as string,
+        latitude: latitude as number,
+        longitude: longitude as number,
+        houseSystem: "placidus",
+        northNodeLongitude: northNodeLongitude as number,
+      },
+      !hasAstroApiKey()
+    )
+      .then((data) => {
+        if (!cancelled) setHouses({ north: data.northNode.house, south: data.southNode.house });
+      })
+      .catch(() => { if (!cancelled) setHouses(null); })
+      .finally(() => { if (!cancelled) setHousesLoading(false); });
+    return () => { cancelled = true; };
+  }, [birthDate, birthTime, latitude, longitude, northNodeLongitude]);
+
+  const houseInfo = (h?: number) =>
+    h ? { ordinal: ordinal(h), label: HOUSE_LABELS[h] } : null;
+
+
 
 
   const findSpots = async () => {
@@ -145,10 +198,24 @@ export const NodalEnvironments = ({
   return (
     <div className="space-y-4 mb-6">
       {south && (
-        <NodeCard data={south} badge="Backdrop" window="Pre ages 38–42" active={!postTransition} />
+        <NodeCard
+          data={south}
+          badge="Backdrop"
+          window="Pre ages 38–42"
+          active={!postTransition}
+          houseOverride={houseInfo(houses?.south)}
+          houseLoading={housesLoading}
+        />
       )}
       {north && (
-        <NodeCard data={north} badge="Evolution" window="Post ages 38–42" active={postTransition} />
+        <NodeCard
+          data={north}
+          badge="Evolution"
+          window="Post ages 38–42"
+          active={postTransition}
+          houseOverride={houseInfo(houses?.north)}
+          houseLoading={housesLoading}
+        />
       )}
 
       {/* Nearby spots */}

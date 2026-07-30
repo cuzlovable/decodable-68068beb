@@ -35,7 +35,7 @@ export const SIGNS = [
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces",
 ];
 
-const HOUSE_LABELS: Record<number, string> = {
+export const HOUSE_LABELS: Record<number, string> = {
   1: "Identity & first impressions",
   2: "Resources & self-worth",
   3: "Local life & learning",

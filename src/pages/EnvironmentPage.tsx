@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { NodalEnvironments } from "@/components/NodalEnvironments";
-import { NodeHouses } from "@/components/NodeHouses";
 import { gateSignIndex, gateLongitude } from "@/lib/nodes";
 
 
@@ -193,21 +192,15 @@ const EnvironmentPage = () => {
           southGate={designNodes.south}
           northGate={designNodes.north}
           birthDate={profile?.birth_date}
+          birthTime={profile?.birth_time}
+          latitude={profile?.birth_latitude}
+          longitude={profile?.birth_longitude}
+          northNodeLongitude={northNodeLongitude}
           location={userLocation}
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
         />
 
-        {/* Placidus house placements for the nodes */}
-        <div className="mb-6">
-          <NodeHouses
-            birthDate={profile?.birth_date}
-            birthTime={profile?.birth_time}
-            latitude={profile?.birth_latitude}
-            longitude={profile?.birth_longitude}
-            northNodeLongitude={northNodeLongitude}
-          />
-        </div>
 
 
       </div>
