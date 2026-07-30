@@ -122,7 +122,7 @@ const Index = () => {
 
         {/* Footer */}
         <footer className="text-center py-6 text-xs text-muted-foreground/60">
-          © 2026 AuraMate · Designed by the cosmos
+          © 2026 AuraChem · Designed by the cosmos
         </footer>
       </div>
     </div>
