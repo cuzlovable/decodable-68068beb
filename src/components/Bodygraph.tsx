@@ -438,13 +438,13 @@ const Bodygraph = ({
               </linearGradient>
             </defs>
 
-            {/* Human silhouette backdrop — subtle light bluish-gray outline, no skirt */}
+            {/* Human silhouette backdrop — subtle light bluish-gray outline, top half only */}
             <g opacity="0.18" fill="hsl(220 20% 78%)" stroke="none" pointerEvents="none">
               {/* head */}
               <ellipse cx="300" cy="82" rx="54" ry="64" />
               {/* neck */}
               <path d="M280 138 L320 138 L324 168 L276 168 Z" />
-              {/* torso — broad shoulders tapering to waist, hips split into legs */}
+              {/* torso — broad shoulders tapering to waist, ending at hips */}
               <path d="
                 M276 168
                 C230 182, 190 210, 180 255
@@ -452,13 +452,7 @@ const Bodygraph = ({
                 L185 470
                 C188 490, 200 510, 225 518
                 L240 525
-                L235 870
-                L285 870
-                L290 620
-                L300 560
-                L310 620
-                L315 870
-                L365 870
+                L300 545
                 L360 525
                 L375 518
                 C400 510, 412 490, 415 470
