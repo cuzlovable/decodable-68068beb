@@ -199,6 +199,10 @@ const EnvironmentPage = () => {
           location={userLocation}
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
+          envVariable={
+            ((profile?.variables as any)?.environment ??
+              (profile?.variables as any)?.design_environment) ?? null
+          }
         />
 
 
