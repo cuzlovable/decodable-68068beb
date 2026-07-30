@@ -99,6 +99,10 @@ export const NodalEnvironments = ({
   southGate,
   northGate,
   birthDate,
+  birthTime,
+  latitude,
+  longitude,
+  northNodeLongitude,
   location,
   locationLabel,
   ascSignIndex,
@@ -106,18 +110,58 @@ export const NodalEnvironments = ({
   southGate?: number | null;
   northGate?: number | null;
   birthDate?: string | null;
+  birthTime?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  northNodeLongitude?: number | null;
   location: { lat: number; lng: number } | null;
   locationLabel?: string;
   ascSignIndex?: number | null;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [houses, setHouses] = useState<{ north: number; south: number } | null>(null);
+  const [housesLoading, setHousesLoading] = useState(false);
 
   const south = nodalProfile(southGate, birthDate, "south", ascSignIndex);
   const north = nodalProfile(northGate, birthDate, "north", ascSignIndex);
   const age = ageFrom(birthDate);
   const postTransition = age !== null && age >= 40;
   const activeNode = postTransition ? north ?? south : south ?? north;
+
+  // External astrology API (with local Placidus fallback) for node house numbers.
+  useEffect(() => {
+    const ready =
+      Boolean(birthDate && birthTime) &&
+      typeof latitude === "number" &&
+      typeof longitude === "number" &&
+      typeof northNodeLongitude === "number";
+    if (!ready) return;
+    let cancelled = false;
+    setHousesLoading(true);
+    fetchNodeHouses(
+      {
+        date: birthDate as string,
+        time: birthTime as string,
+        latitude: latitude as number,
+        longitude: longitude as number,
+        houseSystem: "placidus",
+        northNodeLongitude: northNodeLongitude as number,
+      },
+      !hasAstroApiKey()
+    )
+      .then((data) => {
+        if (!cancelled) setHouses({ north: data.northNode.house, south: data.southNode.house });
+      })
+      .catch(() => { if (!cancelled) setHouses(null); })
+      .finally(() => { if (!cancelled) setHousesLoading(false); });
+    return () => { cancelled = true; };
+  }, [birthDate, birthTime, latitude, longitude, northNodeLongitude]);
+
+  const houseInfo = (h?: number) =>
+    h ? { ordinal: ordinal(h), label: HOUSE_LABELS[h] } : null;
+
+
 
 
   const findSpots = async () => {
