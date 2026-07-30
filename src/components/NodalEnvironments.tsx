@@ -27,11 +27,15 @@ const NodeCard = ({
   badge,
   window: windowLabel,
   active,
+  houseOverride,
+  houseLoading,
 }: {
   data: NodalProfile;
   badge: string;
   window: string;
   active: boolean;
+  houseOverride?: { ordinal: string; label: string } | null;
+  houseLoading?: boolean;
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 16 }}
