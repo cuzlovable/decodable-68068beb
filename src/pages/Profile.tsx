@@ -97,7 +97,7 @@ const Profile = () => {
 
             <p className="text-muted-foreground text-sm leading-relaxed">
               {profile?.energy_type
-                ? `As a ${profile.energy_type}, you have a unique way of experiencing connection. Your design chart is being displayed for insights.`
+                ? `As a ${profile.energy_type}, you have a unique way of experiencing connection. Your design is being displayed for insights.`
                 : "Your Human Design chart is being processed. Check back soon for your full energetic profile and compatibility insights."}
             </p>
           </div>
