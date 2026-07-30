@@ -179,7 +179,8 @@ export type NodalProfile = {
 export function nodalProfile(
   gate: number | null | undefined,
   birthDate?: string | null,
-  kind: "south" | "north" = "south"
+  kind: "south" | "north" = "south",
+  ascSignIndex?: number | null
 ): NodalProfile | null {
   if (!gate) return null;
   const gateName = GATE_NAMES[gate] ?? `Gate ${gate}`;
@@ -193,7 +194,7 @@ export function nodalProfile(
   return {
     gate,
     gateName,
-    house: housePlacement(gate, birthDate),
+    house: housePlacement(gate, birthDate, ascSignIndex),
     coreTheme,
     setting: atmos.setting,
     audience: atmos.audience,
@@ -203,6 +204,7 @@ export function nodalProfile(
     ),
   };
 }
+
 
 /** Ages 38–42 is the nodal transition window. */
 export function ageFrom(birthDate?: string | null): number | null {
