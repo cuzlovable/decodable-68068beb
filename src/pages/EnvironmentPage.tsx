@@ -193,21 +193,15 @@ const EnvironmentPage = () => {
           southGate={designNodes.south}
           northGate={designNodes.north}
           birthDate={profile?.birth_date}
+          birthTime={profile?.birth_time}
+          latitude={profile?.birth_latitude}
+          longitude={profile?.birth_longitude}
+          northNodeLongitude={northNodeLongitude}
           location={userLocation}
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
         />
 
-        {/* Placidus house placements for the nodes */}
-        <div className="mb-6">
-          <NodeHouses
-            birthDate={profile?.birth_date}
-            birthTime={profile?.birth_time}
-            latitude={profile?.birth_latitude}
-            longitude={profile?.birth_longitude}
-            northNodeLongitude={northNodeLongitude}
-          />
-        </div>
 
 
       </div>
