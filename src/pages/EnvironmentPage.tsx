@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+import { NodalEnvironments } from "@/components/NodalEnvironments";
 
 // Concise PHS explainers — only the essentials.
 const ENVIRONMENT_EXPLAINER =
