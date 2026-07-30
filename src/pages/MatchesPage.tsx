@@ -55,7 +55,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     profile: "3/5",
     authority: "Emotional",
     chemistryScore: 65,
-    dominantTheme: "They'll shift how you see yourself — in the best way",
+    dominantTheme: "They'll shift how you see yourself in the best way",
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
