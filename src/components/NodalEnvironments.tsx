@@ -93,21 +93,24 @@ export const NodalEnvironments = ({
   birthDate,
   location,
   locationLabel,
+  ascSignIndex,
 }: {
   southGate?: number | null;
   northGate?: number | null;
   birthDate?: string | null;
   location: { lat: number; lng: number } | null;
   locationLabel?: string;
+  ascSignIndex?: number | null;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const south = nodalProfile(southGate, birthDate, "south");
-  const north = nodalProfile(northGate, birthDate, "north");
+  const south = nodalProfile(southGate, birthDate, "south", ascSignIndex);
+  const north = nodalProfile(northGate, birthDate, "north", ascSignIndex);
   const age = ageFrom(birthDate);
   const postTransition = age !== null && age >= 40;
   const activeNode = postTransition ? north ?? south : south ?? north;
+
 
   const findSpots = async () => {
     if (!location || !activeNode) return;

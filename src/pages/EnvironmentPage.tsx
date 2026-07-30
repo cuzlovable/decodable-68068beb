@@ -11,6 +11,8 @@ import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { NodalEnvironments } from "@/components/NodalEnvironments";
+import { gateSignIndex } from "@/lib/nodes";
+
 
 // Concise PHS explainers — only the essentials.
 const ENVIRONMENT_EXPLAINER =
@@ -65,8 +67,6 @@ const EnvironmentPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [result, setResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -112,51 +112,38 @@ const EnvironmentPage = () => {
     load();
   }, [navigate]);
 
-  const decoded = useMemo(
-    () => decodeAll((profile?.variables ?? null) as PhsVariables | null),
-    [profile?.variables]
-  );
+  // Node gates come from the DESIGN (red) side of the bodygraph.
+  const designNodes = useMemo(() => {
+    const design = (profile?.chart_raw as any)?.gate_and_line?.design;
+    const pick = (aliases: string[]) => {
+      if (!design) return null;
+      for (const [planet, gl] of Object.entries(design as Record<string, any>)) {
+        const key = planet.toLowerCase().replace(/[\s._-]/g, "");
+        if (aliases.includes(key) && Array.isArray(gl) && typeof gl[0] === "number") {
+          return gl[0] as number;
+        }
+      }
+      return null;
+    };
+    return {
+      south: pick(["southnode", "snode", "s", "ketu", "descendingnode"]) ?? profile?.south_node_gate ?? null,
+      north: pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]) ?? profile?.north_node_gate ?? null,
+    };
+  }, [profile]);
 
-  const fetchSuggestions = useCallback(async () => {
-    if (!decoded.environment || !userLocation) return;
-
-    setAiLoading(true);
-    setResult(null);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("environment-suggestions", {
-        body: {
-          // Send the precise color+tone label so the AI grounds in
-          // e.g. "Narrow Valley" instead of generic "Valleys".
-          environment: decoded.environment.full,
-          environmentColor: decoded.environment.colorLabel,
-          environmentTone: decoded.environment.toneLabel,
-          digestion: decoded.digestion?.full,
-          perspective: decoded.perspective?.full,
-          motivation: decoded.motivation?.full,
-          latitude: userLocation.lat,
-          longitude: userLocation.lng,
-          birthDate: profile?.birth_date,
-          southNodeGate: profile?.south_node_gate,
-          northNodeGate: profile?.north_node_gate,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      setResult(data);
-    } catch (err: any) {
-      console.error("Environment AI error:", err);
-      toast({
-        title: "Error",
-        description: err.message || "Failed to get suggestions. Try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setAiLoading(false);
+  // Whole-sign houses need the Ascendant; use it when the chart provides one.
+  const ascSignIndex = useMemo(() => {
+    const raw = profile?.chart_raw as any;
+    const src = raw?.gate_and_line?.personality ?? {};
+    for (const [planet, gl] of Object.entries(src as Record<string, any>)) {
+      const key = planet.toLowerCase().replace(/[\s._-]/g, "");
+      if ((key === "ascendant" || key === "asc" || key === "rising") && Array.isArray(gl)) {
+        return gateSignIndex(gl[0]);
+      }
     }
-  }, [decoded, userLocation, profile]);
+    return null;
+  }, [profile]);
+
 
   if (loading) {
     return (
@@ -190,194 +177,34 @@ const EnvironmentPage = () => {
           </div>
         )}
 
-        {/* Auto-detected environment card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 p-6 mb-6 shadow-aura"
-        >
-          <div className="flex items-center gap-2 mb-1">
-            <Compass className="w-4 h-4 text-primary" />
-            <span className="text-[11px] uppercase tracking-wider text-primary font-medium">
-              Your Design Environment
-            </span>
-          </div>
-
-          {decoded.environment ? (
-            <>
-              <h2 className="font-display text-2xl font-bold text-foreground">
-                {decoded.environment.full}
-              </h2>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Color {decoded.environment.color} · Tone {decoded.environment.tone}
-              </p>
-              <p className="text-sm text-foreground/80 leading-relaxed mt-3 mb-4">
-                {ENVIRONMENT_EXPLAINER}
-              </p>
-
-              {decoded.digestion && (
-                <div className="mb-4 p-3 rounded-xl bg-muted/30 border border-border/40">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-                    Determination · {decoded.digestion.full}
-                    <span className="ml-1 opacity-70">
-                      (C{decoded.digestion.color}·T{decoded.digestion.tone})
-                    </span>
-                  </p>
-                  <p className="text-xs text-foreground/80 leading-relaxed">
-                    {DIGESTION_EXPLAINER}
-                  </p>
-                </div>
-              )}
-
-              {/* Location override — accurate, accessible search */}
-              <div className="mb-4">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Search near
-                </p>
-                <LocationAutocomplete
-                  value={locationLabel}
-                  onChange={(name, lat, lon) => {
-                    setUserLocation({ lat, lng: lon });
-                    setLocationLabel(name);
-                    setLocationError(null);
-                  }}
-                />
-              </div>
-
-              <Button
-                onClick={fetchSuggestions}
-                disabled={!userLocation || aiLoading}
-                className="w-full gradient-aura text-primary-foreground hover:opacity-90"
-              >
-                {aiLoading ? (
-                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Finding {decoded.environment.full} spots…</>
-                ) : (
-                  <><Sparkles className="w-4 h-4 mr-2" /> Find my {decoded.environment.full} spots</>
-                )}
-              </Button>
-
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Your environment variable hasn't been calculated yet. Finish onboarding so we can decode your color and tone.
-            </p>
-          )}
-        </motion.div>
+        {/* Location override — accurate, accessible search */}
+        <div className="mb-6">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
+            Search near
+          </p>
+          <LocationAutocomplete
+            value={locationLabel}
+            onChange={(name, lat, lon) => {
+              setUserLocation({ lat, lng: lon });
+              setLocationLabel(name);
+              setLocationError(null);
+            }}
+          />
+        </div>
 
         {/* Nodal environments + nearby spots */}
         <NodalEnvironments
-          southGate={profile?.south_node_gate}
-          northGate={profile?.north_node_gate}
+          southGate={designNodes.south}
+          northGate={designNodes.north}
           birthDate={profile?.birth_date}
           location={userLocation}
           locationLabel={locationLabel}
+          ascSignIndex={ascSignIndex}
         />
 
-        {/* Chiron Return Banner */}
-        <AnimatePresence>
-          {result?.chironReturn && result.chironMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="rounded-2xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-300/30 p-5 mb-6"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <Star className="w-4 h-4 text-indigo-400" />
-                </div>
-                <div>
-                  <h3 className="font-display text-sm font-bold text-foreground mb-1">
-                    ✦ Chiron Return Active
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {result.chironMessage}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Results */}
-        <AnimatePresence>
-          {result?.suggestions && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-3"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-display text-lg font-semibold text-foreground">
-                  Your {decoded.environment?.full ?? ""} spots
-                </h3>
-                <Button variant="ghost" size="sm" onClick={fetchSuggestions} disabled={aiLoading}>
-                  <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
-                </Button>
-              </div>
-
-              {result.suggestions.map((s, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 overflow-hidden"
-                >
-                  <img
-                    src={imageFor(s)}
-                    alt={s.name}
-                    loading="lazy"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                    className="w-full h-32 object-cover"
-                  />
-                  <div className="p-5 flex items-start gap-3">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${CATEGORY_COLORS[s.category] || "bg-muted text-muted-foreground"}`}>
-                      {CATEGORY_ICONS[s.category] || <MapPin className="w-4 h-4" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-display text-sm font-semibold text-foreground">{s.name}</h4>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${CATEGORY_COLORS[s.category] || "bg-muted text-muted-foreground"}`}>
-                          {s.category}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed mb-2">{s.reason}</p>
-                      <div className="text-[11px] text-foreground/70 bg-muted/50 rounded-lg px-3 py-2">
-                        💡 {s.tip}
-                      </div>
-                      {s.nodalAlignment && (
-                        <div className="mt-2 text-[11px] text-indigo-500 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg px-3 py-2">
-                          ✦ {s.nodalAlignment}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Empty state */}
-        {!result && !aiLoading && decoded.environment && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-center py-12"
-          >
-            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-              <MapPin className="w-7 h-7 text-muted-foreground" />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Tap "Find my {decoded.environment.full} spots" to surface<br />
-              where your aura naturally thrives nearby.
-            </p>
-          </motion.div>
-        )}
       </div>
     </div>
+
   );
 };
 

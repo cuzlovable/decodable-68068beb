@@ -76,12 +76,20 @@ export function gateSignIndex(gate: number): number | null {
 
 export type HousePlacement = { house: number; label: string; ordinal: string; sign: string };
 
-/** Solar-house placement (Sun sign = 1st house) — no birth-time dependency. */
-export function housePlacement(gate: number, birthDate?: string | null): HousePlacement | null {
+/**
+ * Whole-sign house placement.
+ * Uses the Ascendant sign when available (accurate), otherwise falls back to
+ * solar houses (Sun sign = 1st house) which needs no birth time.
+ */
+export function housePlacement(
+  gate: number,
+  birthDate?: string | null,
+  ascSignIndex?: number | null
+): HousePlacement | null {
   const gSign = gateSignIndex(gate);
-  const sSign = sunSignIndex(birthDate);
-  if (gSign === null || sSign === null) return null;
-  const house = ((gSign - sSign + 12) % 12) + 1;
+  const base = ascSignIndex ?? sunSignIndex(birthDate);
+  if (gSign === null || base === null || base === undefined) return null;
+  const house = ((gSign - base + 12) % 12) + 1;
   return {
     house,
     label: HOUSE_LABELS[house],
@@ -89,6 +97,7 @@ export function housePlacement(gate: number, birthDate?: string | null): HousePl
     sign: SIGNS[gSign],
   };
 }
+
 
 export function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
@@ -170,7 +179,8 @@ export type NodalProfile = {
 export function nodalProfile(
   gate: number | null | undefined,
   birthDate?: string | null,
-  kind: "south" | "north" = "south"
+  kind: "south" | "north" = "south",
+  ascSignIndex?: number | null
 ): NodalProfile | null {
   if (!gate) return null;
   const gateName = GATE_NAMES[gate] ?? `Gate ${gate}`;
@@ -184,7 +194,7 @@ export function nodalProfile(
   return {
     gate,
     gateName,
-    house: housePlacement(gate, birthDate),
+    house: housePlacement(gate, birthDate, ascSignIndex),
     coreTheme,
     setting: atmos.setting,
     audience: atmos.audience,
@@ -194,6 +204,7 @@ export function nodalProfile(
     ),
   };
 }
+
 
 /** Ages 38–42 is the nodal transition window. */
 export function ageFrom(birthDate?: string | null): number | null {
