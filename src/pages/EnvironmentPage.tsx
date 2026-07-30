@@ -67,8 +67,6 @@ const EnvironmentPage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [result, setResult] = useState<AIResult | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
