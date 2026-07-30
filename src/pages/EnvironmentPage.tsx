@@ -112,51 +112,38 @@ const EnvironmentPage = () => {
     load();
   }, [navigate]);
 
-  const decoded = useMemo(
-    () => decodeAll((profile?.variables ?? null) as PhsVariables | null),
-    [profile?.variables]
-  );
+  // Node gates come from the DESIGN (red) side of the bodygraph.
+  const designNodes = useMemo(() => {
+    const design = (profile?.chart_raw as any)?.gate_and_line?.design;
+    const pick = (aliases: string[]) => {
+      if (!design) return null;
+      for (const [planet, gl] of Object.entries(design as Record<string, any>)) {
+        const key = planet.toLowerCase().replace(/[\s._-]/g, "");
+        if (aliases.includes(key) && Array.isArray(gl) && typeof gl[0] === "number") {
+          return gl[0] as number;
+        }
+      }
+      return null;
+    };
+    return {
+      south: pick(["southnode", "snode", "s", "ketu", "descendingnode"]) ?? profile?.south_node_gate ?? null,
+      north: pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]) ?? profile?.north_node_gate ?? null,
+    };
+  }, [profile]);
 
-  const fetchSuggestions = useCallback(async () => {
-    if (!decoded.environment || !userLocation) return;
-
-    setAiLoading(true);
-    setResult(null);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("environment-suggestions", {
-        body: {
-          // Send the precise color+tone label so the AI grounds in
-          // e.g. "Narrow Valley" instead of generic "Valleys".
-          environment: decoded.environment.full,
-          environmentColor: decoded.environment.colorLabel,
-          environmentTone: decoded.environment.toneLabel,
-          digestion: decoded.digestion?.full,
-          perspective: decoded.perspective?.full,
-          motivation: decoded.motivation?.full,
-          latitude: userLocation.lat,
-          longitude: userLocation.lng,
-          birthDate: profile?.birth_date,
-          southNodeGate: profile?.south_node_gate,
-          northNodeGate: profile?.north_node_gate,
-        },
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      setResult(data);
-    } catch (err: any) {
-      console.error("Environment AI error:", err);
-      toast({
-        title: "Error",
-        description: err.message || "Failed to get suggestions. Try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setAiLoading(false);
+  // Whole-sign houses need the Ascendant; use it when the chart provides one.
+  const ascSignIndex = useMemo(() => {
+    const raw = profile?.chart_raw as any;
+    const src = raw?.gate_and_line?.personality ?? {};
+    for (const [planet, gl] of Object.entries(src as Record<string, any>)) {
+      const key = planet.toLowerCase().replace(/[\s._-]/g, "");
+      if ((key === "ascendant" || key === "asc" || key === "rising") && Array.isArray(gl)) {
+        return gateSignIndex(gl[0]);
+      }
     }
-  }, [decoded, userLocation, profile]);
+    return null;
+  }, [profile]);
+
 
   if (loading) {
     return (
