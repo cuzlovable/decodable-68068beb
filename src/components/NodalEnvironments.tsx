@@ -198,10 +198,24 @@ export const NodalEnvironments = ({
   return (
     <div className="space-y-4 mb-6">
       {south && (
-        <NodeCard data={south} badge="Backdrop" window="Pre ages 38–42" active={!postTransition} />
+        <NodeCard
+          data={south}
+          badge="Backdrop"
+          window="Pre ages 38–42"
+          active={!postTransition}
+          houseOverride={houseInfo(houses?.south)}
+          houseLoading={housesLoading}
+        />
       )}
       {north && (
-        <NodeCard data={north} badge="Evolution" window="Post ages 38–42" active={postTransition} />
+        <NodeCard
+          data={north}
+          badge="Evolution"
+          window="Post ages 38–42"
+          active={postTransition}
+          houseOverride={houseInfo(houses?.north)}
+          houseLoading={housesLoading}
+        />
       )}
 
       {/* Nearby spots */}
