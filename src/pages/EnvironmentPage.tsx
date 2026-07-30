@@ -70,7 +70,46 @@ const EnvironmentPage = () => {
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState<string>("");
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  // Reverse-geocode coords into a readable place name.
+  const labelForCoords = useCallback(async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`,
+        { headers: { "Accept-Language": "en" } }
+      );
+      const json = await res.json();
+      const a = json?.address ?? {};
+      const city = a.city || a.town || a.village || a.county || a.state;
+      return [city, a.country].filter(Boolean).join(", ") || "Your current location";
+    } catch {
+      return "Your current location";
+    }
+  }, []);
+
+  const useCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError("Location isn't available in this browser. Search below instead.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        setUserLocation({ lat, lng });
+        setLocationLabel(await labelForCoords(lat, lng));
+        setLocationError(null);
+        setLocating(false);
+      },
+      () => {
+        setLocationError("Location permission denied. Search for a place below.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [labelForCoords]);
+
 
   useEffect(() => {
     const load = async () => {
