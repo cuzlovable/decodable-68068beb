@@ -63,10 +63,14 @@ const NodeCard = ({
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">House</p>
         <p className="font-display text-xl font-bold text-foreground leading-none flex items-center gap-1.5">
           <Compass className="w-4 h-4 text-primary" />
-          {data.house ? `${data.house.ordinal}` : "—"}
+          {houseLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            (houseOverride ?? data.house)?.ordinal ?? "—"
+          )}
         </p>
         <p className="text-[11px] text-foreground/70 mt-1">
-          {data.house ? data.house.label : "Add your birth date"}
+          {(houseOverride ?? data.house)?.label ?? "Add your birth date"}
         </p>
       </div>
     </div>
