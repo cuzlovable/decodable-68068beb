@@ -115,21 +115,31 @@ const EnvironmentPage = () => {
   // Node gates come from the DESIGN (red) side of the bodygraph.
   const designNodes = useMemo(() => {
     const design = (profile?.chart_raw as any)?.gate_and_line?.design;
-    const pick = (aliases: string[]) => {
+    const pick = (aliases: string[]): [number, number] | null => {
       if (!design) return null;
       for (const [planet, gl] of Object.entries(design as Record<string, any>)) {
         const key = planet.toLowerCase().replace(/[\s._-]/g, "");
         if (aliases.includes(key) && Array.isArray(gl) && typeof gl[0] === "number") {
-          return gl[0] as number;
+          return [gl[0] as number, (gl[1] as number) ?? 1];
         }
       }
       return null;
     };
+    const s = pick(["southnode", "snode", "s", "ketu", "descendingnode"]);
+    const n = pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]);
     return {
-      south: pick(["southnode", "snode", "s", "ketu", "descendingnode"]) ?? profile?.south_node_gate ?? null,
-      north: pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]) ?? profile?.north_node_gate ?? null,
+      south: s?.[0] ?? profile?.south_node_gate ?? null,
+      north: n?.[0] ?? profile?.north_node_gate ?? null,
+      northLine: n?.[1] ?? null,
     };
   }, [profile]);
+
+  // Ecliptic longitude of the North Node, used for house placement.
+  const northNodeLongitude = useMemo(
+    () => (designNodes.north ? gateLongitude(designNodes.north, designNodes.northLine) : null),
+    [designNodes]
+  );
+
 
   // Whole-sign houses need the Ascendant; use it when the chart provides one.
   const ascSignIndex = useMemo(() => {
