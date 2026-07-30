@@ -221,8 +221,7 @@ const MatchesPage = () => {
           className="mt-8 p-4 rounded-2xl bg-card/50 border border-border/30 text-center"
         >
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">For any 1:1.</span> Smarter matches start with your
-            feedback.
+            <span className="font-semibold text-foreground"></span> Smarter matches start with your feedback.
           </p>
         </motion.div>
       </div>
