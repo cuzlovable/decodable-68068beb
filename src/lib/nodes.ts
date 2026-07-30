@@ -128,7 +128,7 @@ const CENTER_ATMOSPHERE: Record<string, CenterAtmosphere> = {
     audience: "Attracts people who value willpower, promises, and results",
     keywords: ["market", "gym", "business club", "auction house"],
   },
-  spleen: {
+  splenic: {
     setting: "Grounding, health-forward spaces — wellness studios, forests, saunas",
     audience: "Attracts people needing safety, timing, and instinctive guidance",
     keywords: ["wellness studio", "forest trail", "sauna", "herbal apothecary"],
