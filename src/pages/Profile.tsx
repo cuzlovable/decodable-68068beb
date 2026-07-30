@@ -97,7 +97,7 @@ const Profile = () => {
 
             <p className="text-muted-foreground text-sm leading-relaxed">
               {profile?.energy_type
-                ? `As a ${profile.energy_type}, you have a unique way of experiencing connection and intimacy. Your design chart is being analyzed for compatibility insights.`
+                ? `As a ${profile.energy_type}, you have a unique way of experiencing connection. Your design chart is being analyzed for compatibility insights.`
                 : "Your Human Design chart is being processed. Check back soon for your full energetic profile and compatibility insights."}
             </p>
           </div>
@@ -140,9 +140,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">My Environments</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Discover where your aura thrives
-                  </p>
+                  <p className="text-xs text-muted-foreground">Discover where your aura thrives</p>
                 </div>
               </div>
             </div>
