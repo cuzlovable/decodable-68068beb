@@ -46,7 +46,7 @@ const Index = () => {
               </h1>
 
               <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-xs mx-auto">
-                Your unique energetic blueprint reveals compatibility — beyond surface-level attraction.
+                Your unique energetic blueprint reveals sparks beyond human capacity.
               </p>
 
               {/* CTA Buttons */}
