@@ -28,7 +28,7 @@ const Index = () => {
             <div className="w-9 h-9 rounded-full gradient-aura flex items-center justify-center shadow-aura">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-semibold text-foreground">AuraMate</span>
+            <span className="font-display text-xl font-semibold text-foreground">AuraChem</span>
           </motion.div>
         </nav>
 
