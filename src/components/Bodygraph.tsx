@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { type CenterId, CENTERS, UNIQUE_CHANNELS, getDefinedCenters } from "@/lib/humandesign";
+import silhouette from "@/assets/bodygraph-silhouette.png.asset.json";
+
 
 // ─── Bodygraph ──────────────────────────────────────────────────
 // Brand-tinted: red with a gentle gray hue; black softened to charcoal with gray hue.
