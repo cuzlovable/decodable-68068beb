@@ -70,6 +70,7 @@ const EnvironmentPage = () => {
   const [loading, setLoading] = useState(true);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState<string>("");
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
 
   // Reverse-geocode coords into a readable place name.
