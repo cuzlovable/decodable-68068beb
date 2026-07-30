@@ -216,9 +216,8 @@ const EnvironmentPage = () => {
         />
 
       </div>
-
-      </div>
     </div>
+
   );
 };
 
