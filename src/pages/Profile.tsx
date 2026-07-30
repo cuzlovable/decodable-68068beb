@@ -163,7 +163,7 @@ const Profile = () => {
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">High Chemistry</h3>
                   <p className="text-xs text-muted-foreground">
-                    Matches ranked by friction-reduced, dynamic,harmonic chemistry
+                    Matches ranked by friction-reduced, dynamic, harmonic chemistry
                   </p>
                 </div>
               </div>
