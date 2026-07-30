@@ -1,6 +1,6 @@
-# AuraMate Connect
+# AuraChem Connect
 
-Act as a Full Stack Developer and UX Designer. Build a mobile-responsive web app for a dating platform called 'AuraMatch.' The core USP is Human Design compatibility.
+Act as a Full Stack Developer and UX Designer. Build a mobile-responsive web app for a dating platform called 'AuraChem.' The core USP is Human Design compatibility.
 
 Core Features needed:
 

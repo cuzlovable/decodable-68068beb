@@ -54,7 +54,7 @@ const Profile = () => {
             <div className="w-8 h-8 rounded-full gradient-aura flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-semibold text-foreground">AuraMate</span>
+            <span className="font-display text-lg font-semibold text-foreground">AuraChem</span>
           </div>
           <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground">
             <LogOut className="w-4 h-4 mr-1" /> Sign Out

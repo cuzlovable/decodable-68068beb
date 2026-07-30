@@ -52,7 +52,7 @@ const Auth = () => {
           <div className="w-14 h-14 rounded-full gradient-aura flex items-center justify-center mx-auto mb-4">
             <Sparkles className="w-7 h-7 text-primary-foreground" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground mb-2">Welcome to AuraMate</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-2">Welcome to AuraChem</h1>
           <p className="text-muted-foreground">Sign in to discover your energetic blueprint</p>
         </div>
 
