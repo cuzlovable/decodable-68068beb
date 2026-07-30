@@ -264,6 +264,15 @@ const EnvironmentPage = () => {
           )}
         </motion.div>
 
+        {/* Nodal environments + nearby spots */}
+        <NodalEnvironments
+          southGate={profile?.south_node_gate}
+          northGate={profile?.north_node_gate}
+          birthDate={profile?.birth_date}
+          location={userLocation}
+          locationLabel={locationLabel}
+        />
+
         {/* Chiron Return Banner */}
         <AnimatePresence>
           {result?.chironReturn && result.chironMessage && (
