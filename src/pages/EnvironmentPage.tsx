@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
-import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { NodalEnvironments } from "@/components/NodalEnvironments";
-import { gateSignIndex } from "@/lib/nodes";
+import { NodeHouses } from "@/components/NodeHouses";
+import { gateSignIndex, gateLongitude } from "@/lib/nodes";
+
 
 
 // Concise PHS explainers — only the essentials.
@@ -115,21 +116,31 @@ const EnvironmentPage = () => {
   // Node gates come from the DESIGN (red) side of the bodygraph.
   const designNodes = useMemo(() => {
     const design = (profile?.chart_raw as any)?.gate_and_line?.design;
-    const pick = (aliases: string[]) => {
+    const pick = (aliases: string[]): [number, number] | null => {
       if (!design) return null;
       for (const [planet, gl] of Object.entries(design as Record<string, any>)) {
         const key = planet.toLowerCase().replace(/[\s._-]/g, "");
         if (aliases.includes(key) && Array.isArray(gl) && typeof gl[0] === "number") {
-          return gl[0] as number;
+          return [gl[0] as number, (gl[1] as number) ?? 1];
         }
       }
       return null;
     };
+    const s = pick(["southnode", "snode", "s", "ketu", "descendingnode"]);
+    const n = pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]);
     return {
-      south: pick(["southnode", "snode", "s", "ketu", "descendingnode"]) ?? profile?.south_node_gate ?? null,
-      north: pick(["northnode", "nnode", "n", "rahu", "ascendingnode"]) ?? profile?.north_node_gate ?? null,
+      south: s?.[0] ?? profile?.south_node_gate ?? null,
+      north: n?.[0] ?? profile?.north_node_gate ?? null,
+      northLine: n?.[1] ?? null,
     };
   }, [profile]);
+
+  // Ecliptic longitude of the North Node, used for house placement.
+  const northNodeLongitude = useMemo(
+    () => (designNodes.north ? gateLongitude(designNodes.north, designNodes.northLine) : null),
+    [designNodes]
+  );
+
 
   // Whole-sign houses need the Ascendant; use it when the chart provides one.
   const ascSignIndex = useMemo(() => {
@@ -177,21 +188,6 @@ const EnvironmentPage = () => {
           </div>
         )}
 
-        {/* Location override — accurate, accessible search */}
-        <div className="mb-6">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
-            Search near
-          </p>
-          <LocationAutocomplete
-            value={locationLabel}
-            onChange={(name, lat, lon) => {
-              setUserLocation({ lat, lng: lon });
-              setLocationLabel(name);
-              setLocationError(null);
-            }}
-          />
-        </div>
-
         {/* Nodal environments + nearby spots */}
         <NodalEnvironments
           southGate={designNodes.south}
@@ -201,6 +197,18 @@ const EnvironmentPage = () => {
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
         />
+
+        {/* Placidus house placements for the nodes */}
+        <div className="mb-6">
+          <NodeHouses
+            birthDate={profile?.birth_date}
+            birthTime={profile?.birth_time}
+            latitude={profile?.birth_latitude}
+            longitude={profile?.birth_longitude}
+            northNodeLongitude={northNodeLongitude}
+          />
+        </div>
+
 
       </div>
     </div>

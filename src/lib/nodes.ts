@@ -74,6 +74,16 @@ export function gateSignIndex(gate: number): number | null {
   return Math.floor(degrees / 30) % 12;
 }
 
+/** Tropical ecliptic longitude (0–360°) for a gate, refined by line when given. */
+export function gateLongitude(gate: number, line?: number | null): number | null {
+  const idx = WHEEL.indexOf(gate);
+  if (idx === -1) return null;
+  const step = 360 / 64;
+  const lineOffset = line && line >= 1 && line <= 6 ? ((line - 0.5) / 6) * step : step / 2;
+  return (idx * step + lineOffset) % 360;
+}
+
+
 export type HousePlacement = { house: number; label: string; ordinal: string; sign: string };
 
 /**
