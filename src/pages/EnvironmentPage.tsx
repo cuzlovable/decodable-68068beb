@@ -177,21 +177,6 @@ const EnvironmentPage = () => {
           </div>
         )}
 
-        {/* Location override — accurate, accessible search */}
-        <div className="mb-6">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5">
-            Search near
-          </p>
-          <LocationAutocomplete
-            value={locationLabel}
-            onChange={(name, lat, lon) => {
-              setUserLocation({ lat, lng: lon });
-              setLocationLabel(name);
-              setLocationError(null);
-            }}
-          />
-        </div>
-
         {/* Nodal environments + nearby spots */}
         <NodalEnvironments
           southGate={designNodes.south}
@@ -201,6 +186,18 @@ const EnvironmentPage = () => {
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
         />
+
+        {/* Placidus house placements for the nodes */}
+        <div className="mb-6">
+          <NodeHouses
+            birthDate={profile?.birth_date}
+            birthTime={profile?.birth_time}
+            latitude={profile?.birth_latitude}
+            longitude={profile?.birth_longitude}
+            northNodeLongitude={northNodeLongitude}
+          />
+        </div>
+
 
       </div>
     </div>
