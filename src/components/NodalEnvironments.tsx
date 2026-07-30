@@ -107,6 +107,7 @@ export const NodalEnvironments = ({
   location,
   locationLabel,
   ascSignIndex,
+  envVariable,
 }: {
   southGate?: number | null;
   northGate?: number | null;
@@ -118,17 +119,28 @@ export const NodalEnvironments = ({
   location: { lat: number; lng: number } | null;
   locationLabel?: string;
   ascSignIndex?: number | null;
+  /** PHS Environment variable as `color.tone`, e.g. 5.2 */
+  envVariable?: number | null;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [houses, setHouses] = useState<{ north: number; south: number } | null>(null);
   const [housesLoading, setHousesLoading] = useState(false);
 
-  const south = nodalProfile(southGate, birthDate, "south", ascSignIndex);
-  const north = nodalProfile(northGate, birthDate, "north", ascSignIndex);
+  const env = typeof envVariable === "number" ? decodeEnvironment(envVariable) : null;
+  const envColor = env?.color ?? null;
+  const envTone = env?.tone ?? null;
+
+  const south = nodalProfile(southGate, birthDate, "south", ascSignIndex, {
+    houseNumber: houses?.south, envColor, envTone,
+  });
+  const north = nodalProfile(northGate, birthDate, "north", ascSignIndex, {
+    houseNumber: houses?.north, envColor, envTone,
+  });
   const age = ageFrom(birthDate);
   const postTransition = age !== null && age >= 40;
   const activeNode = postTransition ? north ?? south : south ?? north;
+
 
   // External astrology API (with local Placidus fallback) for node house numbers.
   useEffect(() => {
