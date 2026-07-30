@@ -143,6 +143,8 @@ const Profile = () => {
                   <p className="text-xs text-muted-foreground">
                     Discover where your aura thrives
                   </p>
+                </div>
+              </div>
             </div>
           </Link>
         </motion.div>
