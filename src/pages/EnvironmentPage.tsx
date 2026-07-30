@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { NodalEnvironments } from "@/components/NodalEnvironments";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { gateSignIndex, gateLongitude } from "@/lib/nodes";
 
 
@@ -70,6 +71,46 @@ const EnvironmentPage = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLabel, setLocationLabel] = useState<string>("");
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  // Reverse-geocode coords into a readable place name.
+  const labelForCoords = useCallback(async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`,
+        { headers: { "Accept-Language": "en" } }
+      );
+      const json = await res.json();
+      const a = json?.address ?? {};
+      const city = a.city || a.town || a.village || a.county || a.state;
+      return [city, a.country].filter(Boolean).join(", ") || "Your current location";
+    } catch {
+      return "Your current location";
+    }
+  }, []);
+
+  const useCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationError("Location isn't available in this browser. Search below instead.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        setUserLocation({ lat, lng });
+        setLocationLabel(await labelForCoords(lat, lng));
+        setLocationError(null);
+        setLocating(false);
+      },
+      () => {
+        setLocationError("Location permission denied. Search for a place below.");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [labelForCoords]);
+
 
   useEffect(() => {
     const load = async () => {
@@ -180,12 +221,47 @@ const EnvironmentPage = () => {
           <div className="w-16" />
         </div>
 
+        {/* Location control */}
+        <div className="mb-4 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Compass className="w-4 h-4 text-primary shrink-0" />
+              <span className="text-xs text-muted-foreground truncate">
+                {locationLabel || "No location set"}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={useCurrentLocation}
+              disabled={locating}
+              className="shrink-0 text-xs"
+            >
+              {locating ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5 mr-1" />
+              )}
+              {locating ? "" : "Use current"}
+            </Button>
+          </div>
+          <LocationAutocomplete
+            value=""
+            onChange={(name, lat, lon) => {
+              setUserLocation({ lat, lng: lon });
+              setLocationLabel(name.split(",").slice(0, 2).join(",").trim());
+              setLocationError(null);
+            }}
+          />
+        </div>
+
         {locationError && (
           <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             {locationError}
           </div>
         )}
+
 
         {/* Nodal environments + nearby spots */}
         <NodalEnvironments
