@@ -77,9 +77,16 @@ const NodeCard = ({
       </div>
     </div>
 
-    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-      The Stage &amp; Atmosphere
-    </p>
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+        The Stage &amp; Atmosphere
+      </p>
+      {data.phsLabel && (
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
+          {data.phsLabel}
+        </span>
+      )}
+    </div>
     <ul className="space-y-2">
       <li className="flex items-start gap-2 text-xs text-foreground/80">
         <Theater className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary" />
