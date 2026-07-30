@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { decodeAll, type PhsVariables } from "@/lib/phs";
 import { NodalEnvironments } from "@/components/NodalEnvironments";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { gateSignIndex, gateLongitude } from "@/lib/nodes";
 
 
