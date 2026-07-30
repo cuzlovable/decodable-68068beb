@@ -140,9 +140,11 @@ const Profile = () => {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">My Environments</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Discover where your aura thrives
+                  <p className="text-xs text-muted-foreground">                     
+                      : "Discover where your aura thrives"}
                   </p>
+                </div>
+              </div>
             </div>
           </Link>
         </motion.div>
