@@ -30,8 +30,13 @@ const ChatPage = () => {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/auth"); return; }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
       setUserId(session.user.id);
 
       // Check if demo match
@@ -47,19 +52,27 @@ const ChatPage = () => {
         // Demo partner info
         const demoPartners: Record<string, { name: string; type: EnergyType; profile: string; opener: string }> = {
           "demo-match-1": {
-            name: "Luna", type: "Projector", profile: "4/6",
-            opener: "Okay, your energy reads so steady — I had to say hi. What's been quietly lighting you up lately?",
+            name: "Luna",
+            type: "Projector",
+            profile: "4/6",
+            opener: "Okay, your energy reads steady — I had to say hi. What's been lighting you up lately?",
           },
           "demo-match-2": {
-            name: "Orion", type: "Generator", profile: "1/3",
-            opener: "Your profile made me smile. What's a small thing that's actually made your week feel good?",
+            name: "Orion",
+            type: "Generator",
+            profile: "1/3",
+            opener: "Your profile made me smile. What's a small thing that made your week feel good?",
           },
           "demo-match-3": {
-            name: "Celeste", type: "Manifesting Generator", profile: "3/5",
+            name: "Celeste",
+            type: "Manifesting Generator",
+            profile: "3/5",
             opener: "You look like someone juggling five exciting things at once — which one's winning right now?",
           },
           "demo-match-4": {
-            name: "Atlas", type: "Manifestor", profile: "5/1",
+            name: "Atlas",
+            type: "Manifestor",
+            profile: "5/1",
             opener: "Straight up — your vibe caught me. What are you building or chasing these days?",
           },
         };
@@ -68,10 +81,7 @@ const ChatPage = () => {
         setPartnerType(partner.type);
         setPartnerProfile(partner.profile);
 
-        const n = getMessagingNudge(
-          (myProfile?.energy_type as EnergyType) || "Generator",
-          partner.type
-        );
+        const n = getMessagingNudge((myProfile?.energy_type as EnergyType) || "Generator", partner.type);
         setNudge(n);
 
         // Demo messages
@@ -87,19 +97,22 @@ const ChatPage = () => {
       }
 
       // Real match: load partner + messages
-      const { data: match } = await supabase
-        .from("matches")
-        .select("*")
-        .eq("id", matchId)
-        .single();
+      const { data: match } = await supabase.from("matches").select("*").eq("id", matchId).single();
 
-      if (!match) { navigate("/matches"); return; }
+      if (!match) {
+        navigate("/matches");
+        return;
+      }
 
       const partnerId = match.user_a === session.user.id ? match.user_b : match.user_a;
 
       const [{ data: myProfile }, { data: theirProfile }, { data: msgs }] = await Promise.all([
         supabase.from("profiles").select("energy_type").eq("user_id", session.user.id).single(),
-        supabase.from("profiles").select("display_name, energy_type, profile, authority").eq("user_id", partnerId).single(),
+        supabase
+          .from("profiles")
+          .select("display_name, energy_type, profile, authority")
+          .eq("user_id", partnerId)
+          .single(),
         supabase.from("messages").select("*").eq("match_id", matchId).order("created_at", { ascending: true }),
       ]);
 
@@ -110,7 +123,7 @@ const ChatPage = () => {
 
       const n = getMessagingNudge(
         (myProfile?.energy_type as EnergyType) || null,
-        (theirProfile?.energy_type as EnergyType) || null
+        (theirProfile?.energy_type as EnergyType) || null,
       );
       setNudge(n);
 
@@ -122,11 +135,13 @@ const ChatPage = () => {
           { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${matchId}` },
           (payload) => {
             setMessages((prev) => [...prev, payload.new as Message]);
-          }
+          },
         )
         .subscribe();
 
-      return () => { supabase.removeChannel(channel); };
+      return () => {
+        supabase.removeChannel(channel);
+      };
     };
     load();
   }, [matchId, navigate]);
@@ -174,14 +189,10 @@ const ChatPage = () => {
             </Button>
           </Link>
           <div className="w-9 h-9 rounded-full gradient-aura flex items-center justify-center shrink-0">
-            <span className="font-display text-sm font-bold text-primary-foreground">
-              {partnerName[0]}
-            </span>
+            <span className="font-display text-sm font-bold text-primary-foreground">{partnerName[0]}</span>
           </div>
           <div className="min-w-0">
-            <h2 className="font-display text-base font-semibold text-foreground truncate">
-              {partnerName}
-            </h2>
+            <h2 className="font-display text-base font-semibold text-foreground truncate">{partnerName}</h2>
             <p className="text-[11px] text-primary font-medium">
               {partnerProfile} {partnerType}
             </p>
