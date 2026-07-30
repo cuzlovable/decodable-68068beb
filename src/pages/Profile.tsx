@@ -162,7 +162,7 @@ const Profile = () => {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-semibold text-foreground">High Chemistry</h3>
-                  <p className="text-xs text-muted-foreground">Friction-reduced, dynamic, harmonic chemistry</p>
+                  <p className="text-xs text-muted-foreground">Friction-reduced, dynamic, harmonic signal</p>
                 </div>
               </div>
             </div>
