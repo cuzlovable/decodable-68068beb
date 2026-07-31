@@ -147,7 +147,7 @@ const MatchesPage = () => {
           </Link>
           <div>
             <h1 className="font-display text-xl font-bold text-foreground">High Chemistry</h1>
-            <p className="text-xs text-muted-foreground">1:1 connections — dates, collaborators, friends</p>
+            <p className="text-xs text-muted-foreground">1:1 connections — collaborators, friends, neighbors </p>
           </div>
         </div>
 
