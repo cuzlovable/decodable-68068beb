@@ -38,25 +38,30 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
   }, []);
 
   const searchLocations = async (q: string) => {
-    if (q.length < 3) { setResults([]); return; }
+    if (q.length < 3) {
+      setResults([]);
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=8&addressdetails=1&featuretype=city`,
-        { headers: { "Accept-Language": "en" } }
+        { headers: { "Accept-Language": "en" } },
       );
       // If city-only search returns nothing, fall back to broader search
       let data: LocationResult[] = await res.json();
       if (data.length === 0) {
         const fallback = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5&addressdetails=1`,
-          { headers: { "Accept-Language": "en" } }
+          { headers: { "Accept-Language": "en" } },
         );
         data = await fallback.json();
         // Filter out amenities/shops/restaurants - only keep places
-        data = data.filter(r => ["city", "town", "village", "state", "country", "county", "municipality"].includes(r.addresstype || ""));
+        data = data.filter((r) =>
+          ["city", "town", "village", "state", "country", "county", "municipality"].includes(r.addresstype || ""),
+        );
       }
-      
+
       setResults(data);
       setIsOpen(data.length > 0);
     } catch {
@@ -85,7 +90,7 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Start typing your birth city..."
+          placeholder="Start typing your city..."
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={(e) => {
@@ -95,7 +100,9 @@ export const LocationAutocomplete = ({ value, onChange, className }: LocationAut
           }}
           className={`pl-10 ${className}`}
         />
-        {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />}
+        {loading && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+        )}
       </div>
 
       {isOpen && (
