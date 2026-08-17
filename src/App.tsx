@@ -13,6 +13,7 @@ import GroupDynamicsPage from "./pages/GroupDynamicsPage";
 import MatchesPage from "./pages/MatchesPage";
 import ChatPage from "./pages/ChatPage";
 import UnleashCheckPage from "./pages/UnleashCheckPage";
+import OAuthConsent from "./pages/OAuthConsent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
