@@ -149,6 +149,12 @@ const MatchesPage = () => {
             <h1 className="font-display text-xl font-bold text-foreground">High Chemistry</h1>
             <p className="text-xs text-muted-foreground">1:1 connections — collaborators, friends, neighbors </p>
           </div>
+          <Link to="/discover" className="ml-auto">
+            <Button variant="ghost" size="sm" className="text-xs text-primary">
+              <Sparkles className="w-3.5 h-3.5 mr-1" />
+              Discover
+            </Button>
+          </Link>
         </div>
 
         {/* Match Cards */}

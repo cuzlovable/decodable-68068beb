@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      likes: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          target_user_id: string
+          user_id: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          id?: string
+          target_user_id: string
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          target_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           chemistry_score: number | null
@@ -83,6 +107,7 @@ export type Database = {
         Row: {
           authority: string | null
           avatar_url: string | null
+          bio: string | null
           birth_date: string | null
           birth_latitude: number | null
           birth_location: string | null
@@ -101,6 +126,7 @@ export type Database = {
           north_node_gate: number | null
           not_self_theme: string | null
           onboarding_completed: boolean
+          photos: string[]
           profile: string | null
           signature: string | null
           south_node_environment: string | null
@@ -109,10 +135,12 @@ export type Database = {
           updated_at: string
           user_id: string
           variables: Json | null
+          vibe_traits: string[]
         }
         Insert: {
           authority?: string | null
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           birth_latitude?: number | null
           birth_location?: string | null
@@ -131,6 +159,7 @@ export type Database = {
           north_node_gate?: number | null
           not_self_theme?: string | null
           onboarding_completed?: boolean
+          photos?: string[]
           profile?: string | null
           signature?: string | null
           south_node_environment?: string | null
@@ -139,10 +168,12 @@ export type Database = {
           updated_at?: string
           user_id: string
           variables?: Json | null
+          vibe_traits?: string[]
         }
         Update: {
           authority?: string | null
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           birth_latitude?: number | null
           birth_location?: string | null
@@ -161,6 +192,7 @@ export type Database = {
           north_node_gate?: number | null
           not_self_theme?: string | null
           onboarding_completed?: boolean
+          photos?: string[]
           profile?: string | null
           signature?: string | null
           south_node_environment?: string | null
@@ -169,6 +201,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           variables?: Json | null
+          vibe_traits?: string[]
         }
         Relationships: []
       }
@@ -224,7 +257,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      discover_profiles: {
+        Args: { limit_count?: number }
+        Returns: {
+          authority: string
+          avatar_url: string
+          bio: string
+          display_name: string
+          energy_type: string
+          photos: string[]
+          profile: string
+          user_id: string
+          vibe_traits: string[]
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
