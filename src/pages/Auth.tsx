@@ -1,33 +1,43 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
+/** Only allow same-origin relative paths as post-login destinations. */
+const safeNext = (value: string | null) =>
+  value && value.startsWith("/") && !value.startsWith("//") ? value : null;
+
 const Auth = () => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const next = safeNext(params.get("next"));
 
   useEffect(() => {
+    const go = () => {
+      if (next) window.location.href = next;
+      else navigate("/onboarding");
+    };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/onboarding");
-      }
+      if (session) go();
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate("/onboarding");
+      if (session) go();
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, next]);
 
   const handleGoogleSignIn = async () => {
     await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/onboarding",
+      redirect_uri:
+        window.location.origin + (next ? `/auth?next=${encodeURIComponent(next)}` : "/onboarding"),
     });
   };
 
