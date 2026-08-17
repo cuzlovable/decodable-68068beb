@@ -81,7 +81,8 @@ const ProfileSetup = () => {
       }
       const nextPhotos = [...photos, ...added];
       setPhotos(nextPhotos);
-      setPreviews((prev) => ({ ...prev, ...(await signPhotoPaths(added)) }));
+      const signed = await signPhotoPaths(added);
+      setPreviews((prev) => ({ ...prev, ...signed }));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
     } finally {
