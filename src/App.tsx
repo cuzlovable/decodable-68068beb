@@ -35,6 +35,7 @@ const App = () => (
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/chat/:matchId" element={<ChatPage />} />
           <Route path="/unleash/:matchId" element={<UnleashCheckPage />} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
