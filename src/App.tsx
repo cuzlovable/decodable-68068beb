@@ -13,6 +13,7 @@ import GroupDynamicsPage from "./pages/GroupDynamicsPage";
 import MatchesPage from "./pages/MatchesPage";
 import ChatPage from "./pages/ChatPage";
 import UnleashCheckPage from "./pages/UnleashCheckPage";
+import OAuthConsent from "./pages/OAuthConsent";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/chat/:matchId" element={<ChatPage />} />
           <Route path="/unleash/:matchId" element={<UnleashCheckPage />} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
