@@ -29,6 +29,7 @@ const ChatPage = () => {
   const [isDemo, setIsDemo] = useState(false);
 
   useEffect(() => {
+    let channelRef: ReturnType<typeof supabase.channel> | null = null;
     const load = async () => {
       const {
         data: { session },
