@@ -129,22 +129,22 @@ const ChatPage = () => {
       setNudge(n);
 
       // Realtime subscription
-      const channel = supabase
+      channelRef = supabase
         .channel(`messages-${matchId}`)
         .on(
           "postgres_changes",
           { event: "INSERT", schema: "public", table: "messages", filter: `match_id=eq.${matchId}` },
           (payload) => {
-            setMessages((prev) => [...prev, payload.new as Message]);
+            const incoming = payload.new as Message;
+            setMessages((prev) => (prev.some((m) => m.id === incoming.id) ? prev : [...prev, incoming]));
           },
         )
         .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
     };
     load();
+    return () => {
+      if (channelRef) supabase.removeChannel(channelRef);
+    };
   }, [matchId, navigate]);
 
   useEffect(() => {
