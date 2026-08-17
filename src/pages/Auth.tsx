@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { toast } from "sonner";
 
 /** Only allow same-origin relative paths as post-login destinations. */
 const safeNext = (value: string | null) =>
@@ -14,11 +17,16 @@ const Auth = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
+  const [mode, setMode] = useState<"signin" | "signup">("signup");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const go = () => {
       if (next) window.location.href = next;
-      else navigate("/onboarding");
+      else navigate("/profile-setup");
     };
 
     const {
@@ -37,8 +45,43 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     await lovable.auth.signInWithOAuth("google", {
       redirect_uri:
-        window.location.origin + (next ? `/auth?next=${encodeURIComponent(next)}` : "/onboarding"),
+        window.location.origin +
+        (next ? `/auth?next=${encodeURIComponent(next)}` : "/profile-setup"),
     });
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || password.length < 6) {
+      toast.error("Enter an email and a password of at least 6 characters");
+      return;
+    }
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/profile-setup`,
+            data: { full_name: name.trim() || null },
+          },
+        });
+        if (error) throw error;
+        toast.success("Account created — check your inbox if confirmation is required.");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (error) throw error;
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,10 +106,65 @@ const Auth = () => {
             <Sparkles className="w-7 h-7 text-primary-foreground" />
           </div>
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">Welcome to AuraChem</h1>
-          <p className="text-muted-foreground">Sign in to discover your energetic blueprint</p>
+          <p className="text-muted-foreground">
+            {mode === "signup" ? "Create an account to map your chemistry" : "Sign in to your blueprint"}
+          </p>
         </div>
 
-        <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50">
+        <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 space-y-5">
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            {mode === "signup" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your first name"
+                  autoComplete="name"
+                />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full py-6 rounded-xl gradient-aura text-primary-foreground text-base font-medium"
+            >
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {mode === "signup" ? "Create account" : "Sign in"}
+            </Button>
+          </form>
+
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
           <Button
             onClick={handleGoogleSignIn}
             variant="outline"
@@ -92,6 +190,14 @@ const Auth = () => {
             </svg>
             Continue with Google
           </Button>
+
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+            className="w-full text-sm text-primary hover:underline"
+          >
+            {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
+          </button>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
