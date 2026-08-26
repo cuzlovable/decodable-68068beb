@@ -106,18 +106,6 @@ const Auth = () => {
 
         <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 space-y-5">
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            {mode === "signup" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your first name"
-                  autoComplete="name"
-                />
-              </div>
-            )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input

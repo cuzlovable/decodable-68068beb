@@ -280,7 +280,7 @@ function GroupSimulator({
 }
 
 const GroupDynamicsPage = () => {
-  const navigate = useNavigate();
+  // routing handled by RequireStage
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
