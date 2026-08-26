@@ -17,6 +17,8 @@ import ChatPage from "./pages/ChatPage";
 import UnleashCheckPage from "./pages/UnleashCheckPage";
 import OAuthConsent from "./pages/OAuthConsent";
 import NotFound from "./pages/NotFound";
+import { UserStateProvider } from "@/hooks/useUserState";
+import { RequireStage } from "@/components/RequireStage";
 
 const queryClient = new QueryClient();
 
@@ -26,23 +28,96 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/profile-setup" element={<ProfileSetup />} />
-          <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/bodygraph" element={<BodygraphPage />} />
-          <Route path="/environment" element={<EnvironmentPage />} />
-          <Route path="/group-dynamics" element={<GroupDynamicsPage />} />
-          <Route path="/matches" element={<MatchesPage />} />
-          <Route path="/chat/:matchId" element={<ChatPage />} />
-          <Route path="/unleash/:matchId" element={<UnleashCheckPage />} />
-          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <UserStateProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/onboarding"
+              element={
+                <RequireStage gate="onboarding">
+                  <Onboarding />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/profile-setup"
+              element={
+                <RequireStage gate="profile-setup">
+                  <ProfileSetup />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/discover"
+              element={
+                <RequireStage gate="app">
+                  <DiscoverPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <RequireStage gate="app">
+                  <Profile />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/bodygraph"
+              element={
+                <RequireStage gate="app">
+                  <BodygraphPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/environment"
+              element={
+                <RequireStage gate="app">
+                  <EnvironmentPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/group-dynamics"
+              element={
+                <RequireStage gate="app">
+                  <GroupDynamicsPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/matches"
+              element={
+                <RequireStage gate="app">
+                  <MatchesPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/chat/:matchId"
+              element={
+                <RequireStage gate="app">
+                  <ChatPage />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/unleash/:matchId"
+              element={
+                <RequireStage gate="app">
+                  <UnleashCheckPage />
+                </RequireStage>
+              }
+            />
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </UserStateProvider>
       </BrowserRouter>
+
     </TooltipProvider>
   </QueryClientProvider>
 );
