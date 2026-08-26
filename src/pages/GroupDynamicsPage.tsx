@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, UsersRound, Sparkles, Plus, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -280,25 +280,25 @@ function GroupSimulator({
 }
 
 const GroupDynamicsPage = () => {
-  const navigate = useNavigate();
+  // routing handled by RequireStage
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/auth"); return; }
+      if (!session) return;
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", session.user.id)
-        .single();
-      if (!data) { navigate("/onboarding"); return; }
+        .maybeSingle();
       setProfile(data);
       setLoading(false);
     };
     load();
-  }, [navigate]);
+  }, []);
+
 
   if (loading) {
     return (

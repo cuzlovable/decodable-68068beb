@@ -15,22 +15,15 @@ const Profile = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
+      if (!session) return;
 
-      const { data } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
-
-      if (data && !data.onboarding_completed) {
-        navigate("/onboarding");
-        return;
-      }
+      const { data } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).maybeSingle();
       setProfile(data);
       setLoading(false);
     };
     load();
-  }, [navigate]);
+  }, []);
+
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();

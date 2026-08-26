@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { useUserState, stageHome } from "@/hooks/useUserState";
 import { toast } from "sonner";
 
 /** Only allow same-origin relative paths as post-login destinations. */
@@ -17,36 +18,28 @@ const Auth = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
+  const { stage } = useUserState();
   const [mode, setMode] = useState<"signin" | "signup">("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Centralized user state decides where an authenticated user goes.
   useEffect(() => {
-    const go = () => {
-      if (next) window.location.href = next;
-      else navigate("/profile-setup");
-    };
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) go();
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) go();
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, next]);
+    if (stage === "loading" || stage === "unauthenticated") return;
+    const home = stageHome(stage);
+    // Honor ?next only once the user is fully onboarded, so we never bypass onboarding.
+    if (next && stage === "ready") {
+      navigate(next, { replace: true });
+      return;
+    }
+    navigate(home, { replace: true });
+  }, [stage, next, navigate]);
 
   const handleGoogleSignIn = async () => {
     await lovable.auth.signInWithOAuth("google", {
       redirect_uri:
-        window.location.origin +
-        (next ? `/auth?next=${encodeURIComponent(next)}` : "/profile-setup"),
+        window.location.origin + (next ? `/auth?next=${encodeURIComponent(next)}` : "/auth"),
     });
   };
 
@@ -63,8 +56,7 @@ const Auth = () => {
           email: email.trim(),
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/profile-setup`,
-            data: { full_name: name.trim() || null },
+            emailRedirectTo: `${window.location.origin}/auth`,
           },
         });
         if (error) throw error;
@@ -83,6 +75,7 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen gradient-celestial flex items-center justify-center px-6 overflow-hidden">
@@ -113,18 +106,6 @@ const Auth = () => {
 
         <div className="p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 space-y-5">
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            {mode === "signup" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your first name"
-                  autoComplete="name"
-                />
-              </div>
-            )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input

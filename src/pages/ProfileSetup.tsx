@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadProfilePhoto, signPhotoPaths } from "@/lib/photos";
+import { useUserState } from "@/hooks/useUserState";
 import { toast } from "sonner";
+
 
 const VIBE_TRAITS = [
   "Slow burn",
@@ -27,7 +29,9 @@ const VIBE_TRAITS = [
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const { refresh } = useUserState();
   const [userId, setUserId] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -42,11 +46,9 @@ const ProfileSetup = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth?next=/profile-setup");
-        return;
-      }
+      if (!session) return;
       setUserId(session.user.id);
+
 
       const { data: profile } = await supabase
         .from("profiles")
@@ -120,7 +122,9 @@ const ProfileSetup = () => {
       return;
     }
     toast.success("Profile saved");
-    navigate("/discover");
+    await refresh();
+    navigate("/discover", { replace: true });
+
   };
 
   if (loading) {

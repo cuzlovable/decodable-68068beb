@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, ArrowLeft, MapPin, Clock, CalendarDays, Loader2 } from "lucide-react";
@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserState } from "@/hooks/useUserState";
 import { toast } from "sonner";
 
 const STEPS = ["birth_date", "birth_time", "birth_location"] as const;
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { refresh } = useUserState();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
     birth_date: "",
     birth_time: "",
@@ -22,11 +25,8 @@ const Onboarding = () => {
     birth_longitude: 0,
   });
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate("/auth");
-    });
-  }, [navigate]);
+  // Auth + stage routing is handled centrally by RequireStage.
+
 
   const handleNext = () => {
     if (step === 0 && !form.birth_date) {
@@ -107,7 +107,10 @@ const Onboarding = () => {
       if (error) throw error;
 
       toast.success(`Welcome, ${chart.profile} ${chart.authority} ${chart.energy_type}! ✨`);
-      navigate("/profile");
+      // Refresh centralized user state before navigating so the guard sees the new stage.
+      await refresh();
+      navigate("/profile-setup", { replace: true });
+
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {
