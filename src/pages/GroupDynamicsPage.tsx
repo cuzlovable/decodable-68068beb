@@ -287,18 +287,18 @@ const GroupDynamicsPage = () => {
   useEffect(() => {
     const load = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/auth"); return; }
+      if (!session) return;
       const { data } = await supabase
         .from("profiles")
         .select("*")
         .eq("user_id", session.user.id)
-        .single();
-      if (!data) { navigate("/onboarding"); return; }
+        .maybeSingle();
       setProfile(data);
       setLoading(false);
     };
     load();
-  }, [navigate]);
+  }, []);
+
 
   if (loading) {
     return (
