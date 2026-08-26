@@ -42,11 +42,9 @@ const ProfileSetup = () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session) {
-        navigate("/auth?next=/profile-setup");
-        return;
-      }
+      if (!session) return;
       setUserId(session.user.id);
+
 
       const { data: profile } = await supabase
         .from("profiles")

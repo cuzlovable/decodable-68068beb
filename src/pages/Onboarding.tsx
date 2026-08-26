@@ -107,7 +107,10 @@ const Onboarding = () => {
       if (error) throw error;
 
       toast.success(`Welcome, ${chart.profile} ${chart.authority} ${chart.energy_type}! ✨`);
-      navigate("/profile");
+      // Refresh centralized user state before navigating so the guard sees the new stage.
+      await refresh();
+      navigate("/profile-setup", { replace: true });
+
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");
     } finally {
