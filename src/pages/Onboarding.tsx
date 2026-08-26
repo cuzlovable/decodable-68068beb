@@ -22,11 +22,8 @@ const Onboarding = () => {
     birth_longitude: 0,
   });
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate("/auth");
-    });
-  }, [navigate]);
+  // Auth + stage routing is handled centrally by RequireStage.
+
 
   const handleNext = () => {
     if (step === 0 && !form.birth_date) {
