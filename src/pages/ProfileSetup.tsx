@@ -226,6 +226,48 @@ const ProfileSetup = () => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="location">Current location</Label>
+            <LocationAutocomplete
+              value={locationLabel}
+              onChange={(loc, lat, lon) => {
+                setLocationLabel(loc);
+                setCoords({ lat, lng: lon });
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={useCurrentLocation}
+              disabled={locating}
+              className="w-full"
+            >
+              {locating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Navigation className="w-4 h-4 mr-2" />
+              )}
+              Use current location
+            </Button>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="radius">Search radius (miles)</Label>
+            <Input
+              id="radius"
+              type="number"
+              min={1}
+              max={500}
+              value={radius}
+              onChange={(e) => setRadius(Math.max(1, Math.min(500, Number(e.target.value) || 1)))}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Nearby matches inside this radius rank higher.
+            </p>
+          </div>
+
+
+          <div className="space-y-2">
             <Label>Photos</Label>
             <div className="grid grid-cols-3 gap-2">
               {photos.map((path) => (
