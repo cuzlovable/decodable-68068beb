@@ -132,9 +132,27 @@ const DiscoverPage = () => {
         .maybeSingle();
 
       if (matchRow) {
-        setMatch({ name: current.display_name || "your match", matchId: matchRow.id });
+        // Reuse the compatibility already calculated for this candidate.
+        const compatibility = current.compatibility;
+        await supabase
+          .from("matches")
+          .update({
+            chemistry_score: Math.max(0, Math.min(100, compatibility.combined_centers.defined * 10)),
+            dominant_theme:
+              compatibility.electromagnetic_channels[0]?.theme ||
+              compatibility.explanation.find((e) => e.key === "overall")?.heading ||
+              null,
+          })
+          .eq("id", matchRow.id);
+
+        setMatch({
+          name: current.display_name || "your match",
+          matchId: matchRow.id,
+          compatibility,
+        });
       }
     }
+
 
     setCandidates((prev) => prev.slice(1));
     setActing(false);
