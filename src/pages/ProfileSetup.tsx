@@ -43,6 +43,10 @@ const ProfileSetup = () => {
   const [traits, setTraits] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [locationLabel, setLocationLabel] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [radius, setRadius] = useState<number>(DEFAULT_SEARCH_RADIUS_MILES);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -55,7 +59,9 @@ const ProfileSetup = () => {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("display_name, bio, photos, vibe_traits")
+        .select(
+          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles",
+        )
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -65,9 +71,18 @@ const ProfileSetup = () => {
         setTraits(profile.vibe_traits || []);
         setPhotos(profile.photos || []);
         setPreviews(await signPhotoPaths(profile.photos || []));
+        setLocationLabel(profile.current_location || "");
+        if (
+          typeof profile.current_latitude === "number" &&
+          typeof profile.current_longitude === "number"
+        ) {
+          setCoords({ lat: profile.current_latitude, lng: profile.current_longitude });
+        }
+        setRadius(profile.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES);
       }
       setLoading(false);
     };
+
     load();
   }, [navigate]);
 
