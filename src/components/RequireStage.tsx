@@ -2,7 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useUserState } from "@/hooks/useUserState";
 
-type Gate = "app" | "onboarding" | "profile-setup";
+type Gate = "app" | "onboarding" | "profile-setup" | "reveal";
 
 const Loading = () => (
   <div className="min-h-screen gradient-celestial flex items-center justify-center">
@@ -27,8 +27,15 @@ export const RequireStage = ({ gate, children }: { gate: Gate; children: ReactNo
     return <Navigate to={`/auth?next=${encodeURIComponent(next)}`} replace />;
   }
 
+  if (gate === "reveal") {
+    // Requires a calculated chart; fully onboarded users are never forced back here.
+    if (stage === "needs_onboarding") return <Navigate to="/onboarding" replace />;
+    if (stage === "ready") return <Navigate to="/profile" replace />;
+    return <>{children}</>;
+  }
+
   if (gate === "onboarding") {
-    if (stage === "needs_profile") return <Navigate to="/profile-setup" replace />;
+    if (stage === "needs_profile") return <Navigate to="/design-reveal" replace />;
     if (stage === "ready") return <Navigate to="/profile" replace />;
     return <>{children}</>;
   }
