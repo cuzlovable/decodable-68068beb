@@ -244,6 +244,13 @@ const EnvironmentPage = () => {
           location={userLocation}
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
+          locating={locating}
+          onUseCurrentLocation={useCurrentLocation}
+          onLocationChange={(name, lat, lon) => {
+            setUserLocation({ lat, lng: lon });
+            setLocationLabel(name.split(",").slice(0, 2).join(",").trim());
+            setLocationError(null);
+          }}
           envVariable={
             ((profile?.variables as any)?.environment ??
               (profile?.variables as any)?.design_environment) ?? null
