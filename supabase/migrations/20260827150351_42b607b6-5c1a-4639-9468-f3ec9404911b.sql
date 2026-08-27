@@ -1,0 +1,2 @@
+DELETE FROM public.likes a USING public.likes b WHERE a.user_id = b.user_id AND a.target_user_id = b.target_user_id AND a.ctid > b.ctid;
+CREATE UNIQUE INDEX IF NOT EXISTS likes_user_target_unique ON public.likes (user_id, target_user_id);
