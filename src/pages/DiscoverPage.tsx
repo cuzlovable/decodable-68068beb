@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, X, Sparkles, MessageCircle, User } from "lucide-react";
+import { Heart, X, Sparkles, MessageCircle, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { signPhotoPath } from "@/lib/photos";
@@ -173,13 +173,13 @@ const DiscoverPage = () => {
           <h1 className="font-display text-xl font-bold text-foreground">Discover</h1>
           <div className="flex gap-1">
             <Link to="/matches">
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
+              <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Matches">
                 <MessageCircle className="w-5 h-5" />
               </Button>
             </Link>
-            <Link to="/profile-setup">
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
-                <User className="w-5 h-5" />
+            <Link to="/profile">
+              <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Home">
+                <Home className="w-5 h-5" />
               </Button>
             </Link>
           </div>
