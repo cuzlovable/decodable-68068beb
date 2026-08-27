@@ -2,15 +2,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ChemistryExplanation } from "@/components/ChemistrySummary";
+import type { CompatibilityResult } from "@/lib/compatibility";
 
 interface MatchModalProps {
   open: boolean;
   name: string;
   matchId: string | null;
+  compatibility?: CompatibilityResult | null;
   onClose: () => void;
 }
 
-export const MatchModal = ({ open, name, matchId, onClose }: MatchModalProps) => (
+export const MatchModal = ({ open, name, matchId, compatibility, onClose }: MatchModalProps) => (
   <AnimatePresence>
     {open && (
       <motion.div
@@ -25,7 +28,7 @@ export const MatchModal = ({ open, name, matchId, onClose }: MatchModalProps) =>
           initial={{ scale: 0.9, y: 16, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-sm p-8 rounded-3xl bg-card border border-border/50 text-center shadow-aura"
+          className="w-full max-w-sm p-8 rounded-3xl bg-card border border-border/50 text-center shadow-aura max-h-[90vh] overflow-y-auto"
         >
           <div className="w-16 h-16 rounded-full gradient-aura flex items-center justify-center mx-auto mb-5 animate-pulse-glow">
             <Sparkles className="w-8 h-8 text-primary-foreground" />
@@ -34,6 +37,12 @@ export const MatchModal = ({ open, name, matchId, onClose }: MatchModalProps) =>
           <p className="text-sm text-muted-foreground mb-6">
             You and {name} liked each other. The chemistry is mutual.
           </p>
+          {compatibility && (
+            <div className="text-left mb-6">
+              <ChemistryExplanation compatibility={compatibility} />
+            </div>
+          )}
+
           <div className="space-y-2">
             {matchId && (
               <Link to={`/chat/${matchId}`}>
