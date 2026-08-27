@@ -102,6 +102,15 @@ const MatchesPage = () => {
         return;
       }
 
+      // Own persisted chart — read once, used by the canonical engine.
+      const { data: me } = await supabase
+        .from("profiles")
+        .select(
+          "defined_gates, profile, search_radius_miles, current_latitude, current_longitude, birth_latitude, birth_longitude",
+        )
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
       // Try to load real matches, fall back to demo
       const { data: realMatches } = await supabase
         .from("matches")
@@ -113,9 +122,31 @@ const MatchesPage = () => {
         const partnerIds = realMatches.map((m) => (m.user_a === session.user.id ? m.user_b : m.user_a));
         const { data: profiles } = await supabase.from("profiles").select("*").in("user_id", partnerIds);
 
+        const self = {
+          userId: session.user.id,
+          definedGates: me?.defined_gates || [],
+          profile: me?.profile ?? null,
+          latitude: me?.current_latitude ?? me?.birth_latitude ?? null,
+          longitude: me?.current_longitude ?? me?.birth_longitude ?? null,
+        };
+        const radiusMiles = me?.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES;
+
         const mapped: MatchProfile[] = realMatches.map((m) => {
           const partnerId = m.user_a === session.user.id ? m.user_b : m.user_a;
           const p = profiles?.find((pr) => pr.user_id === partnerId);
+          const compatibility = p
+            ? calculateCompatibility(
+                self,
+                {
+                  userId: partnerId,
+                  definedGates: p.defined_gates || [],
+                  profile: p.profile ?? null,
+                  latitude: p.current_latitude ?? p.birth_latitude ?? null,
+                  longitude: p.current_longitude ?? p.birth_longitude ?? null,
+                },
+                { radiusMiles },
+              )
+            : null;
           return {
             id: partnerId,
             matchId: m.id,
@@ -128,12 +159,14 @@ const MatchesPage = () => {
             avatarUrl: p?.avatar_url || null,
             lastMessage: null,
             status: m.status,
+            compatibility,
           };
         });
         setMatches(mapped);
       } else {
         setMatches(DEMO_MATCHES);
       }
+
       setLoading(false);
     };
     load();
