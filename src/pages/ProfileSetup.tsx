@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, ImagePlus, X, Sparkles } from "lucide-react";
+import { Loader2, ImagePlus, X, Sparkles, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadProfilePhoto, signPhotoPaths } from "@/lib/photos";
 import { useUserState } from "@/hooks/useUserState";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+import { DEFAULT_SEARCH_RADIUS_MILES } from "@/lib/compatibility";
 import { toast } from "sonner";
+
 
 
 const VIBE_TRAITS = [

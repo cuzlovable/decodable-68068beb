@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, Zap, MessageCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { ChemistryBadges } from "@/components/ChemistrySummary";
+import {
+  calculateCompatibility,
+  DEFAULT_SEARCH_RADIUS_MILES,
+  type CompatibilityResult,
+} from "@/lib/compatibility";
 
 interface MatchProfile {
   id: string;
@@ -17,7 +23,9 @@ interface MatchProfile {
   avatarUrl: string | null;
   lastMessage: string | null;
   status: string;
+  compatibility: CompatibilityResult | null;
 }
+
 
 // Demo matches (will be replaced with real DB queries when users exist)
 const DEMO_MATCHES: MatchProfile[] = [
