@@ -118,6 +118,9 @@ export const NodalEnvironments = ({
   locationLabel,
   ascSignIndex,
   envVariable,
+  onLocationChange,
+  onUseCurrentLocation,
+  locating,
 }: {
   southGate?: number | null;
   northGate?: number | null;
@@ -131,6 +134,9 @@ export const NodalEnvironments = ({
   ascSignIndex?: number | null;
   /** PHS Environment variable as `color.tone`, e.g. 5.2 */
   envVariable?: number | null;
+  onLocationChange?: (name: string, lat: number, lon: number) => void;
+  onUseCurrentLocation?: () => void;
+  locating?: boolean;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
