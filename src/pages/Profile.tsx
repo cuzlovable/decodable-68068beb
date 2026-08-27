@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, LogOut, Activity, MapPin, Heart, Users } from "lucide-react";
+import { Sparkles, LogOut, Activity, MapPin, Users, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -49,9 +49,16 @@ const Profile = () => {
             </div>
             <span className="font-display text-lg font-semibold text-foreground">AuraChem</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground">
-            <LogOut className="w-4 h-4 mr-1" /> Sign Out
-          </Button>
+          <div className="flex items-center gap-1">
+            <Link to="/discover">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                <Flame className="w-4 h-4 mr-1" /> Discover
+              </Button>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground">
+              <LogOut className="w-4 h-4 mr-1" /> Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Profile Card */}
