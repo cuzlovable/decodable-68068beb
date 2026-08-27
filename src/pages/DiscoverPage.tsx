@@ -214,6 +214,10 @@ const DiscoverPage = () => {
                     {[current.profile, current.authority, current.energy_type].filter(Boolean).join(" · ")}
                   </p>
                 )}
+                <div className="mt-3">
+                  <ChemistryBadges compatibility={current.compatibility} />
+                </div>
+
                 {current.bio && (
                   <p className="text-sm text-muted-foreground leading-relaxed mt-3">{current.bio}</p>
                 )}
@@ -270,10 +274,12 @@ const DiscoverPage = () => {
         open={!!match}
         name={match?.name || ""}
         matchId={match?.matchId || null}
+        compatibility={match?.compatibility || null}
         onClose={() => setMatch(null)}
       />
     </div>
   );
 };
+
 
 export default DiscoverPage;
