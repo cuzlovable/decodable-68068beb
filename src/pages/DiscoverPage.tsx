@@ -89,7 +89,8 @@ const DiscoverPage = () => {
           ),
         })),
       );
-      setCandidates(rankByCompatibility(withPhotos));
+      // AuraChem rule: compromised pairs are never shown in Discover.
+      setCandidates(rankByCompatibility(withPhotos.filter((c) => c.compatibility.eligible)));
       setLoading(false);
     };
     load();
