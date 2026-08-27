@@ -128,9 +128,9 @@ const EnvironmentPage = () => {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
+          async (pos) => {
             setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            setLocationLabel("Your current location");
+            setLocationLabel(await labelForCoords(pos.coords.latitude, pos.coords.longitude));
           },
           () => {
             if (data?.birth_latitude && data?.birth_longitude) {
