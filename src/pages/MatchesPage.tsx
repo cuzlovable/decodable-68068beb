@@ -238,10 +238,17 @@ const MatchesPage = () => {
                       <p className="text-sm font-medium text-primary">
                         {match.profile} {match.authority} {match.energyType}
                       </p>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <Zap className="w-3 h-3 text-primary" />
-                        <span className="text-xs text-muted-foreground">{match.dominantTheme}</span>
-                      </div>
+                      {match.compatibility ? (
+                        <div className="mt-2">
+                          <ChemistryBadges compatibility={match.compatibility} />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <Zap className="w-3 h-3 text-primary" />
+                          <span className="text-xs text-muted-foreground">{match.dominantTheme}</span>
+                        </div>
+                      )}
+
                     </div>
 
                     {/* Action */}
