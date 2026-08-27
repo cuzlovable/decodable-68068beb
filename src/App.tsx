@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import ProfileSetup from "./pages/ProfileSetup";
+import DesignReveal from "./pages/DesignReveal";
 import DiscoverPage from "./pages/DiscoverPage";
 import Profile from "./pages/Profile";
 import BodygraphPage from "./pages/BodygraphPage";
@@ -37,6 +38,14 @@ const App = () => (
               element={
                 <RequireStage gate="onboarding">
                   <Onboarding />
+                </RequireStage>
+              }
+            />
+            <Route
+              path="/design-reveal"
+              element={
+                <RequireStage gate="reveal">
+                  <DesignReveal />
                 </RequireStage>
               }
             />

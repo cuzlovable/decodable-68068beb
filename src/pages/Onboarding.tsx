@@ -109,7 +109,7 @@ const Onboarding = () => {
       toast.success(`Welcome, ${chart.profile} ${chart.authority} ${chart.energy_type}! ✨`);
       // Refresh centralized user state before navigating so the guard sees the new stage.
       await refresh();
-      navigate("/profile-setup", { replace: true });
+      navigate("/design-reveal", { replace: true });
 
     } catch (err: any) {
       toast.error(err.message || "Something went wrong");

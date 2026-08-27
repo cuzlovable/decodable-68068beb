@@ -127,9 +127,9 @@ export const stageHome = (stage: UserStage) => {
     case "needs_onboarding":
       return "/onboarding";
     case "needs_profile":
-      return "/profile-setup";
+      return "/design-reveal";
     case "ready":
-      return "/discover";
+      return "/profile";
     default:
       return "/auth";
   }
