@@ -4,6 +4,12 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, Zap, MessageCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { ChemistryBadges } from "@/components/ChemistrySummary";
+import {
+  calculateCompatibility,
+  DEFAULT_SEARCH_RADIUS_MILES,
+  type CompatibilityResult,
+} from "@/lib/compatibility";
 
 interface MatchProfile {
   id: string;
@@ -17,7 +23,9 @@ interface MatchProfile {
   avatarUrl: string | null;
   lastMessage: string | null;
   status: string;
+  compatibility: CompatibilityResult | null;
 }
+
 
 // Demo matches (will be replaced with real DB queries when users exist)
 const DEMO_MATCHES: MatchProfile[] = [
@@ -33,6 +41,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-2",
@@ -46,6 +55,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-3",
@@ -59,6 +69,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-4",
@@ -72,6 +83,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
 ];
 
@@ -90,6 +102,15 @@ const MatchesPage = () => {
         return;
       }
 
+      // Own persisted chart — read once, used by the canonical engine.
+      const { data: me } = await supabase
+        .from("profiles")
+        .select(
+          "defined_gates, profile, search_radius_miles, current_latitude, current_longitude, birth_latitude, birth_longitude",
+        )
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
       // Try to load real matches, fall back to demo
       const { data: realMatches } = await supabase
         .from("matches")
@@ -101,9 +122,31 @@ const MatchesPage = () => {
         const partnerIds = realMatches.map((m) => (m.user_a === session.user.id ? m.user_b : m.user_a));
         const { data: profiles } = await supabase.from("profiles").select("*").in("user_id", partnerIds);
 
+        const self = {
+          userId: session.user.id,
+          definedGates: me?.defined_gates || [],
+          profile: me?.profile ?? null,
+          latitude: me?.current_latitude ?? me?.birth_latitude ?? null,
+          longitude: me?.current_longitude ?? me?.birth_longitude ?? null,
+        };
+        const radiusMiles = me?.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES;
+
         const mapped: MatchProfile[] = realMatches.map((m) => {
           const partnerId = m.user_a === session.user.id ? m.user_b : m.user_a;
           const p = profiles?.find((pr) => pr.user_id === partnerId);
+          const compatibility = p
+            ? calculateCompatibility(
+                self,
+                {
+                  userId: partnerId,
+                  definedGates: p.defined_gates || [],
+                  profile: p.profile ?? null,
+                  latitude: p.current_latitude ?? p.birth_latitude ?? null,
+                  longitude: p.current_longitude ?? p.birth_longitude ?? null,
+                },
+                { radiusMiles },
+              )
+            : null;
           return {
             id: partnerId,
             matchId: m.id,
@@ -116,12 +159,14 @@ const MatchesPage = () => {
             avatarUrl: p?.avatar_url || null,
             lastMessage: null,
             status: m.status,
+            compatibility,
           };
         });
         setMatches(mapped);
       } else {
         setMatches(DEMO_MATCHES);
       }
+
       setLoading(false);
     };
     load();
@@ -193,10 +238,17 @@ const MatchesPage = () => {
                       <p className="text-sm font-medium text-primary">
                         {match.profile} {match.authority} {match.energyType}
                       </p>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <Zap className="w-3 h-3 text-primary" />
-                        <span className="text-xs text-muted-foreground">{match.dominantTheme}</span>
-                      </div>
+                      {match.compatibility ? (
+                        <div className="mt-2">
+                          <ChemistryBadges compatibility={match.compatibility} />
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <Zap className="w-3 h-3 text-primary" />
+                          <span className="text-xs text-muted-foreground">{match.dominantTheme}</span>
+                        </div>
+                      )}
+
                     </div>
 
                     {/* Action */}

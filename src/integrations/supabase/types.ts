@@ -115,6 +115,9 @@ export type Database = {
           birth_time: string | null
           chart_raw: Json | null
           created_at: string
+          current_latitude: number | null
+          current_location: string | null
+          current_longitude: number | null
           defined_centers: string[] | null
           defined_gates: number[] | null
           definition: string | null
@@ -128,6 +131,7 @@ export type Database = {
           onboarding_completed: boolean
           photos: string[]
           profile: string | null
+          search_radius_miles: number
           signature: string | null
           south_node_environment: string | null
           south_node_gate: number | null
@@ -148,6 +152,9 @@ export type Database = {
           birth_time?: string | null
           chart_raw?: Json | null
           created_at?: string
+          current_latitude?: number | null
+          current_location?: string | null
+          current_longitude?: number | null
           defined_centers?: string[] | null
           defined_gates?: number[] | null
           definition?: string | null
@@ -161,6 +168,7 @@ export type Database = {
           onboarding_completed?: boolean
           photos?: string[]
           profile?: string | null
+          search_radius_miles?: number
           signature?: string | null
           south_node_environment?: string | null
           south_node_gate?: number | null
@@ -181,6 +189,9 @@ export type Database = {
           birth_time?: string | null
           chart_raw?: Json | null
           created_at?: string
+          current_latitude?: number | null
+          current_location?: string | null
+          current_longitude?: number | null
           defined_centers?: string[] | null
           defined_gates?: number[] | null
           definition?: string | null
@@ -194,6 +205,7 @@ export type Database = {
           onboarding_completed?: boolean
           photos?: string[]
           profile?: string | null
+          search_radius_miles?: number
           signature?: string | null
           south_node_environment?: string | null
           south_node_gate?: number | null
@@ -263,7 +275,9 @@ export type Database = {
           authority: string
           avatar_url: string
           bio: string
+          defined_gates: number[]
           display_name: string
+          distance_miles: number
           energy_type: string
           photos: string[]
           profile: string

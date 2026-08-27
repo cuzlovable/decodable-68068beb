@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { signPhotoPath } from "@/lib/photos";
 import { MatchModal } from "@/components/MatchModal";
+import { ChemistryBadges } from "@/components/ChemistrySummary";
+import {
+  calculateCompatibility,
+  rankByCompatibility,
+  DEFAULT_SEARCH_RADIUS_MILES,
+  type ChartInput,
+  type CompatibilityResult,
+} from "@/lib/compatibility";
 import { toast } from "sonner";
 
 interface Candidate {
@@ -17,7 +25,10 @@ interface Candidate {
   energy_type: string | null;
   authority: string | null;
   profile: string | null;
+  defined_gates: number[] | null;
+  distance_miles: number | null;
   photoUrl?: string | null;
+  compatibility: CompatibilityResult;
 }
 
 const DiscoverPage = () => {
@@ -25,7 +36,11 @@ const DiscoverPage = () => {
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState(false);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [match, setMatch] = useState<{ name: string; matchId: string | null } | null>(null);
+  const [match, setMatch] = useState<{
+    name: string;
+    matchId: string | null;
+    compatibility: CompatibilityResult;
+  } | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -37,23 +52,51 @@ const DiscoverPage = () => {
         return;
       }
 
+      // Own persisted Human Design data — never recalculated here.
+      const { data: me } = await supabase
+        .from("profiles")
+        .select("defined_gates, profile, search_radius_miles")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      const self: ChartInput = {
+        userId: session.user.id,
+        definedGates: me?.defined_gates || [],
+        profile: me?.profile ?? null,
+      };
+      const radiusMiles = me?.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES;
+
       const { data, error } = await supabase.rpc("discover_profiles", { limit_count: 30 });
       if (error) {
         toast.error(error.message);
         setLoading(false);
         return;
       }
-      const rows = (data || []) as Candidate[];
+      const rows = (data || []) as Omit<Candidate, "compatibility" | "photoUrl">[];
       const withPhotos = await Promise.all(
-        rows.map(async (row) => ({ ...row, photoUrl: await signPhotoPath(row.photos?.[0]) })),
+        rows.map(async (row) => ({
+          ...row,
+          photoUrl: await signPhotoPath(row.photos?.[0]),
+          // ONE canonical compatibility calculation, done once per candidate.
+          compatibility: calculateCompatibility(
+            self,
+            {
+              userId: row.user_id,
+              definedGates: row.defined_gates || [],
+              profile: row.profile,
+            },
+            { radiusMiles, distanceMiles: row.distance_miles },
+          ),
+        })),
       );
-      setCandidates(withPhotos);
+      setCandidates(rankByCompatibility(withPhotos));
       setLoading(false);
     };
     load();
   }, [navigate]);
 
   const current = candidates[0];
+
 
   const handleAction = async (action: "like" | "pass") => {
     if (!current || acting) return;
@@ -89,9 +132,27 @@ const DiscoverPage = () => {
         .maybeSingle();
 
       if (matchRow) {
-        setMatch({ name: current.display_name || "your match", matchId: matchRow.id });
+        // Reuse the compatibility already calculated for this candidate.
+        const compatibility = current.compatibility;
+        await supabase
+          .from("matches")
+          .update({
+            chemistry_score: Math.max(0, Math.min(100, compatibility.combined_centers.defined * 10)),
+            dominant_theme:
+              compatibility.electromagnetic_channels[0]?.theme ||
+              compatibility.explanation.find((e) => e.key === "overall")?.heading ||
+              null,
+          })
+          .eq("id", matchRow.id);
+
+        setMatch({
+          name: current.display_name || "your match",
+          matchId: matchRow.id,
+          compatibility,
+        });
       }
     }
+
 
     setCandidates((prev) => prev.slice(1));
     setActing(false);
@@ -153,6 +214,10 @@ const DiscoverPage = () => {
                     {[current.profile, current.authority, current.energy_type].filter(Boolean).join(" · ")}
                   </p>
                 )}
+                <div className="mt-3">
+                  <ChemistryBadges compatibility={current.compatibility} />
+                </div>
+
                 {current.bio && (
                   <p className="text-sm text-muted-foreground leading-relaxed mt-3">{current.bio}</p>
                 )}
@@ -209,10 +274,12 @@ const DiscoverPage = () => {
         open={!!match}
         name={match?.name || ""}
         matchId={match?.matchId || null}
+        compatibility={match?.compatibility || null}
         onClose={() => setMatch(null)}
       />
     </div>
   );
 };
+
 
 export default DiscoverPage;

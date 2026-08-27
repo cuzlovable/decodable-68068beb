@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, ImagePlus, X, Sparkles } from "lucide-react";
+import { Loader2, ImagePlus, X, Sparkles, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadProfilePhoto, signPhotoPaths } from "@/lib/photos";
 import { useUserState } from "@/hooks/useUserState";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+import { DEFAULT_SEARCH_RADIUS_MILES } from "@/lib/compatibility";
 import { toast } from "sonner";
+
 
 
 const VIBE_TRAITS = [
@@ -40,6 +43,10 @@ const ProfileSetup = () => {
   const [traits, setTraits] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [locationLabel, setLocationLabel] = useState("");
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [radius, setRadius] = useState<number>(DEFAULT_SEARCH_RADIUS_MILES);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -52,7 +59,9 @@ const ProfileSetup = () => {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("display_name, bio, photos, vibe_traits")
+        .select(
+          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles",
+        )
         .eq("user_id", session.user.id)
         .maybeSingle();
 
@@ -62,9 +71,18 @@ const ProfileSetup = () => {
         setTraits(profile.vibe_traits || []);
         setPhotos(profile.photos || []);
         setPreviews(await signPhotoPaths(profile.photos || []));
+        setLocationLabel(profile.current_location || "");
+        if (
+          typeof profile.current_latitude === "number" &&
+          typeof profile.current_longitude === "number"
+        ) {
+          setCoords({ lat: profile.current_latitude, lng: profile.current_longitude });
+        }
+        setRadius(profile.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES);
       }
       setLoading(false);
     };
+
     load();
   }, [navigate]);
 
@@ -94,6 +112,34 @@ const ProfileSetup = () => {
 
   const removePhoto = (path: string) => setPhotos((prev) => prev.filter((p) => p !== path));
 
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Location isn't available on this device");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCoords({ lat: latitude, lng: longitude });
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+          const json = await res.json();
+          setLocationLabel(json?.display_name || `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+        } catch {
+          setLocationLabel(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+        }
+        setLocating(false);
+      },
+      () => {
+        toast.error("Couldn't get your location");
+        setLocating(false);
+      },
+    );
+  };
+
   const handleSave = async () => {
     if (!userId) return;
     if (!displayName.trim()) {
@@ -111,11 +157,16 @@ const ProfileSetup = () => {
           photos,
           vibe_traits: traits,
           avatar_url: null,
+          current_location: locationLabel.trim() || null,
+          current_latitude: coords?.lat ?? null,
+          current_longitude: coords?.lng ?? null,
+          search_radius_miles: radius,
         },
         { onConflict: "user_id" },
       )
       .select()
       .maybeSingle();
+
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -173,6 +224,48 @@ const ProfileSetup = () => {
             />
             <p className="text-[11px] text-muted-foreground">{bio.length}/500</p>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">Current location</Label>
+            <LocationAutocomplete
+              value={locationLabel}
+              onChange={(loc, lat, lon) => {
+                setLocationLabel(loc);
+                setCoords({ lat, lng: lon });
+              }}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={useCurrentLocation}
+              disabled={locating}
+              className="w-full"
+            >
+              {locating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Navigation className="w-4 h-4 mr-2" />
+              )}
+              Use current location
+            </Button>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="radius">Search radius (miles)</Label>
+            <Input
+              id="radius"
+              type="number"
+              min={1}
+              max={500}
+              value={radius}
+              onChange={(e) => setRadius(Math.max(1, Math.min(500, Number(e.target.value) || 1)))}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Nearby matches inside this radius rank higher.
+            </p>
+          </div>
+
 
           <div className="space-y-2">
             <Label>Photos</Label>
