@@ -41,6 +41,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-2",
@@ -54,6 +55,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-3",
@@ -67,6 +69,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
   {
     id: "demo-4",
@@ -80,6 +83,7 @@ const DEMO_MATCHES: MatchProfile[] = [
     avatarUrl: null,
     lastMessage: null,
     status: "pending",
+    compatibility: null,
   },
 ];
 
