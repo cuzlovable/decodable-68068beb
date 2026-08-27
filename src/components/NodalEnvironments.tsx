@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Sparkles, Compass, Home, Users, Theater, MapPin, Loader2,
-  ExternalLink, Navigation, Star,
+  ExternalLink, Navigation, Star, RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,8 @@ import { toast } from "@/hooks/use-toast";
 import { nodalProfile, ageFrom, ordinal, HOUSE_LABELS, type NodalProfile } from "@/lib/nodes";
 import { fetchNodeHouses, hasAstroApiKey } from "@/lib/astro";
 import { decodeEnvironment } from "@/lib/phs";
+import { LocationAutocomplete } from "@/components/LocationAutocomplete";
+
 
 type Place = {
   id: string;
@@ -116,6 +118,9 @@ export const NodalEnvironments = ({
   locationLabel,
   ascSignIndex,
   envVariable,
+  onLocationChange,
+  onUseCurrentLocation,
+  locating,
 }: {
   southGate?: number | null;
   northGate?: number | null;
@@ -129,6 +134,9 @@ export const NodalEnvironments = ({
   ascSignIndex?: number | null;
   /** PHS Environment variable as `color.tone`, e.g. 5.2 */
   envVariable?: number | null;
+  onLocationChange?: (name: string, lat: number, lon: number) => void;
+  onUseCurrentLocation?: () => void;
+  locating?: boolean;
 }) => {
   const [places, setPlaces] = useState<Place[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -182,8 +190,19 @@ export const NodalEnvironments = ({
   const houseInfo = (h?: number) =>
     h ? { ordinal: ordinal(h), label: HOUSE_LABELS[h] } : null;
 
-
-
+  // Blend both nodes' themes (gate + house + environment colour keywords),
+  // leading with the node that is currently active for the user's age.
+  const otherNode = activeNode === north ? south : north;
+  const blendedKeywords = (() => {
+    const lead = activeNode?.keywords ?? [];
+    const support = otherNode?.keywords ?? [];
+    const out: string[] = [];
+    for (let i = 0; i < Math.max(lead.length, support.length) && out.length < 4; i++) {
+      if (lead[i] && !out.includes(lead[i])) out.push(lead[i]);
+      if (out.length < 4 && support[i] && !out.includes(support[i])) out.push(support[i]);
+    }
+    return out;
+  })();
 
   const findSpots = async () => {
     if (!location || !activeNode) return;
@@ -194,7 +213,7 @@ export const NodalEnvironments = ({
         body: {
           latitude: location.lat,
           longitude: location.lng,
-          keywords: activeNode.keywords,
+          keywords: blendedKeywords,
           gate: activeNode.gate,
           gateName: activeNode.gateName,
         },
@@ -212,6 +231,17 @@ export const NodalEnvironments = ({
       setLoading(false);
     }
   };
+
+  // Auto-search whenever a location becomes available or changes.
+  const lastSearchKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!location || !activeNode || housesLoading) return;
+    const key = `${location.lat.toFixed(3)},${location.lng.toFixed(3)}|${activeNode.gate}|${houses?.north ?? ""}${houses?.south ?? ""}`;
+    if (lastSearchKey.current === key) return;
+    lastSearchKey.current = key;
+    findSpots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location?.lat, location?.lng, activeNode?.gate, houses, housesLoading]);
 
   if (!south && !north) return null;
 
@@ -247,13 +277,51 @@ export const NodalEnvironments = ({
         <div className="flex items-center gap-2 mb-1">
           <MapPin className="w-4 h-4 text-primary" />
           <h3 className="font-display text-base font-semibold text-foreground">
-            Nearby Spots Matching Your Nodal Vibe
+            Nodal Spots Near You
           </h3>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
-          {locationLabel ? `Near ${locationLabel}` : "Based on your current location"}
-          {activeNode ? ` · tuned to Gate ${activeNode.gate}` : ""}
+          {locationLabel ? `Near ${locationLabel}` : "Finding your current location…"}
+          {activeNode
+            ? ` · Gate ${activeNode.gate}${houses ? ` · ${ordinal(activeNode === north ? houses.north : houses.south)} house` : ""}`
+            : ""}
         </p>
+
+        {/* Single search control: current location by default, searchable override */}
+        <div className="space-y-2 mb-4">
+          <LocationAutocomplete
+            value=""
+            onChange={(name, lat, lon) => onLocationChange?.(name, lat, lon)}
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onUseCurrentLocation}
+              disabled={locating}
+              className="flex-1 text-xs"
+            >
+              {locating ? (
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              Use current location
+            </Button>
+            <Button
+              size="sm"
+              onClick={findSpots}
+              disabled={!location || loading}
+              className="flex-1 gradient-aura text-primary-foreground hover:opacity-90 text-xs"
+            >
+              {loading ? (
+                <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> Searching…</>
+              ) : (
+                <><Sparkles className="w-3.5 h-3.5 mr-1.5" /> Refresh spots</>
+              )}
+            </Button>
+          </div>
+        </div>
 
         {activeNode && (
           <div className="flex flex-wrap gap-1.5 mb-4">
@@ -268,17 +336,6 @@ export const NodalEnvironments = ({
           </div>
         )}
 
-        <Button
-          onClick={findSpots}
-          disabled={!location || loading}
-          className="w-full gradient-aura text-primary-foreground hover:opacity-90"
-        >
-          {loading ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Searching nearby…</>
-          ) : (
-            <><Sparkles className="w-4 h-4 mr-2" /> Find nodal spots near me</>
-          )}
-        </Button>
 
         {places && places.length === 0 && (
           <p className="text-xs text-muted-foreground text-center mt-4">

@@ -128,9 +128,9 @@ const EnvironmentPage = () => {
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
+          async (pos) => {
             setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            setLocationLabel("Your current location");
+            setLocationLabel(await labelForCoords(pos.coords.latitude, pos.coords.longitude));
           },
           () => {
             if (data?.birth_latitude && data?.birth_longitude) {
@@ -221,39 +221,8 @@ const EnvironmentPage = () => {
           <div className="w-16" />
         </div>
 
-        {/* Location control */}
-        <div className="mb-4 rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <Compass className="w-4 h-4 text-primary shrink-0" />
-              <span className="text-xs text-muted-foreground truncate">
-                {locationLabel || "No location set"}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={useCurrentLocation}
-              disabled={locating}
-              className="shrink-0 text-xs"
-            >
-              {locating ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="w-3.5 h-3.5 mr-1" />
-              )}
-              {locating ? "" : "Use current"}
-            </Button>
-          </div>
-          <LocationAutocomplete
-            value=""
-            onChange={(name, lat, lon) => {
-              setUserLocation({ lat, lng: lon });
-              setLocationLabel(name.split(",").slice(0, 2).join(",").trim());
-              setLocationError(null);
-            }}
-          />
-        </div>
+        {/* Location is managed inside the nodal spots card below */}
+
 
         {locationError && (
           <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2">
@@ -275,6 +244,13 @@ const EnvironmentPage = () => {
           location={userLocation}
           locationLabel={locationLabel}
           ascSignIndex={ascSignIndex}
+          locating={locating}
+          onUseCurrentLocation={useCurrentLocation}
+          onLocationChange={(name, lat, lon) => {
+            setUserLocation({ lat, lng: lon });
+            setLocationLabel(name.split(",").slice(0, 2).join(",").trim());
+            setLocationError(null);
+          }}
           envVariable={
             ((profile?.variables as any)?.environment ??
               (profile?.variables as any)?.design_environment) ?? null
