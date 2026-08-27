@@ -112,6 +112,34 @@ const ProfileSetup = () => {
 
   const removePhoto = (path: string) => setPhotos((prev) => prev.filter((p) => p !== path));
 
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Location isn't available on this device");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCoords({ lat: latitude, lng: longitude });
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+          const json = await res.json();
+          setLocationLabel(json?.display_name || `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+        } catch {
+          setLocationLabel(`${latitude.toFixed(3)}, ${longitude.toFixed(3)}`);
+        }
+        setLocating(false);
+      },
+      () => {
+        toast.error("Couldn't get your location");
+        setLocating(false);
+      },
+    );
+  };
+
   const handleSave = async () => {
     if (!userId) return;
     if (!displayName.trim()) {
@@ -129,11 +157,16 @@ const ProfileSetup = () => {
           photos,
           vibe_traits: traits,
           avatar_url: null,
+          current_location: locationLabel.trim() || null,
+          current_latitude: coords?.lat ?? null,
+          current_longitude: coords?.lng ?? null,
+          search_radius_miles: radius,
         },
         { onConflict: "user_id" },
       )
       .select()
       .maybeSingle();
+
     setSaving(false);
     if (error) {
       toast.error(error.message);
