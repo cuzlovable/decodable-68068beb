@@ -267,6 +267,109 @@ const ProfileSetup = () => {
           </div>
 
           <div className="space-y-2">
+            <Label>
+              You{" "}
+              {age !== null && (
+                <span className="text-muted-foreground">
+                  · {age} {age < MIN_AGE ? "(must be 18+)" : "years old"}
+                </span>
+              )}
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {GENDER_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setGender(option)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    gender === option
+                      ? "gradient-aura text-primary-foreground border-transparent"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {ORIENTATION_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setOrientation(orientation === option ? "" : option)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    orientation === option
+                      ? "bg-primary/15 text-primary border-primary/40"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Your age is shown to others — your exact birth date never is.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Show me</Label>
+            <div className="flex flex-wrap gap-2">
+              {GENDER_OPTIONS.map((option) => {
+                const active = preferredGenders.includes(option);
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() =>
+                      setPreferredGenders((prev) =>
+                        prev.includes(option) ? prev.filter((g) => g !== option) : [...prev, option],
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                      active
+                        ? "gradient-aura text-primary-foreground border-transparent"
+                        : "border-border text-muted-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="space-y-1">
+                <Label htmlFor="ageMin" className="text-xs text-muted-foreground">
+                  Age from
+                </Label>
+                <Input
+                  id="ageMin"
+                  type="number"
+                  min={MIN_AGE}
+                  max={120}
+                  value={ageMin}
+                  onChange={(e) => setAgeMin(Math.max(MIN_AGE, Math.min(120, Number(e.target.value) || MIN_AGE)))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="ageMax" className="text-xs text-muted-foreground">
+                  Age to
+                </Label>
+                <Input
+                  id="ageMax"
+                  type="number"
+                  min={MIN_AGE}
+                  max={120}
+                  value={ageMax}
+                  onChange={(e) => setAgeMax(Math.max(MIN_AGE, Math.min(120, Number(e.target.value) || MIN_AGE)))}
+                />
+              </div>
+            </div>
+          </div>
+
+
+
+          <div className="space-y-2">
             <Label htmlFor="location">Current location</Label>
             <LocationAutocomplete
               value={locationLabel}
