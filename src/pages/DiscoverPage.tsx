@@ -26,6 +26,7 @@ interface Candidate {
   authority: string | null;
   profile: string | null;
   defined_gates: number[] | null;
+  age: number | null;
   distance_miles: number | null;
   photoUrl?: string | null;
   compatibility: CompatibilityResult;
