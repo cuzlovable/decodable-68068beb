@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserState } from "@/hooks/useUserState";
+import { isAdult } from "@/lib/age";
 import { toast } from "sonner";
 
 const STEPS = ["birth_date", "birth_time", "birth_location"] as const;
