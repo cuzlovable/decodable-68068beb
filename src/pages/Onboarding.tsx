@@ -33,6 +33,11 @@ const Onboarding = () => {
       toast.error("Please enter your birth date");
       return;
     }
+    // AuraChem is 18+. Age is always derived from the birth date, never stored separately.
+    if (step === 0 && !isAdult(form.birth_date)) {
+      toast.error("You must be 18 or older to use AuraChem");
+      return;
+    }
     if (step === 1 && !form.birth_time) {
       toast.error("Please enter your birth time — it's crucial for accuracy!");
       return;
