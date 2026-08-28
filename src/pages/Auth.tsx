@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -179,6 +179,13 @@ const Auth = () => {
           >
             {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
           </button>
+
+          <Link
+            to="/forgot-password"
+            className="block w-full text-center text-sm text-muted-foreground hover:text-foreground hover:underline"
+          >
+            Forgot your password?
+          </Link>
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
