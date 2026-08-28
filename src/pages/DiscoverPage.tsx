@@ -210,6 +210,9 @@ const DiscoverPage = () => {
               <div className="p-5">
                 <h2 className="font-display text-2xl font-bold text-foreground">
                   {current.display_name || "Someone new"}
+                  {typeof current.age === "number" && (
+                    <span className="font-sans text-lg font-normal text-muted-foreground">, {current.age}</span>
+                  )}
                 </h2>
                 {(current.profile || current.energy_type) && (
                   <p className="text-sm font-medium text-primary mt-0.5">
