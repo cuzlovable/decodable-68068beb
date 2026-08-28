@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserState } from "@/hooks/useUserState";
+import { isAdult } from "@/lib/age";
 import { toast } from "sonner";
 
 const STEPS = ["birth_date", "birth_time", "birth_location"] as const;
@@ -31,6 +32,11 @@ const Onboarding = () => {
   const handleNext = () => {
     if (step === 0 && !form.birth_date) {
       toast.error("Please enter your birth date");
+      return;
+    }
+    // AuraChem is 18+. Age is always derived from the birth date, never stored separately.
+    if (step === 0 && !isAdult(form.birth_date)) {
+      toast.error("You must be 18 or older to use AuraChem");
       return;
     }
     if (step === 1 && !form.birth_time) {

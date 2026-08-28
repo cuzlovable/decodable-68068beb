@@ -123,13 +123,18 @@ export type Database = {
           definition: string | null
           display_name: string | null
           energy_type: string | null
+          gender: string | null
           id: string
           incarnation_cross: string | null
           north_node_environment: string | null
           north_node_gate: number | null
           not_self_theme: string | null
           onboarding_completed: boolean
+          orientation: string | null
           photos: string[]
+          preferred_age_max: number
+          preferred_age_min: number
+          preferred_genders: string[]
           profile: string | null
           search_radius_miles: number
           signature: string | null
@@ -160,13 +165,18 @@ export type Database = {
           definition?: string | null
           display_name?: string | null
           energy_type?: string | null
+          gender?: string | null
           id?: string
           incarnation_cross?: string | null
           north_node_environment?: string | null
           north_node_gate?: number | null
           not_self_theme?: string | null
           onboarding_completed?: boolean
+          orientation?: string | null
           photos?: string[]
+          preferred_age_max?: number
+          preferred_age_min?: number
+          preferred_genders?: string[]
           profile?: string | null
           search_radius_miles?: number
           signature?: string | null
@@ -197,13 +207,18 @@ export type Database = {
           definition?: string | null
           display_name?: string | null
           energy_type?: string | null
+          gender?: string | null
           id?: string
           incarnation_cross?: string | null
           north_node_environment?: string | null
           north_node_gate?: number | null
           not_self_theme?: string | null
           onboarding_completed?: boolean
+          orientation?: string | null
           photos?: string[]
+          preferred_age_max?: number
+          preferred_age_min?: number
+          preferred_genders?: string[]
           profile?: string | null
           search_radius_miles?: number
           signature?: string | null
@@ -272,6 +287,7 @@ export type Database = {
       discover_profiles: {
         Args: { limit_count?: number }
         Returns: {
+          age: number
           authority: string
           avatar_url: string
           bio: string
@@ -285,6 +301,7 @@ export type Database = {
           vibe_traits: string[]
         }[]
       }
+      profile_age: { Args: { birth: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never

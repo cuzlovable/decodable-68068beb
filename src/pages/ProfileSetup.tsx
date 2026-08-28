@@ -11,6 +11,7 @@ import { uploadProfilePhoto, signPhotoPaths } from "@/lib/photos";
 import { useUserState } from "@/hooks/useUserState";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { DEFAULT_SEARCH_RADIUS_MILES } from "@/lib/compatibility";
+import { ageFromBirthDate, GENDER_OPTIONS, MIN_AGE, ORIENTATION_OPTIONS } from "@/lib/age";
 import { toast } from "sonner";
 
 
@@ -47,6 +48,13 @@ const ProfileSetup = () => {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [radius, setRadius] = useState<number>(DEFAULT_SEARCH_RADIUS_MILES);
   const [locating, setLocating] = useState(false);
+  const [age, setAge] = useState<number | null>(null);
+  const [gender, setGender] = useState<string>("");
+  const [orientation, setOrientation] = useState<string>("");
+  const [preferredGenders, setPreferredGenders] = useState<string[]>([]);
+  const [ageMin, setAgeMin] = useState(18);
+  const [ageMax, setAgeMax] = useState(99);
+
 
   useEffect(() => {
     const load = async () => {
@@ -60,7 +68,7 @@ const ProfileSetup = () => {
       const { data: profile } = await supabase
         .from("profiles")
         .select(
-          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles",
+          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles, birth_date, gender, orientation, preferred_genders, preferred_age_min, preferred_age_max",
         )
         .eq("user_id", session.user.id)
         .maybeSingle();
@@ -79,6 +87,13 @@ const ProfileSetup = () => {
           setCoords({ lat: profile.current_latitude, lng: profile.current_longitude });
         }
         setRadius(profile.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES);
+        // Age is derived from the Human Design birth date — never stored separately.
+        setAge(ageFromBirthDate(profile.birth_date));
+        setGender(profile.gender || "");
+        setOrientation(profile.orientation || "");
+        setPreferredGenders(profile.preferred_genders || []);
+        setAgeMin(profile.preferred_age_min ?? 18);
+        setAgeMax(profile.preferred_age_max ?? 99);
       }
       setLoading(false);
     };
@@ -146,6 +161,27 @@ const ProfileSetup = () => {
       toast.error("Add your name so matches know who you are");
       return;
     }
+    // 18+ gate: derived from the birth date collected during Human Design onboarding.
+    if (age === null || age < MIN_AGE) {
+      toast.error(`You must be ${MIN_AGE} or older to create a dating profile`);
+      return;
+    }
+    if (photos.length === 0) {
+      toast.error("Add at least one photo so you can be discovered");
+      return;
+    }
+    if (!gender) {
+      toast.error("Select your gender");
+      return;
+    }
+    if (preferredGenders.length === 0) {
+      toast.error("Pick who you'd like to see");
+      return;
+    }
+    if (ageMin > ageMax) {
+      toast.error("Your age range is inverted");
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
@@ -161,6 +197,11 @@ const ProfileSetup = () => {
           current_latitude: coords?.lat ?? null,
           current_longitude: coords?.lng ?? null,
           search_radius_miles: radius,
+          gender,
+          orientation: orientation || null,
+          preferred_genders: preferredGenders,
+          preferred_age_min: Math.max(MIN_AGE, ageMin),
+          preferred_age_max: Math.min(120, ageMax),
         },
         { onConflict: "user_id" },
       )
@@ -224,6 +265,109 @@ const ProfileSetup = () => {
             />
             <p className="text-[11px] text-muted-foreground">{bio.length}/500</p>
           </div>
+
+          <div className="space-y-2">
+            <Label>
+              You{" "}
+              {age !== null && (
+                <span className="text-muted-foreground">
+                  · {age} {age < MIN_AGE ? "(must be 18+)" : "years old"}
+                </span>
+              )}
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {GENDER_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setGender(option)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    gender === option
+                      ? "gradient-aura text-primary-foreground border-transparent"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {ORIENTATION_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setOrientation(orientation === option ? "" : option)}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                    orientation === option
+                      ? "bg-primary/15 text-primary border-primary/40"
+                      : "border-border text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Your age is shown to others — your exact birth date never is.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Show me</Label>
+            <div className="flex flex-wrap gap-2">
+              {GENDER_OPTIONS.map((option) => {
+                const active = preferredGenders.includes(option);
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() =>
+                      setPreferredGenders((prev) =>
+                        prev.includes(option) ? prev.filter((g) => g !== option) : [...prev, option],
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                      active
+                        ? "gradient-aura text-primary-foreground border-transparent"
+                        : "border-border text-muted-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="space-y-1">
+                <Label htmlFor="ageMin" className="text-xs text-muted-foreground">
+                  Age from
+                </Label>
+                <Input
+                  id="ageMin"
+                  type="number"
+                  min={MIN_AGE}
+                  max={120}
+                  value={ageMin}
+                  onChange={(e) => setAgeMin(Math.max(MIN_AGE, Math.min(120, Number(e.target.value) || MIN_AGE)))}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="ageMax" className="text-xs text-muted-foreground">
+                  Age to
+                </Label>
+                <Input
+                  id="ageMax"
+                  type="number"
+                  min={MIN_AGE}
+                  max={120}
+                  value={ageMax}
+                  onChange={(e) => setAgeMax(Math.max(MIN_AGE, Math.min(120, Number(e.target.value) || MIN_AGE)))}
+                />
+              </div>
+            </div>
+          </div>
+
+
 
           <div className="space-y-2">
             <Label htmlFor="location">Current location</Label>
