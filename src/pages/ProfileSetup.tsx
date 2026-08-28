@@ -48,6 +48,13 @@ const ProfileSetup = () => {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [radius, setRadius] = useState<number>(DEFAULT_SEARCH_RADIUS_MILES);
   const [locating, setLocating] = useState(false);
+  const [age, setAge] = useState<number | null>(null);
+  const [gender, setGender] = useState<string>("");
+  const [orientation, setOrientation] = useState<string>("");
+  const [preferredGenders, setPreferredGenders] = useState<string[]>([]);
+  const [ageMin, setAgeMin] = useState(18);
+  const [ageMax, setAgeMax] = useState(99);
+
 
   useEffect(() => {
     const load = async () => {
