@@ -11,6 +11,7 @@ import { uploadProfilePhoto, signPhotoPaths } from "@/lib/photos";
 import { useUserState } from "@/hooks/useUserState";
 import { LocationAutocomplete } from "@/components/LocationAutocomplete";
 import { DEFAULT_SEARCH_RADIUS_MILES } from "@/lib/compatibility";
+import { ageFromBirthDate, GENDER_OPTIONS, MIN_AGE, ORIENTATION_OPTIONS } from "@/lib/age";
 import { toast } from "sonner";
 
 
