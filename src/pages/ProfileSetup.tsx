@@ -161,6 +161,27 @@ const ProfileSetup = () => {
       toast.error("Add your name so matches know who you are");
       return;
     }
+    // 18+ gate: derived from the birth date collected during Human Design onboarding.
+    if (age === null || age < MIN_AGE) {
+      toast.error(`You must be ${MIN_AGE} or older to create a dating profile`);
+      return;
+    }
+    if (photos.length === 0) {
+      toast.error("Add at least one photo so you can be discovered");
+      return;
+    }
+    if (!gender) {
+      toast.error("Select your gender");
+      return;
+    }
+    if (preferredGenders.length === 0) {
+      toast.error("Pick who you'd like to see");
+      return;
+    }
+    if (ageMin > ageMax) {
+      toast.error("Your age range is inverted");
+      return;
+    }
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
@@ -176,6 +197,11 @@ const ProfileSetup = () => {
           current_latitude: coords?.lat ?? null,
           current_longitude: coords?.lng ?? null,
           search_radius_miles: radius,
+          gender,
+          orientation: orientation || null,
+          preferred_genders: preferredGenders,
+          preferred_age_min: Math.max(MIN_AGE, ageMin),
+          preferred_age_max: Math.min(120, ageMax),
         },
         { onConflict: "user_id" },
       )
