@@ -68,7 +68,7 @@ const ProfileSetup = () => {
       const { data: profile } = await supabase
         .from("profiles")
         .select(
-          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles",
+          "display_name, bio, photos, vibe_traits, current_location, current_latitude, current_longitude, search_radius_miles, birth_date, gender, orientation, preferred_genders, preferred_age_min, preferred_age_max",
         )
         .eq("user_id", session.user.id)
         .maybeSingle();
@@ -87,6 +87,13 @@ const ProfileSetup = () => {
           setCoords({ lat: profile.current_latitude, lng: profile.current_longitude });
         }
         setRadius(profile.search_radius_miles ?? DEFAULT_SEARCH_RADIUS_MILES);
+        // Age is derived from the Human Design birth date — never stored separately.
+        setAge(ageFromBirthDate(profile.birth_date));
+        setGender(profile.gender || "");
+        setOrientation(profile.orientation || "");
+        setPreferredGenders(profile.preferred_genders || []);
+        setAgeMin(profile.preferred_age_min ?? 18);
+        setAgeMax(profile.preferred_age_max ?? 99);
       }
       setLoading(false);
     };
