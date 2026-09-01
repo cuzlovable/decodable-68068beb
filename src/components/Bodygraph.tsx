@@ -196,15 +196,11 @@ function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
 
 function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean }) {
   const { shape } = CENTER_SHAPES[center];
-  const { fill, stroke } = CENTER_COLORS[center];
+  const fill = isDefined ? DEFINED_CENTER_FILL[center] : "#FFFFFF";
+  const stroke = isDefined ? DEFINED_CENTER_STROKE[center] : OPEN_GRAY;
   return (
     <g>
-      {shapeEl(
-        shape,
-        isDefined ? fill : "hsl(var(--card))",
-        isDefined ? stroke : OPEN_GRAY,
-        !isDefined,
-      )}
+      {shapeEl(shape, fill, stroke, !isDefined)}
     </g>
   );
 }
