@@ -5,24 +5,42 @@ import silhouette from "@/assets/bodygraph-silhouette.png.asset.json";
 
 
 // ─── Bodygraph ──────────────────────────────────────────────────
-// Brand-tinted: red with a gentle gray hue; black softened to charcoal with gray hue.
-const DESIGN_C  = "hsl(2 48% 50%)";     // red, hint of gray (Design)
-const PERSON_C  = "hsl(220 10% 24%)";   // charcoal, hint of gray (Personality)
-const OPEN_GRAY = "hsl(220 12% 72%)";
-const TUBE_OFF  = "hsl(30 25% 95%)";    // soft cream tube band (matches reference)
-const TUBE_EDGE = "hsl(25 18% 78%)";    // tube outline
+// AuraChem bodygraph color tokens (provided design system).
+const DESIGN_C          = "#E11D48"; // channel / Design (Body)
+const PERSON_C          = "#0F172A"; // channel / Personality (Mind)
+const TRANSIT_C         = "#0284C7"; // future transit channels
+const OPEN_GRAY         = "#94A3B8"; // undefined center stroke / inactive gates
+const TUBE_OFF          = "#FFFFFF"; // channel base
+const TUBE_EDGE         = "#94A3B8"; // channel border
+const CANVAS_BG         = "#F7F0E5"; // bodygraph canvas background
+const PANEL_FILL        = "#FFFFFF"; // planet-list panel fill
+const PANEL_STROKE      = "#CBD5E1"; // planet-list panel stroke
+const PANEL_SYMBOL      = "#475569"; // planet glyph color
+const ACTIVE_GATE_BADGE = "#2563EB"; // generic active-gate badge accent
 
-// Branded muted pastels with a grayish hue.
-const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string }> = {
-  head:    { fill: "hsl(40 38% 80%)",  stroke: "hsl(35 28% 55%)"  },
-  ajna:    { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  throat:  { fill: "hsl(28 25% 72%)",  stroke: "hsl(28 22% 48%)"  },
-  g:       { fill: "hsl(35 45% 80%)",  stroke: "hsl(30 35% 55%)"  },
-  heart:   { fill: "hsl(8 45% 72%)",   stroke: "hsl(8 45% 50%)"   },
-  splenic: { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  solar:   { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  sacral:  { fill: "hsl(15 50% 76%)",  stroke: "hsl(15 45% 52%)"  },
-  root:    { fill: "hsl(18 32% 68%)",  stroke: "hsl(18 30% 45%)"  },
+const DEFINED_CENTER_FILL: Record<CenterId, string> = {
+  head:    "#FACC15",
+  ajna:    "#4ADE80",
+  throat:  "#A16207",
+  g:       "#FACC15",
+  heart:   "#FB7185",
+  splenic: "#A16207",
+  solar:   "#A16207",
+  sacral:  "#FB7185",
+  root:    "#A16207",
+};
+
+// Defined-center strokes are a slightly darker shade of each fill so shapes read cleanly.
+const DEFINED_CENTER_STROKE: Record<CenterId, string> = {
+  head:    "#CA8A04",
+  ajna:    "#16A34A",
+  throat:  "#713F12",
+  g:       "#CA8A04",
+  heart:   "#E11D48",
+  splenic: "#713F12",
+  solar:   "#713F12",
+  sacral:  "#E11D48",
+  root:    "#713F12",
 };
 
 type Shape =
@@ -178,15 +196,11 @@ function shapeEl(shape: Shape, fill: string, stroke: string, dashed: boolean) {
 
 function CenterEl({ center, isDefined }: { center: CenterId; isDefined: boolean }) {
   const { shape } = CENTER_SHAPES[center];
-  const { fill, stroke } = CENTER_COLORS[center];
+  const fill = isDefined ? DEFINED_CENTER_FILL[center] : "#FFFFFF";
+  const stroke = isDefined ? DEFINED_CENTER_STROKE[center] : OPEN_GRAY;
   return (
     <g>
-      {shapeEl(
-        shape,
-        isDefined ? fill : "hsl(var(--card))",
-        isDefined ? stroke : OPEN_GRAY,
-        !isDefined,
-      )}
+      {shapeEl(shape, fill, stroke, !isDefined)}
     </g>
   );
 }
@@ -203,13 +217,18 @@ function GateEl({
   const isActive = activeGates.has(gate);
   const inDesign = designSet.has(gate);
   const inPersonality = personalitySet.has(gate);
-  const fill = !isActive
-    ? "hsl(var(--card))"
-    : inDesign && inPersonality
-      ? "url(#gateSplit)"
-      : inDesign ? DESIGN_C : PERSON_C;
-  const stroke = isActive ? fill : "hsl(220 15% 62%)";
-  const textFill = isActive ? "hsl(var(--primary-foreground))" : "hsl(220 15% 35%)";
+  const hasSideInfo = designSet.size > 0 || personalitySet.size > 0;
+
+  let fill: string;
+  if (!isActive) fill = "#FFFFFF";
+  else if (inDesign && inPersonality) fill = "url(#gateSplit)";
+  else if (inDesign) fill = DESIGN_C;
+  else if (inPersonality) fill = PERSON_C;
+  else if (!hasSideInfo) fill = ACTIVE_GATE_BADGE; // generic active badge when no side data
+  else fill = PERSON_C;
+
+  const stroke = isActive ? (fill === "url(#gateSplit)" ? OPEN_GRAY : fill) : OPEN_GRAY;
+  const textFill = isActive ? "#FFFFFF" : "#475569";
   return (
     <g>
       <circle cx={point[0]} cy={point[1]} r={7.5} fill={fill} stroke={stroke} strokeWidth={1.2} />
@@ -337,11 +356,15 @@ function PlanetCol({
   side: "design" | "personality";
   items: Array<{ gate: number; line: number; planet?: string } | null>;
 }) {
-  const color = side === "personality" ? PERSON_C : DESIGN_C;
+  const textColor = side === "personality" ? PANEL_SYMBOL : PANEL_SYMBOL;
+  const valueColor = side === "personality" ? PERSON_C : DESIGN_C;
   const align = side === "personality" ? "items-end text-right" : "items-start text-left";
   return (
-    <div className={`flex flex-col gap-1 ${align} text-[11px]`} style={{ color }}>
-      <div className="font-bold uppercase tracking-wider text-[10px] mb-1">
+    <div
+      className={`flex flex-col gap-1 ${align} text-[11px] rounded-xl px-2.5 py-3`}
+      style={{ background: PANEL_FILL, border: `1px solid ${PANEL_STROKE}`, color: textColor }}
+    >
+      <div className="font-bold uppercase tracking-wider text-[10px] mb-1" style={{ color: valueColor }}>
         {side === "personality" ? "Personality" : "Design"}
       </div>
       {PLANETS.map((p, i) => {
@@ -350,13 +373,13 @@ function PlanetCol({
           <div key={p.name} className="flex items-center gap-1.5 leading-tight">
             {side === "personality" ? (
               <>
-                <span className="tabular-nums">{v ? `${v.gate}.${v.line}` : "—"}</span>
-                <span className="w-4 text-center">{p.glyph}</span>
+                <span className="tabular-nums" style={{ color: valueColor }}>{v ? `${v.gate}.${v.line}` : "—"}</span>
+                <span className="w-4 text-center" style={{ color: PANEL_SYMBOL }}>{p.glyph}</span>
               </>
             ) : (
               <>
-                <span className="w-4 text-center">{p.glyph}</span>
-                <span className="tabular-nums">{v ? `${v.gate}.${v.line}` : "—"}</span>
+                <span className="w-4 text-center" style={{ color: PANEL_SYMBOL }}>{p.glyph}</span>
+                <span className="tabular-nums" style={{ color: valueColor }}>{v ? `${v.gate}.${v.line}` : "—"}</span>
               </>
             )}
           </div>
@@ -430,7 +453,7 @@ const Bodygraph = ({
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
         <div className="flex-1 max-w-[400px]">
-          <svg viewBox="0 0 600 900" className="w-full block" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 600 900" className="w-full block rounded-2xl" xmlns="http://www.w3.org/2000/svg" style={{ background: CANVAS_BG }}>
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={DESIGN_C} />
