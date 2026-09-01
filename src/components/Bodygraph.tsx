@@ -453,7 +453,7 @@ const Bodygraph = ({
       <div className="flex items-start justify-center gap-2">
         <PlanetCol side="design" items={designSorted} />
         <div className="flex-1 max-w-[400px]">
-          <svg viewBox="0 0 600 900" className="w-full block" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 600 900" className="w-full block rounded-2xl" xmlns="http://www.w3.org/2000/svg" style={{ background: CANVAS_BG }}>
             <defs>
               <linearGradient id="gateSplit" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={DESIGN_C} />
