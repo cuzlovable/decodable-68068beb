@@ -356,11 +356,15 @@ function PlanetCol({
   side: "design" | "personality";
   items: Array<{ gate: number; line: number; planet?: string } | null>;
 }) {
-  const color = side === "personality" ? PERSON_C : DESIGN_C;
+  const textColor = side === "personality" ? PANEL_SYMBOL : PANEL_SYMBOL;
+  const valueColor = side === "personality" ? PERSON_C : DESIGN_C;
   const align = side === "personality" ? "items-end text-right" : "items-start text-left";
   return (
-    <div className={`flex flex-col gap-1 ${align} text-[11px]`} style={{ color }}>
-      <div className="font-bold uppercase tracking-wider text-[10px] mb-1">
+    <div
+      className={`flex flex-col gap-1 ${align} text-[11px] rounded-xl px-2.5 py-3`}
+      style={{ background: PANEL_FILL, border: `1px solid ${PANEL_STROKE}`, color: textColor }}
+    >
+      <div className="font-bold uppercase tracking-wider text-[10px] mb-1" style={{ color: valueColor }}>
         {side === "personality" ? "Personality" : "Design"}
       </div>
       {PLANETS.map((p, i) => {
@@ -369,13 +373,13 @@ function PlanetCol({
           <div key={p.name} className="flex items-center gap-1.5 leading-tight">
             {side === "personality" ? (
               <>
-                <span className="tabular-nums">{v ? `${v.gate}.${v.line}` : "—"}</span>
-                <span className="w-4 text-center">{p.glyph}</span>
+                <span className="tabular-nums" style={{ color: valueColor }}>{v ? `${v.gate}.${v.line}` : "—"}</span>
+                <span className="w-4 text-center" style={{ color: PANEL_SYMBOL }}>{p.glyph}</span>
               </>
             ) : (
               <>
-                <span className="w-4 text-center">{p.glyph}</span>
-                <span className="tabular-nums">{v ? `${v.gate}.${v.line}` : "—"}</span>
+                <span className="w-4 text-center" style={{ color: PANEL_SYMBOL }}>{p.glyph}</span>
+                <span className="tabular-nums" style={{ color: valueColor }}>{v ? `${v.gate}.${v.line}` : "—"}</span>
               </>
             )}
           </div>
