@@ -217,13 +217,18 @@ function GateEl({
   const isActive = activeGates.has(gate);
   const inDesign = designSet.has(gate);
   const inPersonality = personalitySet.has(gate);
-  const fill = !isActive
-    ? "hsl(var(--card))"
-    : inDesign && inPersonality
-      ? "url(#gateSplit)"
-      : inDesign ? DESIGN_C : PERSON_C;
-  const stroke = isActive ? fill : "hsl(220 15% 62%)";
-  const textFill = isActive ? "hsl(var(--primary-foreground))" : "hsl(220 15% 35%)";
+  const hasSideInfo = designSet.size > 0 || personalitySet.size > 0;
+
+  let fill: string;
+  if (!isActive) fill = "#FFFFFF";
+  else if (inDesign && inPersonality) fill = "url(#gateSplit)";
+  else if (inDesign) fill = DESIGN_C;
+  else if (inPersonality) fill = PERSON_C;
+  else if (!hasSideInfo) fill = ACTIVE_GATE_BADGE; // generic active badge when no side data
+  else fill = PERSON_C;
+
+  const stroke = isActive ? (fill === "url(#gateSplit)" ? OPEN_GRAY : fill) : OPEN_GRAY;
+  const textFill = isActive ? "#FFFFFF" : "#475569";
   return (
     <g>
       <circle cx={point[0]} cy={point[1]} r={7.5} fill={fill} stroke={stroke} strokeWidth={1.2} />
