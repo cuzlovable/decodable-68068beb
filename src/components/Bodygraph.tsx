@@ -5,24 +5,42 @@ import silhouette from "@/assets/bodygraph-silhouette.png.asset.json";
 
 
 // ─── Bodygraph ──────────────────────────────────────────────────
-// Brand-tinted: red with a gentle gray hue; black softened to charcoal with gray hue.
-const DESIGN_C  = "hsl(2 48% 50%)";     // red, hint of gray (Design)
-const PERSON_C  = "hsl(220 10% 24%)";   // charcoal, hint of gray (Personality)
-const OPEN_GRAY = "hsl(220 12% 72%)";
-const TUBE_OFF  = "hsl(30 25% 95%)";    // soft cream tube band (matches reference)
-const TUBE_EDGE = "hsl(25 18% 78%)";    // tube outline
+// AuraChem bodygraph color tokens (provided design system).
+const DESIGN_C          = "#E11D48"; // channel / Design (Body)
+const PERSON_C          = "#0F172A"; // channel / Personality (Mind)
+const TRANSIT_C         = "#0284C7"; // future transit channels
+const OPEN_GRAY         = "#94A3B8"; // undefined center stroke / inactive gates
+const TUBE_OFF          = "#FFFFFF"; // channel base
+const TUBE_EDGE         = "#94A3B8"; // channel border
+const CANVAS_BG         = "#F7F0E5"; // bodygraph canvas background
+const PANEL_FILL        = "#FFFFFF"; // planet-list panel fill
+const PANEL_STROKE      = "#CBD5E1"; // planet-list panel stroke
+const PANEL_SYMBOL      = "#475569"; // planet glyph color
+const ACTIVE_GATE_BADGE = "#2563EB"; // generic active-gate badge accent
 
-// Branded muted pastels with a grayish hue.
-const CENTER_COLORS: Record<CenterId, { fill: string; stroke: string }> = {
-  head:    { fill: "hsl(40 38% 80%)",  stroke: "hsl(35 28% 55%)"  },
-  ajna:    { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  throat:  { fill: "hsl(28 25% 72%)",  stroke: "hsl(28 22% 48%)"  },
-  g:       { fill: "hsl(35 45% 80%)",  stroke: "hsl(30 35% 55%)"  },
-  heart:   { fill: "hsl(8 45% 72%)",   stroke: "hsl(8 45% 50%)"   },
-  splenic: { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  solar:   { fill: "hsl(155 22% 76%)", stroke: "hsl(155 22% 50%)" },
-  sacral:  { fill: "hsl(15 50% 76%)",  stroke: "hsl(15 45% 52%)"  },
-  root:    { fill: "hsl(18 32% 68%)",  stroke: "hsl(18 30% 45%)"  },
+const DEFINED_CENTER_FILL: Record<CenterId, string> = {
+  head:    "#FACC15",
+  ajna:    "#4ADE80",
+  throat:  "#A16207",
+  g:       "#FACC15",
+  heart:   "#FB7185",
+  splenic: "#A16207",
+  solar:   "#A16207",
+  sacral:  "#FB7185",
+  root:    "#A16207",
+};
+
+// Defined-center strokes are a slightly darker shade of each fill so shapes read cleanly.
+const DEFINED_CENTER_STROKE: Record<CenterId, string> = {
+  head:    "#CA8A04",
+  ajna:    "#16A34A",
+  throat:  "#713F12",
+  g:       "#CA8A04",
+  heart:   "#E11D48",
+  splenic: "#713F12",
+  solar:   "#713F12",
+  sacral:  "#E11D48",
+  root:    "#713F12",
 };
 
 type Shape =
