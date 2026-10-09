@@ -20,8 +20,9 @@ const Index = () => {
       />
 
       {/* Semi-transparent overlay for text readability */}
-      <div className="absolute inset-0 z-[1] bg-background/55 pointer-events-none" />
-      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/60 via-background/30 to-background/80 pointer-events-none" />
+      <div className="absolute inset-0 z-[1] bg-background/35 pointer-events-none" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/50 via-background/20 to-background/70 pointer-events-none" />
+
 
 
       {/* Content overlay */}
