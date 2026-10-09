@@ -1,20 +1,28 @@
-import { Suspense } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail } from "lucide-react";
-import AuraScene from "@/components/AuraScene";
+import galaxyBg from "@/assets/galaxy-bg.mp4.asset.json";
 
 const Index = () => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-background">
-      {/* 3D Background */}
-      <Suspense fallback={<div className="absolute inset-0 gradient-celestial" />}>
-        <AuraScene />
-      </Suspense>
+      {/* Full-screen looping video background */}
+      <video
+        className="absolute inset-0 z-0 h-full w-full object-cover"
+        src={galaxyBg.url}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+      />
 
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/40 via-background/20 to-background/70 pointer-events-none" />
+      {/* Semi-transparent overlay for text readability */}
+      <div className="absolute inset-0 z-[1] bg-background/55 pointer-events-none" />
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-background/60 via-background/30 to-background/80 pointer-events-none" />
+
 
       {/* Content overlay */}
       <div className="relative z-10 min-h-screen flex flex-col">
