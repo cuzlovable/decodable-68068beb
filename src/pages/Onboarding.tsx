@@ -109,7 +109,7 @@ const Onboarding = () => {
           variables: chart.variables,
           chart_raw: chart.raw,
           onboarding_completed: true,
-        });
+        }, { onConflict: "user_id" });
 
       if (error) throw error;
 
