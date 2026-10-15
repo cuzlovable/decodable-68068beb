@@ -53,6 +53,9 @@
     --gradient-aura: linear-gradient(135deg, hsl(24 90% 65%), hsl(215 60% 72%));
     --gradient-celestial: linear-gradient(180deg, hsl(30 50% 98%), hsl(215 40% 95%));
     --shadow-aura: 0 8px 32px -8px hsl(24 90% 65% / 0.25);
+    --cosmic-background: 240 25% 4%;
+    --cosmic-foreground: 30 40% 96%;
+    --cosmic-text-shadow: 0 2px 18px hsl(240 25% 4% / 0.9), 0 1px 4px hsl(240 25% 4%);
   }
 
   .dark {
@@ -124,6 +127,27 @@
 }
 
 @layer utilities {
+  .cosmic-opening {
+    background: hsl(var(--cosmic-background));
+    color: hsl(var(--cosmic-foreground));
+  }
+  .cosmic-copy {
+    text-shadow: var(--cosmic-text-shadow);
+  }
+  .cosmic-motion-control,
+  .cosmic-entry {
+    color: hsl(var(--cosmic-foreground));
+    background: transparent;
+  }
+  .cosmic-motion-control:hover,
+  .cosmic-entry:hover {
+    color: hsl(var(--cosmic-foreground));
+    background: hsl(var(--cosmic-foreground) / 0.08);
+  }
+  .cosmic-entry {
+    border-bottom: 1px solid hsl(var(--cosmic-foreground) / 0.5);
+    text-shadow: var(--cosmic-text-shadow);
+  }
   .gradient-aura {
     background: var(--gradient-aura);
   }
