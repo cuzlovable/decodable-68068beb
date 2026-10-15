@@ -85,10 +85,12 @@ const Onboarding = () => {
         throw new Error(chart.error);
       }
 
-      // Save birth data + calculated chart to profile
+      // Save birth data + calculated chart to profile.
+      // Upsert (not update) so a missing profile row can't silently drop the chart.
       const { error } = await supabase
         .from("profiles")
-        .update({
+        .upsert({
+          user_id: session.user.id,
           birth_date: form.birth_date,
           birth_time: form.birth_time,
           birth_location: form.birth_location,
@@ -107,8 +109,7 @@ const Onboarding = () => {
           variables: chart.variables,
           chart_raw: chart.raw,
           onboarding_completed: true,
-        })
-        .eq("user_id", session.user.id);
+        });
 
       if (error) throw error;
 
