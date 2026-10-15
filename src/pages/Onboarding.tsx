@@ -90,6 +90,7 @@ const Onboarding = () => {
       const { error } = await supabase
         .from("profiles")
         .upsert({
+          user_id: session.user.id,
           birth_date: form.birth_date,
           birth_time: form.birth_time,
           birth_location: form.birth_location,
